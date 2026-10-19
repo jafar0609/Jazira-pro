@@ -132,16 +132,19 @@
             </div>
         </div>
 
-        <!-- 3. KURYER (KUNDALIK QOPLANMA VA ALOHIDA PUL BERISH BO'LIMI) -->
+        <!-- 3. KURYER (IKKITA ALOHIDA QISM: QOPLANMA VA PUL BERISH) -->
         <div id="view-bots" class="tab-content space-y-3">
             <div id="bots-finance-cards" class="grid grid-cols-2 gap-2" style="display: none;">
                 <div class="bg-white p-3 rounded-2xl shadow-sm border-t-4 border-emerald-500 space-y-1 text-xs"><h3 class="font-extrabold">Jazira</h3><div>Ulush: <b id="jbot-share" class="text-emerald-600">+0</b></div><div>Qoplanma: <b id="jbot-subsidy" class="text-rose-600">-0</b></div><div class="pt-1 border-t font-bold">Sof: <span id="jbot-net" class="text-emerald-600">0</span></div></div>
                 <div class="bg-white p-3 rounded-2xl shadow-sm border-t-4 border-purple-600 space-y-1 text-xs"><h3 class="font-extrabold">Chopachop</h3><div>Ulush: <b id="cbot-share" class="text-purple-600">+0</b></div><div>Qoplanma: <b id="cbot-subsidy" class="text-rose-600">-0</b></div><div class="pt-1 border-t font-bold">Sof: <span id="cbot-net" class="text-purple-600">0</span></div></div>
             </div>
 
-            <!-- A) Kundalik qoplanma yozish -->
+            <!-- 1-QISM: Kundalik qoplanma yozish -->
             <div class="bg-white p-3.5 rounded-2xl shadow-sm border space-y-2">
-                <h2 class="text-xs font-extrabold text-blue-900">1. Kuryerga Kundalik Qoplanma Yozish</h2>
+                <div class="flex items-center gap-2 border-b pb-2">
+                    <div class="w-6 h-6 rounded-lg bg-blue-600 text-white flex items-center justify-center font-bold text-xs">1</div>
+                    <h2 class="text-xs font-extrabold text-slate-900">Kuryerga Kundalik Qoplanma Yozish</h2>
+                </div>
                 <form onsubmit="addBotCost(event)" class="space-y-2 bg-blue-50/40 p-3 rounded-xl border border-blue-200">
                     <div class="grid grid-cols-3 gap-1"><input type="date" id="bc-date" required class="px-1 py-1 text-xs border rounded"><select id="bc-source" class="px-1 py-1 text-xs border rounded"></select><select id="bc-courier" class="px-1 py-1 text-xs border rounded"></select></div>
                     <div class="grid grid-cols-2 gap-1"><input type="number" step="any" id="bc-amount" placeholder="Qoplanma summasi" required class="px-2 py-1 text-xs border rounded"><input type="text" id="bc-desc" placeholder="Izoh..." required class="px-2 py-1 text-xs border rounded"></div>
@@ -153,13 +156,16 @@
                 </form>
             </div>
 
-            <!-- B) Kuryerga pul berish (Alohida bo'lim) -->
+            <!-- 2-QISM: Kuryerga pul berish (Alohida bo'lim) -->
             <div class="bg-white p-3.5 rounded-2xl shadow-sm border space-y-2">
-                <h2 class="text-xs font-extrabold text-emerald-800">2. Kuryerga Pul Berish (Haftalik / 5 kunda)</h2>
+                <div class="flex items-center gap-2 border-b pb-2">
+                    <div class="w-6 h-6 rounded-lg bg-emerald-600 text-white flex items-center justify-center font-bold text-xs">2</div>
+                    <h2 class="text-xs font-extrabold text-slate-900">Kuryerga Pul Berish (Haftalik / 5 kunda)</h2>
+                </div>
                 <form onsubmit="addCourierPayout(event)" class="space-y-2 bg-emerald-50/40 p-3 rounded-xl border border-emerald-200">
                     <div class="grid grid-cols-2 gap-1"><select id="cp-courier" class="px-2 py-1 text-xs border rounded"></select><input type="date" id="cp-date" required class="px-2 py-1 text-xs border rounded"></div>
                     <div class="grid grid-cols-2 gap-1"><input type="number" step="any" id="cp-amount" placeholder="Berilgan pul summasi" required class="px-2 py-1 text-xs border rounded"><select id="cp-paytype" class="px-2 py-1 text-xs border rounded bg-white font-bold text-emerald-700"><option value="Naqd (Sarpul kassa)">🍗 Sarpul kassa (Naqd)</option><option value="Naqd (Vaynkamat kassa)">🍔 Vaynkamat kassa (Naqd)</option><option value="Karta orqali">💳 Karta orqali</option></select></div>
-                    <input type="text" id="cp-desc" placeholder="Izoh (masalan: 5 kunlik hisob-kitob)..." required class="w-full px-2 py-1 text-xs border rounded">
+                    <input type="text" id="cp-desc" placeholder="Izoh (masalan: 5 kunlik hisob)..." required class="w-full px-2 py-1 text-xs border rounded">
                     <button type="submit" class="w-full py-2 bg-emerald-600 text-white font-bold text-xs rounded-xl">Kuryerga Pul Berishni Saqlash</button>
                 </form>
             </div>
