@@ -341,7 +341,7 @@
     <script>
         const HOURLY_RATE = 2500000 / 360;
         let currentRole = 'fayoza';
-        let staffList = JSON.parse(localStorage.getItem('jc_v26_staff')) || [
+        let staffList = JSON.parse(localStorage.getItem('jc_v28_staff')) || [
             { id: 1, name: "Oʻzim (Rahbar)", role: "rahbar", salary: 0 },
             { id: 2, name: "Xushnud", role: "razdacha", salary: 2500000 },
             { id: 3, name: "Murod", role: "razdacha", salary: 2500000 },
@@ -357,17 +357,17 @@
             { id: 13, name: "Abbos", role: "kuryer", salary: 700000 },
             { id: 14, name: "Umid", role: "kuryer", salary: 700000 }
         ];
-        let partners = JSON.parse(localStorage.getItem('jc_v26_partners')) || [{ id: 1, name: "Kafe 1", percent: 10 }];
-        let branchSales = JSON.parse(localStorage.getItem('jc_v26_sales')) || [];
-        let botCosts = JSON.parse(localStorage.getItem('jc_v26_botcosts')) || [];
-        let attendance = JSON.parse(localStorage.getItem('jc_v26_att')) || [];
-        let expenses = JSON.parse(localStorage.getItem('jc_v26_exp')) || [];
-        let atkazs = JSON.parse(localStorage.getItem('jc_v26_atkazs')) || [];
-        let tasks = JSON.parse(localStorage.getItem('jc_v26_tasks')) || [];
-        let financeItems = JSON.parse(localStorage.getItem('jc_v26_fin')) || [];
-        let calcMode = localStorage.getItem('jc_v26_calcmode') || 'dastavka';
+        let partners = JSON.parse(localStorage.getItem('jc_v28_partners')) || [{ id: 1, name: "Kafe 1", percent: 10 }];
+        let branchSales = JSON.parse(localStorage.getItem('jc_v28_sales')) || [];
+        let botCosts = JSON.parse(localStorage.getItem('jc_v28_botcosts')) || [];
+        let attendance = JSON.parse(localStorage.getItem('jc_v28_att')) || [];
+        let expenses = JSON.parse(localStorage.getItem('jc_v28_exp')) || [];
+        let atkazs = JSON.parse(localStorage.getItem('jc_v28_atkazs')) || [];
+        let tasks = JSON.parse(localStorage.getItem('jc_v28_tasks')) || [];
+        let financeItems = JSON.parse(localStorage.getItem('jc_v28_fin')) || [];
+        let calcMode = localStorage.getItem('jc_v28_calcmode') || 'dastavka';
 
-        let globalSelectedDate = localStorage.getItem('jc_v26_gdate') || new Date().toISOString().split('T')[0];
+        let globalSelectedDate = localStorage.getItem('jc_v28_gdate') || new Date().toISOString().split('T')[0];
 
         const todayStr = new Date().toISOString().split('T')[0];
         ['sale-date', 'att-date', 'fin-date', 'bc-date', 'cp-date', 'exp-date', 'atkaz-date'].forEach(id => {
@@ -384,7 +384,7 @@
         function onGlobalDateChange(val) {
             if (!val) return;
             globalSelectedDate = val;
-            localStorage.setItem('jc_v26_gdate', globalSelectedDate);
+            localStorage.setItem('jc_v28_gdate', globalSelectedDate);
             applyGlobalDateToForms();
         }
 
@@ -400,16 +400,16 @@
         initGlobalDate();
 
         function saveAll() {
-            localStorage.setItem('jc_v26_staff', JSON.stringify(staffList));
-            localStorage.setItem('jc_v26_partners', JSON.stringify(partners));
-            localStorage.setItem('jc_v26_sales', JSON.stringify(branchSales));
-            localStorage.setItem('jc_v26_botcosts', JSON.stringify(botCosts));
-            localStorage.setItem('jc_v26_att', JSON.stringify(attendance));
-            localStorage.setItem('jc_v26_exp', JSON.stringify(expenses));
-            localStorage.setItem('jc_v26_atkazs', JSON.stringify(atkazs));
-            localStorage.setItem('jc_v26_tasks', JSON.stringify(tasks));
-            localStorage.setItem('jc_v26_fin', JSON.stringify(financeItems));
-            localStorage.setItem('jc_v26_calcmode', calcMode);
+            localStorage.setItem('jc_v28_staff', JSON.stringify(staffList));
+            localStorage.setItem('jc_v28_partners', JSON.stringify(partners));
+            localStorage.setItem('jc_v28_sales', JSON.stringify(branchSales));
+            localStorage.setItem('jc_v28_botcosts', JSON.stringify(botCosts));
+            localStorage.setItem('jc_v28_att', JSON.stringify(attendance));
+            localStorage.setItem('jc_v28_exp', JSON.stringify(expenses));
+            localStorage.setItem('jc_v28_atkazs', JSON.stringify(atkazs));
+            localStorage.setItem('jc_v28_tasks', JSON.stringify(tasks));
+            localStorage.setItem('jc_v28_fin', JSON.stringify(financeItems));
+            localStorage.setItem('jc_v28_calcmode', calcMode);
         }
 
         function exportData() {
@@ -449,8 +449,14 @@
             return Math.round(n);
         }
 
-        function formatUZS(num) { return Math.round(num).toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ") + " soʻm"; }
-        function formatShort(num) { let k = Math.round(num / 1000); return k.toString().replace(/\B(?=(\d{3})+(?!\d))/g, "."); }
+        function formatUZS(num) {
+            let n = Math.round(Number(num) || 0);
+            return n.toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ") + " soʻm";
+        }
+        function formatShort(num) { 
+            let k = Math.round((Number(num) || 0) / 1000); 
+            return k.toString().replace(/\B(?=(\d{3})+(?!\d))/g, "."); 
+        }
         function formatDateDot(iso) { if (!iso) return ""; const p = iso.split('-'); return p.length === 3 ? `${p[2]}.${p[1]}.${p[0]}` : iso; }
 
         function changeCalcMode() {
@@ -466,7 +472,6 @@
             } else {
                 currentRole = 'fayoza';
                 applyRoleUI();
-                renderAll();
             }
         }
 
@@ -476,7 +481,6 @@
                 currentRole = 'admin';
                 closePinModal();
                 applyRoleUI();
-                renderAll();
             } else { alert("❌ PIN-kod noto'g'ri!"); }
         }
 
@@ -508,7 +512,7 @@
                 if (taskAddForm) taskAddForm.style.display = 'none';
                 if (taskPanelTitle) taskPanelTitle.innerText = "Rahbar tomonidan sizga qoʻyilgan rejalar";
             }
-            renderAll();
+            renderAll(false);
         }
 
         function switchTab(tab) {
@@ -991,12 +995,8 @@
 
             const sTable = document.getElementById('staff-salary-table'); sTable.innerHTML = '';
             const wFood = {}, wAv = {}; expenses.forEach(x => { if(x.kind==='food') wFood[x.target]=(wFood[x.target]||0)+x.amount; else if(x.kind==='avans') wAv[x.target]=(wAv[x.target]||0)+x.amount; });
-            staffList.forEach(s => {
+            staffList.filter(s => s.role !== 'rahbar').forEach(s => {
                 let rem = s.salary - (wFood[s.name]||0) - (wAv[s.name]||0);
-                if (s.name === "Oʻzim (Rahbar)") {
-                    const myAtkaz = atkazs.filter(a => a.worker === "Oʻzim (Rahbar)").reduce((acc, a) => acc + a.amount, 0);
-                    rem -= myAtkaz;
-                }
                 sTable.innerHTML += `<div onclick="showWorkerHistory('${s.name}')" class="py-2 flex justify-between items-center cursor-pointer hover:bg-slate-50 px-2 rounded"><span>${s.name}</span><b class="${rem>=0?'text-emerald-600':'text-rose-600'}">${formatUZS(rem)}</b></div>`;
             });
 
