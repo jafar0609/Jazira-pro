@@ -17,6 +17,7 @@
         }
         .tab-content { display: none !important; }
         .tab-content.active { display: block !important; }
+        .modal-bg { background-color: rgba(15, 23, 42, 0.65); backdrop-filter: blur(4px); }
     </style>
 </head>
 <body class="text-slate-800">
@@ -52,7 +53,7 @@
 
         <!-- 1. SAVDO -->
         <div id="view-home" class="tab-content active space-y-3">
-            <div id="finance-card-wrapper" class="bg-slate-900 text-white p-3.5 rounded-2xl shadow-lg space-y-2">
+            <div id="finance-card-wrapper" class="bg-slate-900 text-white p-3.5 rounded-2xl shadow-lg space-y-2" style="display: none;">
                 <div class="flex items-center justify-between">
                     <span class="text-[11px] font-bold text-blue-300">UMUMIY MOLIYAVIY NATIJA</span>
                     <select id="calc-mode" onchange="changeCalcMode()" class="text-[10px] bg-white/15 text-white rounded px-2 py-0.5">
@@ -121,7 +122,7 @@
         <div id="view-analytics" class="tab-content space-y-3">
             <div class="bg-white p-3.5 rounded-2xl shadow-sm border space-y-3">
                 <h2 class="text-xs font-extrabold text-slate-900">Biznes Holati va Tahlil</h2>
-                <div id="analytics-status-box" class="p-2.5 rounded-xl text-xs font-bold"></div>
+                <div id="analytics-status-box" class="p-2.5 rounded-xl text-xs font-bold" style="display: none;"></div>
                 <div class="grid grid-cols-2 gap-2 text-xs">
                     <div class="bg-blue-50 p-2 rounded-xl"><span class="text-slate-500 text-[9px]">Sarpul & Vaynkamat:</span><b id="ana-jazira-filial" class="text-blue-900 text-xs block">0</b></div>
                     <div class="bg-emerald-50 p-2 rounded-xl"><span class="text-slate-500 text-[9px]">Jazira Bot:</span><b id="ana-jazira-bot" class="text-emerald-900 text-xs block">0</b></div>
@@ -131,9 +132,9 @@
             </div>
         </div>
 
-        <!-- 3. TAHLIL (BOTS) -->
+        <!-- 3. TAHLIL (BOTS / KURYERLAR) -->
         <div id="view-bots" class="tab-content space-y-3">
-            <div class="grid grid-cols-2 gap-2">
+            <div id="bots-finance-cards" class="grid grid-cols-2 gap-2" style="display: none;">
                 <div class="bg-white p-3 rounded-2xl shadow-sm border-t-4 border-emerald-500 space-y-1 text-xs"><h3 class="font-extrabold">Jazira</h3><div>Ulush: <b id="jbot-share" class="text-emerald-600">+0</b></div><div>Qoplanma: <b id="jbot-subsidy" class="text-rose-600">-0</b></div><div class="pt-1 border-t font-bold">Sof: <span id="jbot-net" class="text-emerald-600">0</span></div></div>
                 <div class="bg-white p-3 rounded-2xl shadow-sm border-t-4 border-purple-600 space-y-1 text-xs"><h3 class="font-extrabold">Chopachop</h3><div>Ulush: <b id="cbot-share" class="text-purple-600">+0</b></div><div>Qoplanma: <b id="cbot-subsidy" class="text-rose-600">-0</b></div><div class="pt-1 border-t font-bold">Sof: <span id="cbot-net" class="text-purple-600">0</span></div></div>
             </div>
@@ -142,6 +143,10 @@
                 <form onsubmit="addBotCost(event)" class="space-y-2 bg-slate-50 p-3 rounded-xl border">
                     <div class="grid grid-cols-3 gap-1"><input type="date" id="bc-date" required class="px-1 py-1 text-xs border rounded"><select id="bc-source" class="px-1 py-1 text-xs border rounded"></select><select id="bc-courier" class="px-1 py-1 text-xs border rounded"></select></div>
                     <div class="grid grid-cols-2 gap-1"><input type="number" step="any" id="bc-amount" placeholder="Summa" required class="px-2 py-1 text-xs border rounded"><input type="text" id="bc-desc" placeholder="Izoh" required class="px-2 py-1 text-xs border rounded"></div>
+                    <div>
+                        <label class="block text-[10px] font-bold text-slate-500 mb-1">📸 Chek yoki skrinshot yuklash (ixtiyoriy)</label>
+                        <input type="file" id="bc-image" accept="image/*" class="w-full text-[11px] text-slate-500 file:mr-2 file:py-1.5 file:px-2 file:rounded-lg file:border-0 file:text-[10px] file:font-semibold file:bg-purple-50 file:text-purple-700 border rounded-xl bg-white p-1">
+                    </div>
                     <button type="submit" class="w-full py-2 bg-purple-600 text-white font-bold text-xs rounded-xl">Saqlash</button>
                 </form>
             </div>
@@ -149,7 +154,7 @@
             <div class="bg-white p-3 rounded-2xl shadow-sm border space-y-2"><h3 class="text-[11px] font-bold text-slate-500 uppercase">Tarix</h3><div id="bc-list" class="space-y-1.5 max-h-40 overflow-y-auto"></div></div>
         </div>
 
-        <!-- 4. RAZDACHA (ALOXIDA VAQT BILAN) -->
+        <!-- 4. RAZDACHA (ALOHIDA) -->
         <div id="view-razdacha" class="tab-content space-y-3">
             <div id="razdacha-cards" class="grid grid-cols-1 sm:grid-cols-2 gap-2"></div>
             <div class="bg-white p-3.5 rounded-2xl shadow-sm border space-y-2">
@@ -215,6 +220,14 @@
 
     </main>
 
+    <!-- RASMNI KATTALASHTIRIB KO'RISH MODALI -->
+    <div id="imageModal" class="fixed inset-0 modal-bg z-50 hidden flex items-center justify-center p-3" onclick="closeImageModal()">
+        <div class="bg-white rounded-2xl max-w-lg w-full p-3 shadow-2xl relative" onclick="event.stopPropagation()">
+            <button onclick="closeImageModal()" class="absolute top-2 right-2 w-8 h-8 rounded-lg bg-slate-900 text-white flex items-center justify-center font-bold">✕</button>
+            <img id="modalImageElem" src="" class="w-full max-h-[80vh] object-contain rounded-xl mt-4">
+        </div>
+    </div>
+
     <!-- MODALLAR -->
     <div id="worker-add-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4" style="display: none;">
         <div class="bg-white rounded-2xl p-4 max-w-sm w-full space-y-3 shadow-xl">
@@ -276,7 +289,7 @@
 
     <script>
         const HOURLY_RATE = 2500000 / 360;
-        let currentRole = 'fayoza'; // 'fayoza' yoki 'admin'
+        let currentRole = 'fayoza';
         let staffList = JSON.parse(localStorage.getItem('jc_v23_staff')) || [
             { id: 1, name: "Oʻzim (Rahbar)", role: "rahbar", salary: 0 },
             { id: 2, name: "Xushnud", role: "razdacha", salary: 2500000 },
@@ -420,16 +433,23 @@
             const badge = document.getElementById('role-badge');
             const roleBtn = document.getElementById('role-btn');
             const finCard = document.getElementById('finance-card-wrapper');
+            const statusBox = document.getElementById('analytics-status-box');
+            const botsFinCards = document.getElementById('bots-finance-cards');
+
             if (currentRole === 'admin') {
                 badge.innerText = 'Rahbar';
                 badge.className = 'text-[9px] px-1.5 py-0.2 rounded bg-emerald-500/20 text-emerald-300 font-bold';
                 roleBtn.innerHTML = '<i class="fa-solid fa-unlock"></i> Fayoza';
                 if (finCard) finCard.style.display = 'block';
+                if (statusBox) statusBox.style.display = 'block';
+                if (botsFinCards) botsFinCards.style.display = 'grid';
             } else {
                 badge.innerText = 'Fayoza';
                 badge.className = 'text-[9px] px-1.5 py-0.2 rounded bg-amber-500/20 text-amber-700 font-bold';
                 roleBtn.innerHTML = '<i class="fa-solid fa-lock"></i> Rahbar';
                 if (finCard) finCard.style.display = 'none';
+                if (statusBox) statusBox.style.display = 'none';
+                if (botsFinCards) botsFinCards.style.display = 'none';
             }
         }
 
@@ -581,15 +601,58 @@
 
         function deleteSale(id) { branchSales = branchSales.filter(s => s.id !== id); saveAll(); renderAll(); }
         
+        function compressImage(file, callback) {
+            const reader = new FileReader();
+            reader.onload = function(event) {
+                const img = new Image();
+                img.onload = function() {
+                    const canvas = document.createElement('canvas');
+                    const MAX_WIDTH = 650;
+                    const scaleSize = img.width > MAX_WIDTH ? (MAX_WIDTH / img.width) : 1;
+                    canvas.width = img.width * scaleSize;
+                    canvas.height = img.height * scaleSize;
+                    const ctx = canvas.getContext('2d');
+                    ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+                    callback(canvas.toDataURL('image/jpeg', 0.65));
+                };
+                img.src = event.target.result;
+            };
+            reader.readAsDataURL(file);
+        }
+
         function addBotCost(e) {
             e.preventDefault();
-            const date = document.getElementById('bc-date').value, source = document.getElementById('bc-source').value, courier = document.getElementById('bc-courier').value, amount = normalizeUZS(document.getElementById('bc-amount').value), desc = document.getElementById('bc-desc').value.trim();
-            if (!amount || !desc) return;
-            botCosts.push({ id: Date.now(), date, source, courier, amount, desc });
-            document.getElementById('bc-amount').value = ''; document.getElementById('bc-desc').value = '';
-            saveAll(); renderAll();
+            const date = document.getElementById('bc-date').value;
+            const source = document.getElementById('bc-source').value;
+            const courier = document.getElementById('bc-courier').value;
+            const amount = normalizeUZS(document.getElementById('bc-amount').value);
+            const desc = document.getElementById('bc-desc').value.trim();
+            const fileInput = document.getElementById('bc-image');
+
+            const finalize = (imgBase64) => {
+                botCosts.push({ id: Date.now(), date, source, courier, amount, desc, image: imgBase64 || null });
+                document.getElementById('bc-amount').value = ''; 
+                document.getElementById('bc-desc').value = '';
+                fileInput.value = '';
+                saveAll(); 
+                renderAll();
+            };
+
+            if (fileInput.files && fileInput.files[0]) {
+                compressImage(fileInput.files[0], finalize);
+            } else {
+                finalize(null);
+            }
         }
         function deleteBotCost(id) { botCosts = botCosts.filter(b => b.id !== id); saveAll(); renderAll(); }
+
+        function openImageModal(imgSrc) {
+            document.getElementById('modalImageElem').src = imgSrc;
+            document.getElementById('imageModal').classList.remove('hidden');
+        }
+        function closeImageModal() {
+            document.getElementById('imageModal').classList.add('hidden');
+        }
 
         function addAttendance(e) {
             e.preventDefault();
@@ -684,7 +747,18 @@
             [...botCosts].sort((a,b) => new Date(b.date) - new Date(a.date)).forEach(b => {
                 if (cMap[b.courier] !== undefined) cMap[b.courier] += b.amount;
                 if (b.source.toLowerCase().includes('jazira')) jSub += b.amount; else cSub += b.amount;
-                bcList.innerHTML += `<div class="p-2 bg-slate-50 border rounded-xl flex justify-between text-xs"><span><b>${b.source} (${formatDateDot(b.date)}):</b> ${b.courier} - ${b.desc}</span><span class="text-rose-600 font-bold">-${formatUZS(b.amount)}</span></div>`;
+                bcList.innerHTML += `
+                    <div class="p-2.5 bg-slate-50 border rounded-xl space-y-1.5 text-xs">
+                        <div class="flex justify-between items-center">
+                            <span><b>${b.source} (${formatDateDot(b.date)}):</b> ${b.courier} - ${b.desc}</span>
+                            <div class="flex items-center gap-2">
+                                <span class="text-rose-600 font-bold">-${formatUZS(b.amount)}</span>
+                                <button onclick="deleteBotCost(${b.id})" class="text-rose-500"><i class="fa-solid fa-trash"></i></button>
+                            </div>
+                        </div>
+                        ${b.image ? `<div><img src="${b.image}" onclick="openImageModal('${b.image}')" class="w-full max-h-32 object-contain rounded-lg border bg-white cursor-pointer p-1" title="Kattalashtirish uchun bosing"></div>` : ''}
+                    </div>
+                `;
             });
 
             const cSumEl = document.getElementById('courier-subsidy-summary'); cSumEl.innerHTML = '';
