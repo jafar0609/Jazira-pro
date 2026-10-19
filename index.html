@@ -62,9 +62,9 @@
                     </select>
                 </div>
                 <div class="grid grid-cols-3 gap-2 text-center">
-                    <div class="bg-white/5 p-2 rounded-xl"><p class="text-[9px] text-slate-300">Jazira Opshi</p><p id="stat-jazira-ops" class="text-xs font-extrabold mt-0.5">0</p></div>
-                    <div class="bg-purple-500/25 p-2 rounded-xl"><p class="text-[9px] text-purple-300">Chopachop Foyda</p><p id="stat-chopa-profit" class="text-xs font-extrabold text-purple-300 mt-0.5">0</p></div>
-                    <div class="bg-emerald-500/25 p-2 rounded-xl"><p class="text-[9px] text-emerald-300">Sof Daromad</p><p id="stat-net-balance" class="text-xs font-extrabold text-emerald-300 mt-0.5">0</p></div>
+                    <div class="bg-white/5 p-2 rounded-xl cursor-pointer" onclick="openDetailModal('Jazira Opshi', 'Jazira boʻyicha jami savdolar aylanmasi')"><p class="text-[9px] text-slate-300">Jazira Opshi</p><p id="stat-jazira-ops" class="text-xs font-extrabold mt-0.5">0</p></div>
+                    <div class="bg-purple-500/25 p-2 rounded-xl cursor-pointer" onclick="openDetailModal('Chopachop Foyda', 'Chopachop hamkorlardan kelgan jami ulush')"><p class="text-[9px] text-purple-300">Chopachop Foyda</p><p id="stat-chopa-profit" class="text-xs font-extrabold text-purple-300 mt-0.5">0</p></div>
+                    <div class="bg-emerald-500/25 p-2 rounded-xl cursor-pointer" onclick="openDetailModal('Sof Daromad', 'Barcha komissiya minus xarajatlar')"><p class="text-[9px] text-emerald-300">Sof Daromad</p><p id="stat-net-balance" class="text-xs font-extrabold text-emerald-300 mt-0.5">0</p></div>
                 </div>
             </div>
 
@@ -124,8 +124,8 @@
                 <h2 class="text-xs font-extrabold text-slate-900">Biznes Holati va Tahlil</h2>
                 <div id="analytics-status-box" class="p-2.5 rounded-xl text-xs font-bold" style="display: none;"></div>
                 <div class="grid grid-cols-2 gap-2 text-xs">
-                    <div class="bg-blue-50 p-2 rounded-xl"><span class="text-slate-500 text-[9px]">Sarpul & Vaynkamat:</span><b id="ana-jazira-filial" class="text-blue-900 text-xs block">0</b></div>
-                    <div class="bg-emerald-50 p-2 rounded-xl"><span class="text-slate-500 text-[9px]">Jazira Bot:</span><b id="ana-jazira-bot" class="text-emerald-900 text-xs block">0</b></div>
+                    <div class="bg-blue-50 p-2 rounded-xl cursor-pointer" onclick="openDetailModal('Jazira Filiallar', 'Sarpul va Vaynkamat jami savdosi')"><span class="text-slate-500 text-[9px]">Sarpul & Vaynkamat:</span><b id="ana-jazira-filial" class="text-blue-900 text-xs block">0</b></div>
+                    <div class="bg-emerald-50 p-2 rounded-xl cursor-pointer" onclick="openDetailModal('Jazira Bot', 'Jazira bot orqali tushgan savdolar')"><span class="text-slate-500 text-[9px]">Jazira Bot:</span><b id="ana-jazira-bot" class="text-emerald-900 text-xs block">0</b></div>
                 </div>
                 <div class="space-y-1 pt-2 border-t"><h3 class="text-[11px] font-extrabold text-rose-700 uppercase">Xarajatlar:</h3><div id="ana-cost-breakdown" class="space-y-1 text-xs bg-slate-50 p-2.5 rounded-xl border"></div></div>
                 <div class="space-y-1 pt-2 border-t"><h3 class="text-[11px] font-extrabold text-slate-700 uppercase">Kafelar reytingi:</h3><div id="ana-partner-ranking" class="space-y-1 text-xs"></div></div>
@@ -154,18 +154,27 @@
             <div class="bg-white p-3 rounded-2xl shadow-sm border space-y-2"><h3 class="text-[11px] font-bold text-slate-500 uppercase">Tarix</h3><div id="bc-list" class="space-y-1.5 max-h-40 overflow-y-auto"></div></div>
         </div>
 
-        <!-- 4. RAZDACHA (ALOHIDA) -->
+        <!-- 4. RAZDACHA (XUSHNUD VA MUROD ALOHIDA) -->
         <div id="view-razdacha" class="tab-content space-y-3">
             <div id="razdacha-cards" class="grid grid-cols-1 sm:grid-cols-2 gap-2"></div>
             <div class="bg-white p-3.5 rounded-2xl shadow-sm border space-y-2">
                 <h2 class="text-xs font-bold">Razdacha Smena va Vaqti</h2>
                 <form onsubmit="addAttendance(event)" class="space-y-2 bg-slate-50 p-3 rounded-xl border">
-                    <div class="grid grid-cols-2 gap-1"><select id="att-worker" class="px-2 py-1 text-xs border rounded"></select><input type="date" id="att-date" required class="px-2 py-1 text-xs border rounded"></div>
+                    <div class="grid grid-cols-2 gap-1"><select id="att-worker" class="px-2 py-1 text-xs border rounded"><option value="Xushnud">Xushnud</option><option value="Murod">Murod</option></select><input type="date" id="att-date" required class="px-2 py-1 text-xs border rounded"></div>
                     <div class="grid grid-cols-3 gap-1"><input type="time" id="att-arrival" value="12:00" required class="px-1 py-1 text-xs border rounded"><input type="time" id="att-leave" value="00:00" required class="px-1 py-1 text-xs border rounded"><input type="number" id="att-leave-hours" value="0" step="0.5" required class="px-1 py-1 text-xs border rounded" placeholder="Javob"></div>
-                    <button type="submit" class="w-full py-2 bg-blue-600 text-white font-bold text-xs rounded-xl">Saqlash</button>
+                    <button type="submit" class="w-full py-2 bg-blue-600 text-white font-bold text-xs rounded-xl">Smena Saqlash</button>
                 </form>
             </div>
-            <div class="bg-white p-3 rounded-2xl shadow-sm border space-y-2"><h3 class="text-[11px] font-bold text-slate-500 uppercase">Smenalar Tarixi</h3><div id="att-list" class="space-y-1.5 max-h-40 overflow-y-auto"></div></div>
+            <div class="bg-white p-3.5 rounded-2xl shadow-sm border space-y-2">
+                <h2 class="text-xs font-bold text-amber-700">Xushnud yoki Murodga Ovqat / Avans yozish</h2>
+                <form onsubmit="addRazdachaExpense(event)" class="space-y-2 bg-amber-50/50 p-3 rounded-xl border border-amber-200">
+                    <div class="grid grid-cols-2 gap-1"><select id="rd-worker" class="px-2 py-1 text-xs border rounded"><option value="Xushnud">Xushnud</option><option value="Murod">Murod</option></select><select id="rd-kind" class="px-2 py-1 text-xs border rounded"><option value="food">🍔 Ovqat</option><option value="avans">💵 Avans</option></select></div>
+                    <div class="grid grid-cols-2 gap-1"><input type="number" step="any" id="rd-amount" placeholder="Summa" required class="px-2 py-1 text-xs border rounded"><select id="rd-branch" class="px-2 py-1 text-xs border rounded"><option value="Sarpul">🍗 Sarpul</option><option value="Vaynkamat">🍔 Vaynkamat</option></select></div>
+                    <input type="text" id="rd-desc" placeholder="Izoh..." required class="w-full px-2 py-1 text-xs border rounded">
+                    <button type="submit" class="w-full py-2 bg-amber-600 text-white font-bold text-xs rounded-xl">Yozib qoʻyish</button>
+                </form>
+            </div>
+            <div class="bg-white p-3 rounded-2xl shadow-sm border space-y-2"><h3 class="text-[11px] font-bold text-slate-500 uppercase">Smenalar va Xarajatlar Tarixi</h3><div id="att-list" class="space-y-1.5 max-h-40 overflow-y-auto"></div></div>
         </div>
 
         <!-- 5. JAMOA -->
@@ -177,7 +186,8 @@
             <div class="bg-white p-3.5 rounded-2xl shadow-sm border space-y-2">
                 <h2 class="text-xs font-extrabold">Ovqat va Avans</h2>
                 <form onsubmit="addExpense(event)" class="space-y-2 bg-slate-50 p-3 rounded-xl border">
-                    <div class="grid grid-cols-2 gap-1"><select id="exp-target" class="px-2 py-1 text-xs border rounded"></select><select id="exp-kind" class="px-2 py-1 text-xs border rounded"><option value="food">🍔 Ovqat</option><option value="avans">💵 Avans</option><option value="fine">⚠️ Jarima</option></select></div>
+                    <div class="grid grid-cols-2 gap-1"><select id="exp-target" class="px-2 py-1 text-xs border rounded"></select><select id="exp-kind" onchange="toggleMealBranch()" class="px-2 py-1 text-xs border rounded"><option value="food">🍔 Ovqat</option><option value="avans">💵 Avans</option><option value="fine">⚠️ Jarima</option></select></div>
+                    <div id="meal-branch-box" class="grid grid-cols-1"><select id="exp-branch" class="px-2 py-1 text-xs border rounded bg-amber-50 font-bold"><option value="Sarpul">🍗 Qaysi filialdan: Sarpul</option><option value="Vaynkamat">🍔 Qaysi filialdan: Vaynkamat</option></select></div>
                     <div class="grid grid-cols-3 gap-1"><input type="date" id="exp-date" required class="px-1 py-1 text-xs border rounded"><input type="number" step="any" id="exp-amount" placeholder="Summa" required class="px-1 py-1 text-xs border rounded"><input type="text" id="exp-desc" placeholder="Izoh" required class="px-1 py-1 text-xs border rounded"></div>
                     <button type="submit" class="w-full py-2 bg-slate-900 text-white font-bold text-xs rounded-xl">Saqlash</button>
                 </form>
@@ -185,8 +195,9 @@
             <div class="bg-white p-3.5 rounded-2xl shadow-sm border space-y-2">
                 <h2 class="text-xs font-extrabold text-rose-600">Atkaz Tovar</h2>
                 <form onsubmit="addAtkaz(event)" class="space-y-2 bg-rose-50 p-3 rounded-xl border">
-                    <div class="grid grid-cols-3 gap-1"><input type="date" id="atkaz-date" required class="px-1 py-1 text-xs border rounded"><select id="atkaz-source" class="col-span-2 px-1 py-1 text-xs border rounded"></select></div>
-                    <div class="grid grid-cols-2 gap-1"><input type="number" step="any" id="atkaz-amount" placeholder="Summa" required class="px-2 py-1 text-xs border rounded"><input type="text" id="atkaz-desc" placeholder="Izoh" required class="px-2 py-1 text-xs border rounded"></div>
+                    <div class="grid grid-cols-2 gap-1"><input type="date" id="atkaz-date" required class="px-1 py-1 text-xs border rounded"><select id="atkaz-source" class="px-1 py-1 text-xs border rounded"></select></div>
+                    <div class="grid grid-cols-2 gap-1"><select id="atkaz-worker" class="px-1 py-1 text-xs border rounded font-bold text-rose-800"><option value="Oʻzim (Rahbar)">👤 Rahbarga (Oʻzimga)</option></select><input type="number" step="any" id="atkaz-amount" placeholder="Summa" required class="px-2 py-1 text-xs border rounded"></div>
+                    <input type="text" id="atkaz-desc" placeholder="Izoh..." required class="w-full px-2 py-1 text-xs border rounded">
                     <button type="submit" class="w-full py-2 bg-rose-600 text-white font-bold text-xs rounded-xl">Saqlash</button>
                 </form>
             </div>
@@ -194,11 +205,20 @@
             <div class="bg-white p-3.5 rounded-2xl shadow-sm border space-y-2"><h3 class="text-xs font-extrabold uppercase">Oylik Qoldigʻi</h3><div id="staff-salary-table" class="divide-y text-xs"></div></div>
         </div>
 
-        <!-- 6. REJALAR -->
+        <!-- 6. REJALAR (RAHBAR VA FAYOZA UCHUN) -->
         <div id="view-tasks" class="tab-content space-y-3">
             <div class="bg-white p-3.5 rounded-2xl shadow-sm border space-y-3">
-                <div class="flex items-center justify-between"><h2 class="text-xs font-bold">Rejalar</h2><select id="task-filter" onchange="renderAll()" class="text-xs bg-slate-100 border rounded px-2 py-1"><option value="kunlik">Kunlik</option><option value="haftalik">Haftalik</option><option value="oylik">Oylik</option><option value="yillik">Yillik</option></select></div>
-                <form onsubmit="addTask(event)" class="space-y-2"><div class="flex gap-1"><select id="task-type" class="px-2 py-1 text-xs border rounded"><option value="kunlik">Kunlik</option><option value="haftalik">Haftalik</option><option value="oylik">Oylik</option><option value="yillik">Yillik</option></select><input type="text" id="task-input" placeholder="Yangi reja..." required class="w-full px-2 py-1 text-xs border rounded"></div><button type="submit" class="w-full py-2 bg-blue-600 text-white text-xs font-bold rounded-xl">Qoʻshish</button></form>
+                <div class="flex items-center justify-between">
+                    <h2 class="text-xs font-bold" id="task-panel-title">Rejalar</h2>
+                    <select id="task-filter" onchange="renderAll()" class="text-xs bg-slate-100 border rounded px-2 py-1"><option value="kunlik">Kunlik</option><option value="haftalik">Haftalik</option><option value="oylik">Oylik</option><option value="yillik">Yillik</option></select>
+                </div>
+                <form id="task-add-form" onsubmit="addTask(event)" class="space-y-2" style="display: none;">
+                    <div class="flex gap-1">
+                        <select id="task-type" class="px-2 py-1 text-xs border rounded"><option value="kunlik">Kunlik</option><option value="haftalik">Haftalik</option><option value="oylik">Oylik</option><option value="yillik">Yillik</option></select>
+                        <input type="text" id="task-input" placeholder="Fayozaga yangi reja qoʻyish..." class="w-full px-2 py-1 text-xs border rounded">
+                    </div>
+                    <button type="submit" class="w-full py-2 bg-blue-600 text-white text-xs font-bold rounded-xl">Fayozaga Reja Qoʻshish</button>
+                </form>
                 <div id="task-list" class="space-y-1.5 max-h-60 overflow-y-auto"></div>
             </div>
         </div>
@@ -214,11 +234,22 @@
                     <button type="submit" class="w-full py-2 bg-emerald-600 text-white font-bold text-xs rounded-xl">Saqlash</button>
                 </form>
             </div>
-            <div class="grid grid-cols-2 gap-2"><div class="bg-emerald-50 border p-2.5 rounded-2xl text-center"><span class="text-[9px] font-bold text-emerald-700">KIRIM</span><p id="fin-total-kirim" class="text-xs font-extrabold text-emerald-600">0</p></div><div class="bg-rose-50 border p-2.5 rounded-2xl text-center"><span class="text-[9px] font-bold text-rose-700">CHIQIM</span><p id="fin-total-chiqim" class="text-xs font-extrabold text-rose-600">0</p></div></div>
+            <div class="grid grid-cols-2 gap-2"><div class="bg-emerald-50 border p-2.5 rounded-2xl text-center cursor-pointer" onclick="openDetailModal('Kirimlar tarixi', 'Jami kirim va qarzlar')"><span class="text-[9px] font-bold text-emerald-700">KIRIM</span><p id="fin-total-kirim" class="text-xs font-extrabold text-emerald-600">0</p></div><div class="bg-rose-50 border p-2.5 rounded-2xl text-center cursor-pointer" onclick="openDetailModal('Chiqimlar tarixi', 'Jami chiqimlar')"><span class="text-[9px] font-bold text-rose-700">CHIQIM</span><p id="fin-total-chiqim" class="text-xs font-extrabold text-rose-600">0</p></div></div>
             <div class="bg-white p-3.5 rounded-2xl shadow-sm border space-y-2"><h3 class="text-[11px] font-bold text-slate-500 uppercase">Tarix</h3><div id="fin-list" class="space-y-1.5 max-h-56 overflow-y-auto"></div></div>
         </div>
 
     </main>
+
+    <!-- TAFSILOTLAR MODALI (HAR QAKDAY RAQAM BOSILGANDA OCHILADI) -->
+    <div id="detailModal" class="fixed inset-0 modal-bg z-50 hidden flex items-center justify-center p-3" onclick="closeDetailModal()">
+        <div class="bg-white rounded-2xl max-w-lg w-full max-h-[85vh] flex flex-col shadow-2xl overflow-hidden" onclick="event.stopPropagation()">
+            <div class="px-4 py-3 bg-slate-900 text-white flex items-center justify-between">
+                <h3 id="detailModalTitle" class="font-bold text-xs sm:text-sm">Tafsilotlar</h3>
+                <button onclick="closeDetailModal()" class="w-7 h-7 rounded-lg bg-slate-800 text-slate-300 flex items-center justify-center font-bold">✕</button>
+            </div>
+            <div id="detailModalBody" class="p-4 overflow-y-auto space-y-2 text-xs"></div>
+        </div>
+    </div>
 
     <!-- RASMNI KATTALASHTIRIB KO'RISH MODALI -->
     <div id="imageModal" class="fixed inset-0 modal-bg z-50 hidden flex items-center justify-center p-3" onclick="closeImageModal()">
@@ -290,7 +321,7 @@
     <script>
         const HOURLY_RATE = 2500000 / 360;
         let currentRole = 'fayoza';
-        let staffList = JSON.parse(localStorage.getItem('jc_v23_staff')) || [
+        let staffList = JSON.parse(localStorage.getItem('jc_v24_staff')) || [
             { id: 1, name: "Oʻzim (Rahbar)", role: "rahbar", salary: 0 },
             { id: 2, name: "Xushnud", role: "razdacha", salary: 2500000 },
             { id: 3, name: "Murod", role: "razdacha", salary: 2500000 },
@@ -306,17 +337,17 @@
             { id: 13, name: "Abbos", role: "kuryer", salary: 700000 },
             { id: 14, name: "Umid", role: "kuryer", salary: 700000 }
         ];
-        let partners = JSON.parse(localStorage.getItem('jc_v23_partners')) || [{ id: 1, name: "Kafe 1", percent: 10 }];
-        let branchSales = JSON.parse(localStorage.getItem('jc_v23_sales')) || [];
-        let botCosts = JSON.parse(localStorage.getItem('jc_v23_botcosts')) || [];
-        let attendance = JSON.parse(localStorage.getItem('jc_v23_att')) || [];
-        let expenses = JSON.parse(localStorage.getItem('jc_v23_exp')) || [];
-        let atkazs = JSON.parse(localStorage.getItem('jc_v23_atkazs')) || [];
-        let tasks = JSON.parse(localStorage.getItem('jc_v23_tasks')) || [];
-        let financeItems = JSON.parse(localStorage.getItem('jc_v23_fin')) || [];
-        let calcMode = localStorage.getItem('jc_v23_calcmode') || 'dastavka';
+        let partners = JSON.parse(localStorage.getItem('jc_v24_partners')) || [{ id: 1, name: "Kafe 1", percent: 10 }];
+        let branchSales = JSON.parse(localStorage.getItem('jc_v24_sales')) || [];
+        let botCosts = JSON.parse(localStorage.getItem('jc_v24_botcosts')) || [];
+        let attendance = JSON.parse(localStorage.getItem('jc_v24_att')) || [];
+        let expenses = JSON.parse(localStorage.getItem('jc_v24_exp')) || [];
+        let atkazs = JSON.parse(localStorage.getItem('jc_v24_atkazs')) || [];
+        let tasks = JSON.parse(localStorage.getItem('jc_v24_tasks')) || [];
+        let financeItems = JSON.parse(localStorage.getItem('jc_v24_fin')) || [];
+        let calcMode = localStorage.getItem('jc_v24_calcmode') || 'dastavka';
 
-        let globalSelectedDate = localStorage.getItem('jc_v23_gdate') || new Date().toISOString().split('T')[0];
+        let globalSelectedDate = localStorage.getItem('jc_v24_gdate') || new Date().toISOString().split('T')[0];
 
         const todayStr = new Date().toISOString().split('T')[0];
         ['sale-date', 'att-date', 'fin-date', 'bc-date', 'exp-date', 'atkaz-date'].forEach(id => {
@@ -333,7 +364,7 @@
         function onGlobalDateChange(val) {
             if (!val) return;
             globalSelectedDate = val;
-            localStorage.setItem('jc_v23_gdate', globalSelectedDate);
+            localStorage.setItem('jc_v24_gdate', globalSelectedDate);
             applyGlobalDateToForms();
         }
 
@@ -349,16 +380,16 @@
         initGlobalDate();
 
         function saveAll() {
-            localStorage.setItem('jc_v23_staff', JSON.stringify(staffList));
-            localStorage.setItem('jc_v23_partners', JSON.stringify(partners));
-            localStorage.setItem('jc_v23_sales', JSON.stringify(branchSales));
-            localStorage.setItem('jc_v23_botcosts', JSON.stringify(botCosts));
-            localStorage.setItem('jc_v23_att', JSON.stringify(attendance));
-            localStorage.setItem('jc_v23_exp', JSON.stringify(expenses));
-            localStorage.setItem('jc_v23_atkazs', JSON.stringify(atkazs));
-            localStorage.setItem('jc_v23_tasks', JSON.stringify(tasks));
-            localStorage.setItem('jc_v23_fin', JSON.stringify(financeItems));
-            localStorage.setItem('jc_v23_calcmode', calcMode);
+            localStorage.setItem('jc_v24_staff', JSON.stringify(staffList));
+            localStorage.setItem('jc_v24_partners', JSON.stringify(partners));
+            localStorage.setItem('jc_v24_sales', JSON.stringify(branchSales));
+            localStorage.setItem('jc_v24_botcosts', JSON.stringify(botCosts));
+            localStorage.setItem('jc_v24_att', JSON.stringify(attendance));
+            localStorage.setItem('jc_v24_exp', JSON.stringify(expenses));
+            localStorage.setItem('jc_v24_atkazs', JSON.stringify(atkazs));
+            localStorage.setItem('jc_v24_tasks', JSON.stringify(tasks));
+            localStorage.setItem('jc_v24_fin', JSON.stringify(financeItems));
+            localStorage.setItem('jc_v24_calcmode', calcMode);
         }
 
         function exportData() {
@@ -435,6 +466,8 @@
             const finCard = document.getElementById('finance-card-wrapper');
             const statusBox = document.getElementById('analytics-status-box');
             const botsFinCards = document.getElementById('bots-finance-cards');
+            const taskAddForm = document.getElementById('task-add-form');
+            const taskPanelTitle = document.getElementById('task-panel-title');
 
             if (currentRole === 'admin') {
                 badge.innerText = 'Rahbar';
@@ -443,6 +476,8 @@
                 if (finCard) finCard.style.display = 'block';
                 if (statusBox) statusBox.style.display = 'block';
                 if (botsFinCards) botsFinCards.style.display = 'grid';
+                if (taskAddForm) taskAddForm.style.display = 'block';
+                if (taskPanelTitle) taskPanelTitle.innerText = "Fayozaga qoʻyilgan rejalar nazorati";
             } else {
                 badge.innerText = 'Fayoza';
                 badge.className = 'text-[9px] px-1.5 py-0.2 rounded bg-amber-500/20 text-amber-700 font-bold';
@@ -450,6 +485,8 @@
                 if (finCard) finCard.style.display = 'none';
                 if (statusBox) statusBox.style.display = 'none';
                 if (botsFinCards) botsFinCards.style.display = 'none';
+                if (taskAddForm) taskAddForm.style.display = 'none';
+                if (taskPanelTitle) taskPanelTitle.innerText = "Rahbar tomonidan sizga qoʻyilgan rejalar";
             }
         }
 
@@ -516,10 +553,23 @@
             });
             const bcC = document.getElementById('bc-courier');
             if (bcC) { bcC.innerHTML = ''; staffList.filter(s => s.role === 'kuryer').forEach(c => bcC.innerHTML += `<option value="${c.name}">${c.name}</option>`); }
-            const attW = document.getElementById('att-worker');
-            if (attW) { attW.innerHTML = ''; staffList.filter(s => s.role === 'razdacha').forEach(r => attW.innerHTML += `<option value="${r.name}">${r.name}</option>`); }
+            
+            const atkazW = document.getElementById('atkaz-worker');
+            if (atkazW) {
+                atkazW.innerHTML = `<option value="Oʻzim (Rahbar)">👤 Rahbarga (Oʻzimga)</option>`;
+                staffList.filter(s => s.role === 'operator' || s.role === 'rahbar').forEach(op => {
+                    atkazW.innerHTML += `<option value="${op.name}">Xodim: ${op.name}</option>`;
+                });
+            }
+
             const expT = document.getElementById('exp-target');
             if (expT) { expT.innerHTML = ''; staffList.forEach(s => expT.innerHTML += `<option value="${s.name}">${s.name} (${s.role})</option>`); }
+        }
+
+        function toggleMealBranch() {
+            const kind = document.getElementById('exp-kind').value;
+            const box = document.getElementById('meal-branch-box');
+            if (kind === 'food') box.style.display = 'block'; else box.style.display = 'none';
         }
 
         function addBranchSales(e) {
@@ -668,11 +718,26 @@
         }
         function deleteAtt(id) { attendance = attendance.filter(a => a.id !== id); saveAll(); renderAll(); }
 
+        function addRazdachaExpense(e) {
+            e.preventDefault();
+            const worker = document.getElementById('rd-worker').value;
+            const kind = document.getElementById('rd-kind').value;
+            const amount = normalizeUZS(document.getElementById('rd-amount').value);
+            const branch = document.getElementById('rd-branch').value;
+            const desc = document.getElementById('rd-desc').value.trim();
+            if (!amount || !desc) return;
+            expenses.push({ id: Date.now(), date: globalSelectedDate, target: worker, kind: kind === 'food' ? 'food' : 'avans', amount, desc: `${desc} (${branch})` });
+            document.getElementById('rd-amount').value = ''; document.getElementById('rd-desc').value = '';
+            saveAll(); renderAll();
+        }
+
         function addExpense(e) {
             e.preventDefault();
             const target = document.getElementById('exp-target').value, kind = document.getElementById('exp-kind').value, date = document.getElementById('exp-date').value, amount = normalizeUZS(document.getElementById('exp-amount').value), desc = document.getElementById('exp-desc').value.trim();
+            const branch = document.getElementById('exp-branch').value;
             if (!amount || !desc) return;
-            expenses.push({ id: Date.now(), date, target, kind, amount, desc });
+            const finalDesc = kind === 'food' ? `${desc} [Filial: ${branch}]` : desc;
+            expenses.push({ id: Date.now(), date, target, kind, amount, desc: finalDesc });
             document.getElementById('exp-amount').value = ''; document.getElementById('exp-desc').value = '';
             saveAll(); renderAll();
         }
@@ -680,9 +745,11 @@
 
         function addAtkaz(e) {
             e.preventDefault();
-            const date = document.getElementById('atkaz-date').value, source = document.getElementById('atkaz-source').value, amount = normalizeUZS(document.getElementById('atkaz-amount').value), desc = document.getElementById('atkaz-desc').value.trim();
+            const date = document.getElementById('atkaz-date').value, source = document.getElementById('atkaz-source').value;
+            const worker = document.getElementById('atkaz-worker').value;
+            const amount = normalizeUZS(document.getElementById('atkaz-amount').value), desc = document.getElementById('atkaz-desc').value.trim();
             if (!amount || !desc) return;
-            atkazs.push({ id: Date.now(), date, source, amount, desc });
+            atkazs.push({ id: Date.now(), date, source, worker, amount, desc });
             document.getElementById('atkaz-amount').value = ''; document.getElementById('atkaz-desc').value = '';
             saveAll(); renderAll();
         }
@@ -717,10 +784,40 @@
                 tot += x.amount;
                 body.innerHTML += `<div class="flex justify-between border-b py-1"><span>${formatDateDot(x.date)} (${x.kind}): ${x.desc} <b class="text-rose-600">-${formatUZS(x.amount)}</b></span><button onclick="deleteExp(${x.id}); showWorkerHistory('${name}');" class="text-rose-500"><i class="fa-solid fa-xmark"></i></button></div>`;
             });
+            if (name === "Oʻzim (Rahbar)") {
+                atkazs.filter(a => a.worker === "Oʻzim (Rahbar)").forEach(a => {
+                    tot += a.amount;
+                    body.innerHTML += `<div class="flex justify-between border-b py-1"><span>${formatDateDot(a.date)} (Atkaz - ${a.source}): ${a.desc} <b class="text-rose-600">-${formatUZS(a.amount)}</b></span></div>`;
+                });
+            }
             if (tot === 0) body.innerHTML = `<p class="text-slate-400 text-center">Ma'lumot yoʻq</p>`;
             modal.style.display = 'flex';
         }
         function closeWorkerModal() { document.getElementById('worker-modal').style.display = 'none'; }
+
+        function openDetailModal(title, subtitle) {
+            const modal = document.getElementById('detailModal');
+            document.getElementById('detailModalTitle').innerText = title;
+            const body = document.getElementById('detailModalBody');
+            body.innerHTML = `<p class="font-bold text-slate-500 mb-2">${subtitle}</p>`;
+
+            if (title.includes('Jazira Opshi') || title.includes('Jazira Filiallar')) {
+                branchSales.forEach(s => {
+                    const ops = s.sarpulDastavka + s.sarpulSaboy + s.vaynDastavka + s.vaynSaboy + (s.jaziraBotSum || 0);
+                    body.innerHTML += `<div class="p-2 border rounded mb-1 flex justify-between"><span>📅 ${formatDateDot(s.date)}</span><b>${formatUZS(ops)}</b></div>`;
+                });
+            } else if (title.includes('Chopachop Foyda')) {
+                branchSales.forEach(s => {
+                    s.chopaList.forEach(c => {
+                        body.innerHTML += `<div class="p-2 border rounded mb-1 flex justify-between"><span>📅 ${formatDateDot(s.date)} (${c.name})</span><b class="text-purple-700">+${formatUZS(c.profit)}</b></div>`;
+                    });
+                });
+            } else {
+                body.innerHTML += `<p class="text-slate-400">Tafsilotlar mavjud</p>`;
+            }
+            modal.classList.remove('hidden');
+        }
+        function closeDetailModal() { document.getElementById('detailModal').classList.add('hidden'); }
 
         function renderAll() {
             updateDropdowns();
@@ -738,7 +835,7 @@
                 });
                 totalChopaProfit += dayChopa;
                 const jShare = calcMode === 'dastavka' ? Math.round((s.sarpulDastavka + s.vaynDastavka + (s.jaziraBotSum || 0)) * 0.13) : Math.round(jaziraOps * 0.13);
-                salesList.innerHTML += `<div class="bg-white p-3 rounded-2xl shadow-sm border space-y-1.5 text-xs"><div class="flex justify-between font-bold border-b pb-1"><span>📅 ${formatDateDot(s.date)}</span><div class="flex gap-2"><button onclick="editSale(${s.id})" class="text-blue-600"><i class="fa-solid fa-pen"></i></button><button onclick="deleteSale(${s.id})" class="text-rose-500"><i class="fa-solid fa-trash"></i></button></div></div><div class="grid grid-cols-2 gap-1.5"><div class="bg-blue-50 p-2 rounded-xl"><b>Jazira:</b> ${formatShort(jaziraOps)}<br>13%: +${formatUZS(jShare)}</div><div class="bg-purple-50 p-2 rounded-xl"><b>Chopachop:</b> +${formatUZS(dayChopa)}<br>${chopaHtml}</div></div></div>`;
+                salesList.innerHTML += `<div class="bg-white p-3 rounded-2xl shadow-sm border space-y-1.5 text-xs"><div class="flex justify-between font-bold border-b pb-1"><span>📅 ${formatDateDot(s.date)}</span><div class="flex gap-2"><button onclick="editSale(${s.id})" class="text-blue-600"><i class="fa-solid fa-pen"></i></button><button onclick="deleteSale(${s.id})" class="text-rose-500"><i class="fa-solid fa-trash"></i></button></div></div><div class="grid grid-cols-2 gap-1.5"><div class="bg-blue-50 p-2 rounded-xl cursor-pointer" onclick="openDetailModal('Savdo tafsiloti - ${s.date}', 'Sarpul va Vaynkamat savdolari')"><b>Jazira:</b> ${formatShort(jaziraOps)}<br>13%: +${formatUZS(jShare)}</div><div class="bg-purple-50 p-2 rounded-xl cursor-pointer" onclick="openDetailModal('Chopachop tafsiloti - ${s.date}', 'Hamkorlar ulushi')"><b>Chopachop:</b> +${formatUZS(dayChopa)}<br>${chopaHtml}</div></div></div>`;
             });
             if (!branchSales.length) salesList.innerHTML = `<p class="text-center text-xs text-slate-400 py-4">Savdolar yoʻq</p>`;
 
@@ -763,7 +860,7 @@
 
             const cSumEl = document.getElementById('courier-subsidy-summary'); cSumEl.innerHTML = '';
             staffList.filter(s => s.role === 'kuryer').forEach(c => {
-                cSumEl.innerHTML += `<div class="py-1 flex justify-between text-xs"><span><b>${c.name}</b></span><span class="font-bold text-rose-600">${formatUZS(cMap[c.name])}</span></div>`;
+                cSumEl.innerHTML += `<div class="py-1 flex justify-between text-xs cursor-pointer" onclick="openDetailModal('Kuryer tafsiloti - ${c.name}', 'Jami qoplanma summasi')"><span><b>${c.name}</b></span><span class="font-bold text-rose-600">${formatUZS(cMap[c.name])}</span></div>`;
             });
 
             const jShareTot = branchSales.reduce((acc, s) => acc + (calcMode === 'dastavka' ? Math.round((s.sarpulDastavka + s.vaynDastavka + (s.jaziraBotSum || 0)) * 0.13) : Math.round((s.sarpulDastavka + s.sarpulSaboy + s.vaynDastavka + s.vaynSaboy + (s.jaziraBotSum || 0)) * 0.13)), 0);
@@ -788,33 +885,51 @@
             document.getElementById('ana-jazira-bot').innerText = formatUZS(branchSales.reduce((a,b) => a + (b.jaziraBotSum || 0), 0));
 
             const tAtkaz = atkazs.reduce((a,b)=>a+b.amount,0), tFood = expenses.filter(x=>x.kind==='food').reduce((a,b)=>a+b.amount,0);
-            document.getElementById('ana-cost-breakdown').innerHTML = `<div class="flex justify-between"><span>Kuryer:</span><b class="text-rose-600">-${formatUZS(jSub + cSub)}</b></div><div class="flex justify-between"><span>Atkaz:</span><b class="text-rose-600">-${formatUZS(tAtkaz)}</b></div><div class="flex justify-between"><span>Ovqat:</span><b class="text-rose-600">-${formatUZS(tFood)}</b></div>`;
+            document.getElementById('ana-cost-breakdown').innerHTML = `<div class="flex justify-between cursor-pointer" onclick="openDetailModal('Kuryer xarajatlari', 'Jami kuryer qoplanmalari')"><span>Kuryer:</span><b class="text-rose-600">-${formatUZS(jSub + cSub)}</b></div><div class="flex justify-between cursor-pointer" onclick="openDetailModal('Atkazlar', 'Jami atkaz tovarlar')"><span>Atkaz:</span><b class="text-rose-600">-${formatUZS(tAtkaz)}</b></div><div class="flex justify-between cursor-pointer" onclick="openDetailModal('Ovqat xarajatlari', 'Jami ovqatlar')"><span>Ovqat:</span><b class="text-rose-600">-${formatUZS(tFood)}</b></div>`;
 
             const rRank = document.getElementById('ana-partner-ranking'); rRank.innerHTML = '';
-            Object.keys(partnerProfits).forEach(k => rRank.innerHTML += `<div class="flex justify-between bg-slate-50 p-2 rounded border text-xs"><span>${k}</span><b class="text-purple-700">+${formatUZS(partnerProfits[k])}</b></div>`);
+            Object.keys(partnerProfits).forEach(k => rRank.innerHTML += `<div class="flex justify-between bg-slate-50 p-2 rounded border text-xs cursor-pointer" onclick="openDetailModal('Hamkor - ${k}', 'Jami foyda')"><span>${k}</span><b class="text-purple-700">+${formatUZS(partnerProfits[k])}</b></div>`);
 
             const rCards = document.getElementById('razdacha-cards'); rCards.innerHTML = '';
-            staffList.filter(s => s.role === 'razdacha').forEach(r => {
-                const days = attendance.filter(a => a.worker === r.name).length;
-                const earned = attendance.filter(a => a.worker === r.name).reduce((a,b) => a + b.earned, 0);
-                const food = expenses.filter(x => x.target === r.name && x.kind === 'food').reduce((a,b) => a + b.amount, 0);
-                const av = expenses.filter(x => x.target === r.name && x.kind === 'avans').reduce((a,b) => a + b.amount, 0);
-                rCards.innerHTML += `<div class="bg-white p-3 rounded-2xl shadow-sm border-l-4 border-blue-600 space-y-1"><div class="flex justify-between"><h3 class="text-xs font-extrabold">👨‍🍳 ${r.name}</h3><span class="text-[9px] bg-blue-50 text-blue-600 px-1.5 py-0.5 rounded">${days} smena</span></div><div class="flex justify-between text-xs pt-1 border-t"><span>Qoʻlga:</span><b class="text-emerald-600">${formatUZS(earned - food - av)}</b></div></div>`;
+            ['Xushnud', 'Murod'].forEach(name => {
+                const days = attendance.filter(a => a.worker === name).length;
+                const earned = attendance.filter(a => a.worker === name).reduce((a,b) => a + b.earned, 0);
+                const food = expenses.filter(x => x.target === name && x.kind === 'food').reduce((a,b) => a + b.amount, 0);
+                const av = expenses.filter(x => x.target === name && x.kind === 'avans').reduce((a,b) => a + b.amount, 0);
+                rCards.innerHTML += `
+                    <div class="bg-white p-3 rounded-2xl shadow-sm border-l-4 border-indigo-600 space-y-1">
+                        <div class="flex justify-between">
+                            <h3 class="text-xs font-extrabold">👨‍🍳 ${name}</h3>
+                            <span class="text-[9px] bg-indigo-50 text-indigo-600 px-1.5 py-0.5 rounded">${days} smena</span>
+                        </div>
+                        <div class="flex justify-between text-xs pt-1 border-t cursor-pointer" onclick="showWorkerHistory('${name}')">
+                            <span>Qoʻlga (Hisob):</span>
+                            <b class="text-emerald-600">${formatUZS(earned - food - av)}</b>
+                        </div>
+                    </div>
+                `;
             });
 
             const attList = document.getElementById('att-list'); attList.innerHTML = '';
             [...attendance].sort((a,b)=>new Date(b.date)-new Date(a.date)).forEach(a => attList.innerHTML += `<div class="p-2 bg-slate-50 border rounded-xl flex justify-between text-xs"><span><b>${a.worker}</b> (${formatDateDot(a.date)} | ${a.arrival || '12:00'} - ${a.leave || '00:00'}): +${formatUZS(a.earned)}</span><button onclick="deleteAtt(${a.id})" class="text-rose-500"><i class="fa-solid fa-trash"></i></button></div>`);
+            expenses.filter(x => x.target === 'Xushnud' || x.target === 'Murod').forEach(x => {
+                attList.innerHTML += `<div class="p-2 bg-amber-50 border rounded-xl flex justify-between text-xs"><span><b>${x.target}</b> (${formatDateDot(x.date)} - ${x.kind}): ${x.desc}</span><div class="flex items-center gap-2"><b class="text-rose-600">-${formatUZS(x.amount)}</b><button onclick="deleteExp(${x.id})" class="text-rose-500"><i class="fa-solid fa-trash"></i></button></div></div>`;
+            });
 
             const sList = document.getElementById('team-staff-list'); sList.innerHTML = '';
             staffList.forEach(s => sList.innerHTML += `<div class="flex justify-between items-center bg-slate-50 p-2 rounded-xl border"><b>${s.name}</b><input type="number" value="${s.salary}" onchange="updateWorkerSalary(${s.id}, this.value)" class="w-20 px-1 text-xs border rounded text-center"></div>`);
 
             const aList = document.getElementById('atkaz-list'); aList.innerHTML = '';
-            [...atkazs].sort((a,b)=>new Date(b.date)-new Date(a.date)).forEach(a => aList.innerHTML += `<div class="p-2 bg-rose-50 border rounded-xl flex justify-between text-xs"><span><b>${a.source} (${formatDateDot(a.date)}):</b> ${a.desc}</span><span class="text-rose-700 font-bold">-${formatUZS(a.amount)}</span></div>`);
+            [...atkazs].sort((a,b)=>new Date(b.date)-new Date(a.date)).forEach(a => aList.innerHTML += `<div class="p-2 bg-rose-50 border rounded-xl flex justify-between text-xs"><span><b>${a.source} (${formatDateDot(a.date)}):</b> [Masʼul: ${a.worker}] ${a.desc}</span><div class="flex items-center gap-2"><span class="text-rose-700 font-bold">-${formatUZS(a.amount)}</span><button onclick="deleteAtkaz(${a.id})" class="text-rose-500"><i class="fa-solid fa-trash"></i></button></div></div>`);
 
             const sTable = document.getElementById('staff-salary-table'); sTable.innerHTML = '';
             const wFood = {}, wAv = {}; expenses.forEach(x => { if(x.kind==='food') wFood[x.target]=(wFood[x.target]||0)+x.amount; else if(x.kind==='avans') wAv[x.target]=(wAv[x.target]||0)+x.amount; });
             staffList.forEach(s => {
-                const rem = s.salary - (wFood[s.name]||0) - (wAv[s.name]||0);
+                let rem = s.salary - (wFood[s.name]||0) - (wAv[s.name]||0);
+                if (s.name === "Oʻzim (Rahbar)") {
+                    const myAtkaz = atkazs.filter(a => a.worker === "Oʻzim (Rahbar)").reduce((acc, a) => acc + a.amount, 0);
+                    rem -= myAtkaz;
+                }
                 sTable.innerHTML += `<div onclick="showWorkerHistory('${s.name}')" class="py-2 flex justify-between items-center cursor-pointer hover:bg-slate-50 px-2 rounded"><span>${s.name}</span><b class="${rem>=0?'text-emerald-600':'text-rose-600'}">${formatUZS(rem)}</b></div>`;
             });
 
