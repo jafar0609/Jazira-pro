@@ -10,338 +10,659 @@
 
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
-        body {
-            font-family: 'Inter', sans-serif;
-            background-color: #f1f5f9;
-            padding-bottom: 110px;
+        
+        * {
+            -webkit-tap-highlight-color: transparent;
+            box-sizing: border-box;
         }
-        .tab-content { display: none !important; }
-        .tab-content.active { display: block !important; }
-        .modal-bg { background-color: rgba(15, 23, 42, 0.65); backdrop-filter: blur(4px); }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background-color: #f1f5f9;
+            padding-bottom: 100px;
+            margin: 0;
+            overflow-x: hidden;
+            touch-action: manipulation;
+        }
+
+        button, input, select, label {
+            touch-action: manipulation;
+        }
+
+        .tab-content {
+            display: none !important;
+        }
+        .tab-content.active {
+            display: block !important;
+        }
+
+        /* Honor X6 va barcha Androidlarda modal ekranni to'sib qolmasligi uchun qat'iy qoida */
+        .modal-overlay {
+            display: none !important;
+            pointer-events: none !important;
+            background-color: rgba(15, 23, 42, 0.65);
+            backdrop-filter: blur(3px);
+        }
+        .modal-overlay.open {
+            display: flex !important;
+            pointer-events: auto !important;
+        }
     </style>
 </head>
 <body class="text-slate-800">
 
-    <header class="sticky top-0 z-30 bg-white/95 backdrop-blur border-b border-slate-200 px-3 py-2">
-        <div class="max-w-xl mx-auto flex items-center justify-between">
+    <!-- YUQORI PANEL (HEADER) -->
+    <header class="sticky top-0 z-30 bg-white/95 backdrop-blur border-b border-slate-200 px-3 py-2 shadow-sm">
+        <div class="max-w-xl mx-auto flex items-center justify-between gap-2">
             <div class="flex items-center gap-2">
-                <div class="w-8 h-8 rounded-xl bg-slate-900 text-white flex items-center justify-center font-extrabold text-xs shadow">JC</div>
+                <div class="w-8 h-8 rounded-xl bg-slate-900 text-white flex items-center justify-center font-extrabold text-xs shadow shrink-0">JC</div>
                 <div>
-                    <div class="flex items-center gap-1.5">
-                        <h1 class="text-xs font-extrabold text-slate-900">Jazira & Chopachop</h1>
-                        <span id="role-badge" class="text-[9px] px-1.5 py-0.2 rounded bg-amber-500/20 text-amber-700 font-bold">Fayoza</span>
+                    <div class="flex items-center gap-1.5 flex-wrap">
+                        <h1 class="text-xs font-extrabold text-slate-900 leading-none">Jazira & Chopachop</h1>
+                        <span id="role-badge" class="text-[9px] px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-700 font-bold leading-none">Fayoza</span>
+                        <button type="button" onclick="forceCloudRefresh()" id="sync-badge" class="text-[9px] px-1.5 py-0.5 rounded bg-blue-50 text-blue-600 font-bold border border-blue-200 leading-none flex items-center gap-1">
+                            <i class="fa-solid fa-rotate fa-spin"></i> Ulanmoqda...
+                        </button>
                     </div>
-                    <p id="header-date" class="text-[9px] text-slate-500"></p>
-                    <div class="flex items-center gap-1 mt-0.5">
-                        <span class="text-[9px] text-slate-500">Umumiy Sana:</span>
+                    <div class="flex items-center gap-1.5 mt-1">
+                        <span id="header-date" class="text-[9px] text-slate-400 font-medium"></span>
+                        <span class="text-slate-300">|</span>
                         <input type="date" id="global-date" onchange="onGlobalDateChange(this.value)" class="text-[10px] font-extrabold bg-blue-50 text-blue-700 px-1.5 py-0.5 rounded border border-blue-200 focus:outline-none cursor-pointer">
                     </div>
                 </div>
             </div>
-            <div class="flex items-center gap-1">
-                <button onclick="exportData()" class="px-2 py-1 bg-emerald-600 text-white rounded-lg text-[10px] font-bold"><i class="fa-solid fa-download"></i> Zaxira</button>
-                <label class="px-2 py-1 bg-amber-600 text-white rounded-lg text-[10px] font-bold cursor-pointer">
-                    <i class="fa-solid fa-upload"></i> Tiklash
+            <div class="flex items-center gap-1 shrink-0">
+                <button type="button" onclick="exportData()" title="Zaxira yuklab olish" class="px-2 py-1.5 bg-emerald-600 active:bg-emerald-700 text-white rounded-lg text-[10px] font-bold shadow-sm">
+                    <i class="fa-solid fa-download"></i>
+                </button>
+                <label title="Zaxirani tiklash" class="px-2 py-1.5 bg-amber-600 active:bg-amber-700 text-white rounded-lg text-[10px] font-bold cursor-pointer shadow-sm">
+                    <i class="fa-solid fa-upload"></i>
                     <input type="file" id="import-file" onchange="importData(event)" accept=".json" class="hidden">
                 </label>
-                <button onclick="toggleRole()" id="role-btn" class="px-2 py-1 bg-slate-800 text-white rounded-lg text-[10px] font-bold"><i class="fa-solid fa-lock"></i> Rahbar</button>
+                <button type="button" onclick="toggleRole()" id="role-btn" class="px-2.5 py-1.5 bg-slate-800 active:bg-slate-900 text-white rounded-lg text-[10px] font-bold shadow-sm flex items-center gap-1">
+                    <i class="fa-solid fa-lock"></i> <span>Rahbar</span>
+                </button>
             </div>
         </div>
     </header>
 
+    <!-- ASOSIY KONTENT -->
     <main class="max-w-xl mx-auto p-3 space-y-3">
 
-        <!-- 1. SAVDO -->
+        <!-- ==================== 1. SAVDO BO'LIMI ==================== -->
         <div id="view-home" class="tab-content active space-y-3">
-            <div id="finance-card-wrapper" class="bg-slate-900 text-white p-3.5 rounded-2xl shadow-lg space-y-2" style="display: none;">
+            
+            <!-- Rahbar uchun umumiy moliyaviy natija kartasi -->
+            <div id="finance-card-wrapper" class="bg-slate-900 text-white p-3.5 rounded-2xl shadow-lg space-y-2.5" style="display: none;">
                 <div class="flex items-center justify-between">
-                    <span class="text-[11px] font-bold text-blue-300">UMUMIY MOLIYAVIY NATIJA</span>
-                    <select id="calc-mode" onchange="changeCalcMode()" class="text-[10px] bg-white/15 text-white rounded px-2 py-0.5">
+                    <span class="text-[11px] font-extrabold text-blue-300 tracking-wide">UMUMIY MOLIYAVIY NATIJA</span>
+                    <select id="calc-mode" onchange="changeCalcMode()" class="text-[10px] bg-white/15 text-white rounded-lg px-2 py-1 border border-white/10 focus:outline-none">
                         <option value="dastavka" class="text-slate-900">Jazira: 13% Dastavkadan</option>
                         <option value="opshi" class="text-slate-900">Jazira: 13% Opshi</option>
                     </select>
                 </div>
                 <div class="grid grid-cols-3 gap-2 text-center">
-                    <div class="bg-white/5 p-2 rounded-xl cursor-pointer" onclick="openDetailModal('Jazira Opshi', 'Jazira boʻyicha jami savdolar aylanmasi')"><p class="text-[9px] text-slate-300">Jazira Opshi</p><p id="stat-jazira-ops" class="text-xs font-extrabold mt-0.5">0</p></div>
-                    <div class="bg-purple-500/25 p-2 rounded-xl cursor-pointer" onclick="openDetailModal('Chopachop Foyda', 'Chopachop hamkorlardan kelgan jami ulush')"><p class="text-[9px] text-purple-300">Chopachop Foyda</p><p id="stat-chopa-profit" class="text-xs font-extrabold text-purple-300 mt-0.5">0</p></div>
-                    <div class="bg-emerald-500/25 p-2 rounded-xl cursor-pointer" onclick="openDetailModal('Sof Daromad', 'Barcha komissiya minus xarajatlar')"><p class="text-[9px] text-emerald-300">Sof Daromad</p><p id="stat-net-balance" class="text-xs font-extrabold text-emerald-300 mt-0.5">0</p></div>
+                    <div class="bg-white/10 p-2 rounded-xl cursor-pointer active:scale-95 transition" onclick="openDetailModal('Jazira Opshi', 'Jazira boʻyicha jami savdolar aylanmasi')">
+                        <p class="text-[9px] text-slate-300">Jazira Opshi</p>
+                        <p id="stat-jazira-ops" class="text-xs font-extrabold mt-0.5">0 soʻm</p>
+                    </div>
+                    <div class="bg-purple-500/25 p-2 rounded-xl cursor-pointer active:scale-95 transition" onclick="openDetailModal('Chopachop Foyda', 'Chopachop hamkorlardan kelgan jami ulush')">
+                        <p class="text-[9px] text-purple-200">Chopachop Foyda</p>
+                        <p id="stat-chopa-profit" class="text-xs font-extrabold text-purple-200 mt-0.5">0 soʻm</p>
+                    </div>
+                    <div class="bg-emerald-500/25 p-2 rounded-xl cursor-pointer active:scale-95 transition" onclick="openDetailModal('Sof Daromad', 'Barcha komissiya minus kuryer qoplanmalari')">
+                        <p class="text-[9px] text-emerald-200">Sof Daromad</p>
+                        <p id="stat-net-balance" class="text-xs font-extrabold text-emerald-200 mt-0.5">0 soʻm</p>
+                    </div>
                 </div>
             </div>
 
-            <div class="bg-white p-3.5 rounded-2xl shadow-sm border space-y-3">
+            <!-- Kunlik savdo kiritish formasi -->
+            <div class="bg-white p-3.5 rounded-2xl shadow-sm border border-slate-200/80 space-y-3">
                 <div class="flex justify-between items-center border-b pb-2">
                     <h2 id="sale-form-title" class="text-xs font-extrabold text-slate-800">Kunlik Savdo Kiritish</h2>
-                    <button id="cancel-edit-btn" onclick="resetSaleForm()" style="display:none;" class="text-[10px] text-rose-600 font-bold">Bekor qilish</button>
+                    <button type="button" id="cancel-edit-btn" onclick="resetSaleForm()" style="display:none;" class="text-[10px] text-rose-600 font-bold bg-rose-50 px-2 py-0.5 rounded-lg">Bekor qilish ✕</button>
                 </div>
+
                 <form onsubmit="addBranchSales(event)" class="space-y-2.5">
                     <input type="hidden" id="edit-sale-id">
+                    
                     <div class="flex items-center justify-between bg-slate-50 px-3 py-1.5 rounded-xl border">
-                        <label class="text-[11px] font-bold text-slate-600">📅 Sana:</label>
-                        <input type="date" id="sale-date" required class="text-xs font-extrabold bg-transparent">
+                        <label class="text-[11px] font-bold text-slate-600">📅 Savdo sanasi:</label>
+                        <input type="date" id="sale-date" required class="text-xs font-extrabold bg-transparent focus:outline-none">
                     </div>
-                    <div class="p-2.5 rounded-xl bg-blue-50/50 border space-y-1.5">
+
+                    <!-- Sarpul -->
+                    <div class="p-2.5 rounded-xl bg-blue-50/50 border border-blue-100 space-y-1.5">
                         <span class="text-[11px] font-extrabold text-blue-900 block">📍 Jazira: Sarpul</span>
                         <div class="grid grid-cols-3 gap-1.5">
-                            <div class="col-span-2"><input type="number" step="any" id="sarpul-dastavka" placeholder="Dastavka summasi" required class="w-full px-2 py-1 text-xs bg-white border rounded"></div>
-                            <div><input type="number" id="sarpul-d-soni" placeholder="Soni" required class="w-full px-2 py-1 text-xs bg-white border rounded text-center"></div>
+                            <div class="col-span-2">
+                                <input type="number" step="any" id="sarpul-dastavka" placeholder="Dastavka summasi" required class="w-full px-2.5 py-1.5 text-xs bg-white border rounded-lg focus:outline-none focus:border-blue-500">
+                            </div>
+                            <div>
+                                <input type="number" id="sarpul-d-soni" placeholder="Soni" required class="w-full px-2 py-1.5 text-xs bg-white border rounded-lg text-center focus:outline-none focus:border-blue-500">
+                            </div>
                         </div>
                         <div class="grid grid-cols-3 gap-1.5">
-                            <div class="col-span-2"><input type="number" step="any" id="sarpul-saboy" placeholder="Saboy summasi" required class="w-full px-2 py-1 text-xs bg-white border rounded"></div>
-                            <div><input type="number" id="sarpul-s-soni" placeholder="Soni" required class="w-full px-2 py-1 text-xs bg-white border rounded text-center"></div>
+                            <div class="col-span-2">
+                                <input type="number" step="any" id="sarpul-saboy" placeholder="Saboy summasi" required class="w-full px-2.5 py-1.5 text-xs bg-white border rounded-lg focus:outline-none focus:border-blue-500">
+                            </div>
+                            <div>
+                                <input type="number" id="sarpul-s-soni" placeholder="Soni" required class="w-full px-2 py-1.5 text-xs bg-white border rounded-lg text-center focus:outline-none focus:border-blue-500">
+                            </div>
                         </div>
                     </div>
-                    <div class="p-2.5 rounded-xl bg-indigo-50/50 border space-y-1.5">
+
+                    <!-- Vaynkamat -->
+                    <div class="p-2.5 rounded-xl bg-indigo-50/50 border border-indigo-100 space-y-1.5">
                         <span class="text-[11px] font-extrabold text-indigo-900 block">📍 Jazira: Vaynkamat</span>
                         <div class="grid grid-cols-3 gap-1.5">
-                            <div class="col-span-2"><input type="number" step="any" id="vayn-dastavka" placeholder="Dastavka summasi" required class="w-full px-2 py-1 text-xs bg-white border rounded"></div>
-                            <div><input type="number" id="vayn-d-soni" placeholder="Soni" required class="w-full px-2 py-1 text-xs bg-white border rounded text-center"></div>
+                            <div class="col-span-2">
+                                <input type="number" step="any" id="vayn-dastavka" placeholder="Dastavka summasi" required class="w-full px-2.5 py-1.5 text-xs bg-white border rounded-lg focus:outline-none focus:border-indigo-500">
+                            </div>
+                            <div>
+                                <input type="number" id="vayn-d-soni" placeholder="Soni" required class="w-full px-2 py-1.5 text-xs bg-white border rounded-lg text-center focus:outline-none focus:border-indigo-500">
+                            </div>
                         </div>
                         <div class="grid grid-cols-3 gap-1.5">
-                            <div class="col-span-2"><input type="number" step="any" id="vayn-saboy" placeholder="Saboy summasi" required class="w-full px-2 py-1 text-xs bg-white border rounded"></div>
-                            <div><input type="number" id="vayn-s-soni" placeholder="Soni" required class="w-full px-2 py-1 text-xs bg-white border rounded text-center"></div>
+                            <div class="col-span-2">
+                                <input type="number" step="any" id="vayn-saboy" placeholder="Saboy summasi" required class="w-full px-2.5 py-1.5 text-xs bg-white border rounded-lg focus:outline-none focus:border-indigo-500">
+                            </div>
+                            <div>
+                                <input type="number" id="vayn-s-soni" placeholder="Soni" required class="w-full px-2 py-1.5 text-xs bg-white border rounded-lg text-center focus:outline-none focus:border-indigo-500">
+                            </div>
                         </div>
                     </div>
-                    <div class="p-2.5 rounded-xl bg-emerald-50/60 border space-y-1.5">
+
+                    <!-- Jazira Bot -->
+                    <div class="p-2.5 rounded-xl bg-emerald-50/60 border border-emerald-100 space-y-1.5">
                         <span class="text-[11px] font-extrabold text-emerald-900 block">🤖 Jazira Bot</span>
                         <div class="grid grid-cols-3 gap-1.5">
-                            <div class="col-span-2"><input type="number" step="any" id="jazira-bot-sum" placeholder="Bot savdosi" class="w-full px-2 py-1 text-xs bg-white border rounded"></div>
-                            <div><input type="number" id="jazira-bot-soni" placeholder="Soni" class="w-full px-2 py-1 text-xs bg-white border rounded text-center"></div>
+                            <div class="col-span-2">
+                                <input type="number" step="any" id="jazira-bot-sum" placeholder="Bot savdosi (ixtiyoriy)" class="w-full px-2.5 py-1.5 text-xs bg-white border rounded-lg focus:outline-none focus:border-emerald-500">
+                            </div>
+                            <div>
+                                <input type="number" id="jazira-bot-soni" placeholder="Soni" class="w-full px-2 py-1.5 text-xs bg-white border rounded-lg text-center focus:outline-none focus:border-emerald-500">
+                            </div>
                         </div>
                     </div>
-                    <div class="p-2.5 rounded-xl bg-purple-50/60 border space-y-2">
-                        <div class="flex justify-between items-center"><span class="text-[11px] font-extrabold text-purple-900">🚀 Chopachop Muassasalari</span><button type="button" onclick="openAddPartnerModal()" class="px-2 py-0.5 bg-purple-600 text-white text-[10px] font-bold rounded">Sozlash</button></div>
+
+                    <!-- Chopachop Muassasalari -->
+                    <div class="p-2.5 rounded-xl bg-purple-50/60 border border-purple-100 space-y-2">
+                        <div class="flex justify-between items-center">
+                            <span class="text-[11px] font-extrabold text-purple-900">🚀 Chopachop Muassasalari</span>
+                            <button type="button" onclick="openAddPartnerModal()" class="px-2.5 py-1 bg-purple-600 active:bg-purple-700 text-white text-[10px] font-bold rounded-lg shadow-sm">
+                                <i class="fa-solid fa-gear mr-0.5"></i> Sozlash
+                            </button>
+                        </div>
                         <div id="form-partners-list" class="space-y-1.5"></div>
                     </div>
-                    <button type="submit" id="sale-submit-btn" class="w-full py-2.5 bg-blue-600 text-white font-extrabold text-xs rounded-xl shadow">Kunlik Savdoni Saqlash</button>
+
+                    <button type="submit" id="sale-submit-btn" class="w-full py-2.5 bg-blue-600 active:bg-blue-700 text-white font-extrabold text-xs rounded-xl shadow">
+                        Kunlik Savdoni Saqlash
+                    </button>
                 </form>
             </div>
-            <div class="space-y-2"><h3 class="text-[11px] font-extrabold text-slate-500 uppercase px-1">Tarix</h3><div id="sales-list" class="space-y-2"></div></div>
-        </div>
 
-        <!-- 2. ANALITIKA -->
-        <div id="view-analytics" class="tab-content space-y-3">
-            <div class="bg-white p-3.5 rounded-2xl shadow-sm border space-y-3">
-                <h2 class="text-xs font-extrabold text-slate-900">Biznes Holati va Tahlil</h2>
-                <div id="analytics-status-box" class="p-2.5 rounded-xl text-xs font-bold" style="display: none;"></div>
-                <div class="grid grid-cols-2 gap-2 text-xs">
-                    <div class="bg-blue-50 p-2 rounded-xl cursor-pointer" onclick="openDetailModal('Jazira Filiallar', 'Sarpul va Vaynkamat jami savdosi')"><span class="text-slate-500 text-[9px]">Sarpul & Vaynkamat:</span><b id="ana-jazira-filial" class="text-blue-900 text-xs block">0</b></div>
-                    <div class="bg-emerald-50 p-2 rounded-xl cursor-pointer" onclick="openDetailModal('Jazira Bot', 'Jazira bot orqali tushgan savdolar')"><span class="text-slate-500 text-[9px]">Jazira Bot:</span><b id="ana-jazira-bot" class="text-emerald-900 text-xs block">0</b></div>
-                </div>
-                <div class="space-y-1 pt-2 border-t"><h3 class="text-[11px] font-extrabold text-rose-700 uppercase">Xarajatlar:</h3><div id="ana-cost-breakdown" class="space-y-1 text-xs bg-slate-50 p-2.5 rounded-xl border"></div></div>
-                <div class="space-y-1 pt-2 border-t"><h3 class="text-[11px] font-extrabold text-slate-700 uppercase">Kafelar reytingi:</h3><div id="ana-partner-ranking" class="space-y-1 text-xs"></div></div>
+            <div class="space-y-2">
+                <h3 class="text-[11px] font-extrabold text-slate-500 uppercase px-1">Savdolar Tarixi</h3>
+                <div id="sales-list" class="space-y-2"></div>
             </div>
         </div>
 
-        <!-- 3. KURYER (IKKITA ALOHIDA QISM) -->
+        <!-- ==================== 2. ANALITIKA BO'LIMI ==================== -->
+        <div id="view-analytics" class="tab-content space-y-3">
+            <div class="bg-white p-3.5 rounded-2xl shadow-sm border border-slate-200/80 space-y-3">
+                <h2 class="text-xs font-extrabold text-slate-900">Biznes Holati va Tahlil</h2>
+                <div id="analytics-status-box" class="p-3 rounded-xl text-xs font-extrabold" style="display: none;"></div>
+                
+                <div class="grid grid-cols-2 gap-2 text-xs">
+                    <div class="bg-blue-50 p-2.5 rounded-xl border border-blue-100 cursor-pointer" onclick="openDetailModal('Jazira Filiallar', 'Sarpul va Vaynkamat jami savdosi')">
+                        <span class="text-slate-500 text-[10px] block">Sarpul & Vaynkamat:</span>
+                        <b id="ana-jazira-filial" class="text-blue-900 text-xs block mt-0.5">0 soʻm</b>
+                    </div>
+                    <div class="bg-emerald-50 p-2.5 rounded-xl border border-emerald-100 cursor-pointer" onclick="openDetailModal('Jazira Bot', 'Jazira bot orqali tushgan savdolar')">
+                        <span class="text-slate-500 text-[10px] block">Jazira Bot:</span>
+                        <b id="ana-jazira-bot" class="text-emerald-900 text-xs block mt-0.5">0 soʻm</b>
+                    </div>
+                </div>
+
+                <div class="space-y-1.5 pt-2 border-t">
+                    <h3 class="text-[11px] font-extrabold text-rose-700 uppercase">Umumiy Xarajatlar:</h3>
+                    <div id="ana-cost-breakdown" class="space-y-1.5 text-xs bg-slate-50 p-3 rounded-xl border"></div>
+                </div>
+
+                <div class="space-y-1.5 pt-2 border-t">
+                    <h3 class="text-[11px] font-extrabold text-slate-700 uppercase">Chopachop Kafelar Reytingi:</h3>
+                    <div id="ana-partner-ranking" class="space-y-1.5 text-xs"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==================== 3. KURYER BO'LIMI ==================== -->
         <div id="view-bots" class="tab-content space-y-3">
             <div id="bots-finance-cards" class="grid grid-cols-2 gap-2" style="display: none;">
-                <div class="bg-white p-3 rounded-2xl shadow-sm border-t-4 border-emerald-500 space-y-1 text-xs"><h3 class="font-extrabold">Jazira</h3><div>Ulush: <b id="jbot-share" class="text-emerald-600">+0</b></div><div>Qoplanma: <b id="jbot-subsidy" class="text-rose-600">-0</b></div><div class="pt-1 border-t font-bold">Sof: <span id="jbot-net" class="text-emerald-600">0</span></div></div>
-                <div class="bg-white p-3 rounded-2xl shadow-sm border-t-4 border-purple-600 space-y-1 text-xs"><h3 class="font-extrabold">Chopachop</h3><div>Ulush: <b id="cbot-share" class="text-purple-600">+0</b></div><div>Qoplanma: <b id="cbot-subsidy" class="text-rose-600">-0</b></div><div class="pt-1 border-t font-bold">Sof: <span id="cbot-net" class="text-purple-600">0</span></div></div>
+                <div class="bg-white p-3 rounded-2xl shadow-sm border-t-4 border-emerald-500 space-y-1 text-xs">
+                    <h3 class="font-extrabold text-slate-800">Jazira</h3>
+                    <div class="flex justify-between"><span>Ulush:</span> <b id="jbot-share" class="text-emerald-600">+0</b></div>
+                    <div class="flex justify-between"><span>Qoplanma:</span> <b id="jbot-subsidy" class="text-rose-600">-0</b></div>
+                    <div class="pt-1 border-t flex justify-between font-bold"><span>Sof:</span> <span id="jbot-net" class="text-emerald-600">0</span></div>
+                </div>
+                <div class="bg-white p-3 rounded-2xl shadow-sm border-t-4 border-purple-600 space-y-1 text-xs">
+                    <h3 class="font-extrabold text-slate-800">Chopachop</h3>
+                    <div class="flex justify-between"><span>Ulush:</span> <b id="cbot-share" class="text-purple-600">+0</b></div>
+                    <div class="flex justify-between"><span>Qoplanma:</span> <b id="cbot-subsidy" class="text-rose-600">-0</b></div>
+                    <div class="pt-1 border-t flex justify-between font-bold"><span>Sof:</span> <span id="cbot-net" class="text-purple-600">0</span></div>
+                </div>
             </div>
 
-            <!-- 1-QISM: Kundalik qoplanma yozish -->
-            <div class="bg-white p-3.5 rounded-2xl shadow-sm border space-y-2">
+            <!-- 1-QISM: Kuryerga kundalik qoplanma yozish -->
+            <div class="bg-white p-3.5 rounded-2xl shadow-sm border border-slate-200/80 space-y-2.5">
                 <div class="flex items-center gap-2 border-b pb-2">
-                    <div class="w-6 h-6 rounded-lg bg-blue-600 text-white flex items-center justify-center font-bold text-xs">1</div>
+                    <div class="w-6 h-6 rounded-lg bg-blue-600 text-white flex items-center justify-center font-bold text-xs shrink-0">1</div>
                     <h2 class="text-xs font-extrabold text-slate-900">Kuryerga Kundalik Qoplanma Yozish</h2>
                 </div>
                 <form onsubmit="addBotCost(event)" class="space-y-2 bg-blue-50/40 p-3 rounded-xl border border-blue-200">
-                    <div class="grid grid-cols-3 gap-1"><input type="date" id="bc-date" required class="px-1 py-1 text-xs border rounded"><select id="bc-source" class="px-1 py-1 text-xs border rounded"></select><select id="bc-courier" class="px-1 py-1 text-xs border rounded"></select></div>
-                    <div class="grid grid-cols-2 gap-1"><input type="number" step="any" id="bc-amount" placeholder="Qoplanma summasi" required class="px-2 py-1 text-xs border rounded"><input type="text" id="bc-desc" placeholder="Izoh..." required class="px-2 py-1 text-xs border rounded"></div>
+                    <div class="grid grid-cols-3 gap-1.5">
+                        <input type="date" id="bc-date" required class="px-1.5 py-1.5 text-xs bg-white border rounded-lg">
+                        <select id="bc-source" class="px-1.5 py-1.5 text-xs bg-white border rounded-lg"></select>
+                        <select id="bc-courier" class="px-1.5 py-1.5 text-xs bg-white border rounded-lg font-bold"></select>
+                    </div>
+                    <div class="grid grid-cols-2 gap-1.5">
+                        <input type="number" step="any" id="bc-amount" placeholder="Qoplanma summasi" required class="px-2.5 py-1.5 text-xs bg-white border rounded-lg">
+                        <input type="text" id="bc-desc" placeholder="Izoh (masalan: uzoq masofa)" required class="px-2.5 py-1.5 text-xs bg-white border rounded-lg">
+                    </div>
                     <div>
                         <label class="block text-[10px] font-bold text-slate-500 mb-1">📸 Chek yoki skrinshot yuklash (ixtiyoriy)</label>
-                        <input type="file" id="bc-image" accept="image/*" class="w-full text-[11px] text-slate-500 file:mr-2 file:py-1.5 file:px-2 file:rounded-lg file:border-0 file:text-[10px] file:font-semibold file:bg-purple-50 file:text-purple-700 border rounded-xl bg-white p-1">
+                        <input type="file" id="bc-image" accept="image/*" class="w-full text-[11px] text-slate-500 file:mr-2 file:py-1 file:px-2.5 file:rounded-lg file:border-0 file:text-[10px] file:font-bold file:bg-blue-100 file:text-blue-700 border rounded-xl bg-white p-1">
                     </div>
-                    <button type="submit" class="w-full py-2 bg-blue-600 text-white font-bold text-xs rounded-xl">Qoplanmani Saqlash</button>
+                    <button type="submit" class="w-full py-2 bg-blue-600 active:bg-blue-700 text-white font-bold text-xs rounded-xl shadow-sm">
+                        Qoplanmani Saqlash
+                    </button>
                 </form>
             </div>
 
-            <!-- 2-QISM: Kuryerga pul berish (Alohida bo'lim) -->
-            <div class="bg-white p-3.5 rounded-2xl shadow-sm border space-y-2">
+            <!-- 2-QISM: Kuryerga pul berish -->
+            <div class="bg-white p-3.5 rounded-2xl shadow-sm border border-slate-200/80 space-y-2.5">
                 <div class="flex items-center gap-2 border-b pb-2">
-                    <div class="w-6 h-6 rounded-lg bg-emerald-600 text-white flex items-center justify-center font-bold text-xs">2</div>
+                    <div class="w-6 h-6 rounded-lg bg-emerald-600 text-white flex items-center justify-center font-bold text-xs shrink-0">2</div>
                     <h2 class="text-xs font-extrabold text-slate-900">Kuryerga Pul Berish (Haftalik / 5 kunda)</h2>
                 </div>
                 <form onsubmit="addCourierPayout(event)" class="space-y-2 bg-emerald-50/40 p-3 rounded-xl border border-emerald-200">
-                    <div class="grid grid-cols-2 gap-1"><select id="cp-courier" class="px-2 py-1 text-xs border rounded"></select><input type="date" id="cp-date" required class="px-2 py-1 text-xs border rounded"></div>
-                    <div class="grid grid-cols-2 gap-1"><input type="number" step="any" id="cp-amount" placeholder="Berilgan pul summasi" required class="px-2 py-1 text-xs border rounded"><select id="cp-paytype" class="px-2 py-1 text-xs border rounded bg-white font-bold text-emerald-700"><option value="Naqd (Sarpul kassa)">🍗 Sarpul kassa (Naqd)</option><option value="Naqd (Vaynkamat kassa)">🍔 Vaynkamat kassa (Naqd)</option><option value="Karta orqali">💳 Karta orqali</option></select></div>
-                    <input type="text" id="cp-desc" placeholder="Izoh (masalan: 5 kunlik hisob)..." required class="w-full px-2 py-1 text-xs border rounded">
-                    <button type="submit" class="w-full py-2 bg-emerald-600 text-white font-bold text-xs rounded-xl">Kuryerga Pul Berishni Saqlash</button>
+                    <div class="grid grid-cols-2 gap-1.5">
+                        <select id="cp-courier" class="px-2 py-1.5 text-xs bg-white border rounded-lg font-bold"></select>
+                        <input type="date" id="cp-date" required class="px-2 py-1.5 text-xs bg-white border rounded-lg">
+                    </div>
+                    <div class="grid grid-cols-2 gap-1.5">
+                        <input type="number" step="any" id="cp-amount" placeholder="Berilgan pul summasi" required class="px-2.5 py-1.5 text-xs bg-white border rounded-lg">
+                        <select id="cp-paytype" class="px-2 py-1.5 text-xs border rounded-lg bg-white font-bold text-emerald-700">
+                            <option value="Naqd (Sarpul kassa)">🍗 Sarpul kassa (Naqd)</option>
+                            <option value="Naqd (Vaynkamat kassa)">🍔 Vaynkamat kassa (Naqd)</option>
+                            <option value="Karta orqali">💳 Karta orqali</option>
+                        </select>
+                    </div>
+                    <input type="text" id="cp-desc" placeholder="Izoh (masalan: 5 kunlik hisob yopildi)..." required class="w-full px-2.5 py-1.5 text-xs bg-white border rounded-lg">
+                    <button type="submit" class="w-full py-2 bg-emerald-600 active:bg-emerald-700 text-white font-bold text-xs rounded-xl shadow-sm">
+                        Kuryerga Pul Berishni Saqlash
+                    </button>
                 </form>
             </div>
 
-            <div class="bg-white p-3 rounded-2xl shadow-sm border space-y-2"><h3 class="text-[11px] font-bold text-slate-700 uppercase">Kuryerlar boʻyicha qoldiq</h3><div id="courier-subsidy-summary" class="divide-y text-xs"></div></div>
-            <div class="bg-white p-3 rounded-2xl shadow-sm border space-y-2"><h3 class="text-[11px] font-bold text-slate-500 uppercase">Tarix (Qoplanmalar va Pul berishlar)</h3><div id="bc-list" class="space-y-1.5 max-h-48 overflow-y-auto"></div></div>
+            <div class="bg-white p-3.5 rounded-2xl shadow-sm border space-y-2">
+                <h3 class="text-[11px] font-extrabold text-slate-700 uppercase">Kuryerlar boʻyicha hisob-kitob (Qoldiq)</h3>
+                <div id="courier-subsidy-summary" class="divide-y text-xs"></div>
+            </div>
+
+            <div class="bg-white p-3.5 rounded-2xl shadow-sm border space-y-2">
+                <h3 class="text-[11px] font-extrabold text-slate-500 uppercase">Tarix (Qoplanmalar va Pul berishlar)</h3>
+                <div id="bc-list" class="space-y-1.5 max-h-64 overflow-y-auto"></div>
+            </div>
         </div>
 
-        <!-- 4. RAZDACHA -->
+        <!-- ==================== 4. RAZDACHA BO'LIMI ==================== -->
         <div id="view-razdacha" class="tab-content space-y-3">
             <div id="razdacha-cards" class="grid grid-cols-1 sm:grid-cols-2 gap-2"></div>
-            <div class="bg-white p-3.5 rounded-2xl shadow-sm border space-y-2">
-                <h2 class="text-xs font-bold">Razdacha Smena va Vaqti</h2>
+            
+            <div class="bg-white p-3.5 rounded-2xl shadow-sm border space-y-2.5">
+                <h2 class="text-xs font-extrabold text-slate-800">Razdacha Smena va Vaqti</h2>
                 <form onsubmit="addAttendance(event)" class="space-y-2 bg-slate-50 p-3 rounded-xl border">
-                    <div class="grid grid-cols-2 gap-1"><select id="att-worker" class="px-2 py-1 text-xs border rounded"><option value="Xushnud">Xushnud</option><option value="Murod">Murod</option></select><input type="date" id="att-date" required class="px-2 py-1 text-xs border rounded"></div>
-                    <div class="grid grid-cols-3 gap-1"><input type="time" id="att-arrival" value="12:00" required class="px-1 py-1 text-xs border rounded"><input type="time" id="att-leave" value="00:00" required class="px-1 py-1 text-xs border rounded"><input type="number" id="att-leave-hours" value="0" step="0.5" required class="px-1 py-1 text-xs border rounded" placeholder="Javob"></div>
-                    <button type="submit" class="w-full py-2 bg-blue-600 text-white font-bold text-xs rounded-xl">Smena Saqlash</button>
+                    <div class="grid grid-cols-2 gap-1.5">
+                        <select id="att-worker" class="px-2 py-1.5 text-xs bg-white border rounded-lg font-bold">
+                            <option value="Xushnud">Xushnud</option>
+                            <option value="Murod">Murod</option>
+                        </select>
+                        <input type="date" id="att-date" required class="px-2 py-1.5 text-xs bg-white border rounded-lg">
+                    </div>
+                    <div class="grid grid-cols-3 gap-1.5">
+                        <div>
+                            <label class="text-[9px] text-slate-500 block mb-0.5">Keldi:</label>
+                            <input type="time" id="att-arrival" value="12:00" required class="w-full px-1.5 py-1 text-xs bg-white border rounded-lg">
+                        </div>
+                        <div>
+                            <label class="text-[9px] text-slate-500 block mb-0.5">Ketdi:</label>
+                            <input type="time" id="att-leave" value="00:00" required class="w-full px-1.5 py-1 text-xs bg-white border rounded-lg">
+                        </div>
+                        <div>
+                            <label class="text-[9px] text-slate-500 block mb-0.5">Javob (soat):</label>
+                            <input type="number" id="att-leave-hours" value="0" step="0.5" required class="w-full px-1.5 py-1 text-xs bg-white border rounded-lg" placeholder="0">
+                        </div>
+                    </div>
+                    <button type="submit" class="w-full py-2 bg-blue-600 active:bg-blue-700 text-white font-bold text-xs rounded-xl shadow-sm">
+                        Smena Saqlash
+                    </button>
                 </form>
             </div>
-            <div class="bg-white p-3.5 rounded-2xl shadow-sm border space-y-2">
-                <h2 class="text-xs font-bold text-amber-700">Xushnud yoki Murodga Ovqat / Avans yozish</h2>
+
+            <div class="bg-white p-3.5 rounded-2xl shadow-sm border space-y-2.5">
+                <h2 class="text-xs font-extrabold text-amber-700">Xushnud yoki Murodga Ovqat / Avans yozish</h2>
                 <form onsubmit="addRazdachaExpense(event)" class="space-y-2 bg-amber-50/50 p-3 rounded-xl border border-amber-200">
-                    <div class="grid grid-cols-2 gap-1"><select id="rd-worker" class="px-2 py-1 text-xs border rounded"><option value="Xushnud">Xushnud</option><option value="Murod">Murod</option></select><select id="rd-kind" onchange="toggleRdBranch()" class="px-2 py-1 text-xs border rounded"><option value="food">🍔 Ovqat</option><option value="avans">💵 Avans</option></select></div>
-                    <div class="grid grid-cols-2 gap-1"><input type="number" step="any" id="rd-amount" placeholder="Summa" required class="px-2 py-1 text-xs border rounded"><select id="rd-branch" class="px-2 py-1 text-xs border rounded bg-amber-50 font-bold"><option value="Sarpul">🍗 Sarpul</option><option value="Vaynkamat">🍔 Vaynkamat</option></select></div>
-                    <input type="text" id="rd-desc" placeholder="Izoh..." required class="w-full px-2 py-1 text-xs border rounded">
-                    <button type="submit" class="w-full py-2 bg-amber-600 text-white font-bold text-xs rounded-xl">Yozib qoʻyish</button>
+                    <div class="grid grid-cols-2 gap-1.5">
+                        <select id="rd-worker" class="px-2 py-1.5 text-xs bg-white border rounded-lg font-bold">
+                            <option value="Xushnud">Xushnud</option>
+                            <option value="Murod">Murod</option>
+                        </select>
+                        <select id="rd-kind" onchange="toggleRdBranch()" class="px-2 py-1.5 text-xs bg-white border rounded-lg font-bold">
+                            <option value="food">🍔 Ovqat</option>
+                            <option value="avans">💵 Avans</option>
+                        </select>
+                    </div>
+                    <div class="grid grid-cols-2 gap-1.5">
+                        <input type="number" step="any" id="rd-amount" placeholder="Summa" required class="px-2.5 py-1.5 text-xs bg-white border rounded-lg">
+                        <select id="rd-branch" class="px-2 py-1.5 text-xs border rounded-lg bg-amber-50 font-bold">
+                            <option value="Sarpul">🍗 Sarpul</option>
+                            <option value="Vaynkamat">🍔 Vaynkamat</option>
+                        </select>
+                    </div>
+                    <input type="text" id="rd-desc" placeholder="Izoh..." required class="w-full px-2.5 py-1.5 text-xs bg-white border rounded-lg">
+                    <button type="submit" class="w-full py-2 bg-amber-600 active:bg-amber-700 text-white font-bold text-xs rounded-xl shadow-sm">
+                        Yozib qoʻyish
+                    </button>
                 </form>
             </div>
-            <div class="bg-white p-3 rounded-2xl shadow-sm border space-y-2"><h3 class="text-[11px] font-bold text-slate-500 uppercase">Smenalar va Xarajatlar Tarixi</h3><div id="att-list" class="space-y-1.5 max-h-40 overflow-y-auto"></div></div>
+
+            <div class="bg-white p-3.5 rounded-2xl shadow-sm border space-y-2">
+                <h3 class="text-[11px] font-extrabold text-slate-500 uppercase">Smenalar va Xarajatlar Tarixi</h3>
+                <div id="att-list" class="space-y-1.5 max-h-56 overflow-y-auto"></div>
+            </div>
         </div>
 
-        <!-- 5. JAMOA -->
+        <!-- ==================== 5. JAMOA BO'LIMI ==================== -->
         <div id="view-team" class="tab-content space-y-3">
-            <div class="bg-white p-3.5 rounded-2xl shadow-sm border space-y-2">
-                <div class="flex justify-between items-center border-b pb-2"><h2 class="text-xs font-extrabold">Xodimlar</h2><button type="button" onclick="openAddWorkerModal()" class="px-2 py-1 bg-blue-600 text-white text-[10px] font-bold rounded">Qoʻshish</button></div>
-                <div id="team-staff-list" class="space-y-1.5 text-xs max-h-40 overflow-y-auto"></div>
+            <div class="bg-white p-3.5 rounded-2xl shadow-sm border space-y-2.5">
+                <div class="flex justify-between items-center border-b pb-2">
+                    <h2 class="text-xs font-extrabold">Jamoa Xodimlari va Oyliklar</h2>
+                    <button type="button" onclick="openAddWorkerModal()" class="px-2.5 py-1 bg-blue-600 active:bg-blue-700 text-white text-[10px] font-bold rounded-lg shadow-sm">
+                        + Xodim qoʻshish
+                    </button>
+                </div>
+                <div id="team-staff-list" class="space-y-1.5 text-xs max-h-48 overflow-y-auto"></div>
             </div>
-            <div class="bg-white p-3.5 rounded-2xl shadow-sm border space-y-2">
-                <h2 class="text-xs font-extrabold">Ovqat va Avans</h2>
+
+            <div class="bg-white p-3.5 rounded-2xl shadow-sm border space-y-2.5">
+                <h2 class="text-xs font-extrabold">Ovqat, Avans va Jarima Yozish</h2>
                 <form onsubmit="addExpense(event)" class="space-y-2 bg-slate-50 p-3 rounded-xl border">
-                    <div class="grid grid-cols-2 gap-1"><select id="exp-target" class="px-2 py-1 text-xs border rounded"></select><select id="exp-kind" onchange="toggleMealBranch()" class="px-2 py-1 text-xs border rounded"><option value="food">🍔 Ovqat</option><option value="avans">💵 Avans</option><option value="fine">⚠️ Jarima</option></select></div>
-                    <div id="meal-branch-box" class="grid grid-cols-1"><select id="exp-branch" class="px-2 py-1 text-xs border rounded bg-amber-50 font-bold"><option value="Sarpul">🍗 Qaysi filialdan: Sarpul</option><option value="Vaynkamat">🍔 Qaysi filialdan: Vaynkamat</option></select></div>
-                    <div class="grid grid-cols-3 gap-1"><input type="date" id="exp-date" required class="px-1 py-1 text-xs border rounded"><input type="number" step="any" id="exp-amount" placeholder="Summa" required class="px-1 py-1 text-xs border rounded"><input type="text" id="exp-desc" placeholder="Izoh" required class="px-1 py-1 text-xs border rounded"></div>
-                    <button type="submit" class="w-full py-2 bg-slate-900 text-white font-bold text-xs rounded-xl">Saqlash</button>
+                    <div class="grid grid-cols-2 gap-1.5">
+                        <select id="exp-target" class="px-2 py-1.5 text-xs bg-white border rounded-lg font-bold"></select>
+                        <select id="exp-kind" onchange="toggleMealBranch()" class="px-2 py-1.5 text-xs bg-white border rounded-lg font-bold">
+                            <option value="food">🍔 Ovqat</option>
+                            <option value="avans">💵 Avans</option>
+                            <option value="fine">⚠️ Jarima</option>
+                        </select>
+                    </div>
+                    <div id="meal-branch-box">
+                        <select id="exp-branch" class="w-full px-2 py-1.5 text-xs border rounded-lg bg-amber-50 font-bold">
+                            <option value="Sarpul">🍗 Qaysi filialdan: Sarpul</option>
+                            <option value="Vaynkamat">🍔 Qaysi filialdan: Vaynkamat</option>
+                        </select>
+                    </div>
+                    <div class="grid grid-cols-3 gap-1.5">
+                        <input type="date" id="exp-date" required class="px-1.5 py-1.5 text-xs bg-white border rounded-lg">
+                        <input type="number" step="any" id="exp-amount" placeholder="Summa" required class="px-2 py-1.5 text-xs bg-white border rounded-lg">
+                        <input type="text" id="exp-desc" placeholder="Izoh" required class="px-2 py-1.5 text-xs bg-white border rounded-lg">
+                    </div>
+                    <button type="submit" class="w-full py-2 bg-slate-900 active:bg-slate-800 text-white font-bold text-xs rounded-xl shadow-sm">
+                        Saqlash
+                    </button>
                 </form>
             </div>
+
+            <div class="bg-white p-3.5 rounded-2xl shadow-sm border space-y-2.5">
+                <h2 class="text-xs font-extrabold text-rose-600">Atkaz Tovar Yozish</h2>
+                <form onsubmit="addAtkaz(event)" class="space-y-2 bg-rose-50/60 p-3 rounded-xl border border-rose-200">
+                    <div class="grid grid-cols-2 gap-1.5">
+                        <input type="date" id="atkaz-date" required class="px-2 py-1.5 text-xs bg-white border rounded-lg">
+                        <select id="atkaz-source" class="px-2 py-1.5 text-xs bg-white border rounded-lg"></select>
+                    </div>
+                    <div class="grid grid-cols-2 gap-1.5">
+                        <select id="atkaz-worker" class="px-2 py-1.5 text-xs bg-white border rounded-lg font-bold text-rose-800"></select>
+                        <input type="number" step="any" id="atkaz-amount" placeholder="Summa" required class="px-2.5 py-1.5 text-xs bg-white border rounded-lg">
+                    </div>
+                    <input type="text" id="atkaz-desc" placeholder="Atkaz sababi va mahsulot nomi..." required class="w-full px-2.5 py-1.5 text-xs bg-white border rounded-lg">
+                    <button type="submit" class="w-full py-2 bg-rose-600 active:bg-rose-700 text-white font-bold text-xs rounded-xl shadow-sm">
+                        Atkazni Saqlash
+                    </button>
+                </form>
+            </div>
+
             <div class="bg-white p-3.5 rounded-2xl shadow-sm border space-y-2">
-                <h2 class="text-xs font-extrabold text-rose-600">Atkaz Tovar</h2>
-                <form onsubmit="addAtkaz(event)" class="space-y-2 bg-rose-50 p-3 rounded-xl border">
-                    <div class="grid grid-cols-2 gap-1"><input type="date" id="atkaz-date" required class="px-1 py-1 text-xs border rounded"><select id="atkaz-source" class="px-1 py-1 text-xs border rounded"></select></div>
-                    <div class="grid grid-cols-2 gap-1"><select id="atkaz-worker" class="px-1 py-1 text-xs border rounded font-bold text-rose-800"><option value="Oʻzim (Rahbar)">👤 Rahbarga (Oʻzimga)</option></select><input type="number" step="any" id="atkaz-amount" placeholder="Summa" required class="px-2 py-1 text-xs border rounded"></div>
-                    <input type="text" id="atkaz-desc" placeholder="Izoh..." required class="w-full px-2 py-1 text-xs border rounded">
-                    <button type="submit" class="w-full py-2 bg-rose-600 text-white font-bold text-xs rounded-xl">Saqlash</button>
-                </form>
+                <h3 class="text-[11px] font-extrabold text-slate-500 uppercase">Atkazlar Tarixi</h3>
+                <div id="atkaz-list" class="space-y-1.5 max-h-44 overflow-y-auto"></div>
             </div>
-            <div class="bg-white p-3 rounded-2xl shadow-sm border space-y-2"><h3 class="text-[11px] font-bold text-slate-500 uppercase">Atkazlar Tarixi</h3><div id="atkaz-list" class="space-y-1.5 max-h-40 overflow-y-auto"></div></div>
-            <div class="bg-white p-3.5 rounded-2xl shadow-sm border space-y-2"><h3 class="text-xs font-extrabold uppercase">Oylik Qoldigʻi</h3><div id="staff-salary-table" class="divide-y text-xs"></div></div>
+
+            <div class="bg-white p-3.5 rounded-2xl shadow-sm border space-y-2">
+                <h3 class="text-xs font-extrabold uppercase text-slate-800">Xodimlar Oylik Qoldigʻi (Hisob-kitob)</h3>
+                <p class="text-[10px] text-slate-400">Batafsil koʻrish uchun xodim ustiga bosing</p>
+                <div id="staff-salary-table" class="divide-y text-xs"></div>
+            </div>
         </div>
 
-        <!-- 6. REJALAR -->
+        <!-- ==================== 6. REJALAR BO'LIMI ==================== -->
         <div id="view-tasks" class="tab-content space-y-3">
             <div class="bg-white p-3.5 rounded-2xl shadow-sm border space-y-3">
-                <div class="flex items-center justify-between">
-                    <h2 class="text-xs font-bold" id="task-panel-title">Rejalar</h2>
-                    <select id="task-filter" onchange="renderAll()" class="text-xs bg-slate-100 border rounded px-2 py-1"><option value="kunlik">Kunlik</option><option value="haftalik">Haftalik</option><option value="oylik">Oylik</option><option value="yillik">Yillik</option></select>
+                <div class="flex items-center justify-between border-b pb-2">
+                    <h2 class="text-xs font-extrabold" id="task-panel-title">Rejalar</h2>
+                    <select id="task-filter" onchange="renderAll()" class="text-xs bg-slate-100 border rounded-lg px-2.5 py-1 font-bold">
+                        <option value="kunlik">Kunlik</option>
+                        <option value="haftalik">Haftalik</option>
+                        <option value="oylik">Oylik</option>
+                        <option value="yillik">Yillik</option>
+                    </select>
                 </div>
+
                 <form id="task-add-form" onsubmit="addTask(event)" class="space-y-2" style="display: none;">
-                    <div class="flex gap-1">
-                        <select id="task-type" class="px-2 py-1 text-xs border rounded"><option value="kunlik">Kunlik</option><option value="haftalik">Haftalik</option><option value="oylik">Oylik</option><option value="yillik">Yillik</option></select>
-                        <input type="text" id="task-input" placeholder="Fayozaga yangi reja qoʻyish..." class="w-full px-2 py-1 text-xs border rounded">
+                    <div class="flex gap-1.5">
+                        <select id="task-type" class="px-2 py-1.5 text-xs bg-slate-50 border rounded-lg font-bold">
+                            <option value="kunlik">Kunlik</option>
+                            <option value="haftalik">Haftalik</option>
+                            <option value="oylik">Oylik</option>
+                            <option value="yillik">Yillik</option>
+                        </select>
+                        <input type="text" id="task-input" placeholder="Yangi reja yoki vazifa yozing..." class="w-full px-2.5 py-1.5 text-xs border rounded-lg">
                     </div>
-                    <button type="submit" class="w-full py-2 bg-blue-600 text-white text-xs font-bold rounded-xl">Fayozaga Reja Qoʻshish</button>
+                    <button type="submit" class="w-full py-2 bg-blue-600 active:bg-blue-700 text-white text-xs font-bold rounded-xl shadow-sm">
+                        + Vazifa / Reja Qoʻshish
+                    </button>
                 </form>
-                <div id="task-list" class="space-y-1.5 max-h-60 overflow-y-auto"></div>
+
+                <div id="task-list" class="space-y-1.5 max-h-72 overflow-y-auto"></div>
             </div>
         </div>
 
-        <!-- 7. MOLIYA -->
+        <!-- ==================== 7. MOLIYA BO'LIMI ==================== -->
         <div id="view-finance" class="tab-content space-y-3">
             <div class="bg-white p-3.5 rounded-2xl shadow-sm border space-y-2.5">
                 <h2 class="text-xs font-extrabold text-slate-800">Kirim, Chiqim va Qarzlar</h2>
                 <form onsubmit="addFinanceItem(event)" class="space-y-2 bg-slate-50 p-3 rounded-xl border">
-                    <div class="grid grid-cols-2 gap-1"><select id="fin-type" class="px-2 py-1 text-xs border rounded"><option value="kirim">➕ Kirim</option><option value="chiqim">➖ Chiqim</option><option value="qarz_berdim">🟢 Qarz berdim</option><option value="qarz_oldim">🔴 Qarz oldim</option></select><input type="text" id="fin-person" placeholder="Kim / Qayerdan" required class="px-2 py-1 text-xs border rounded"></div>
-                    <div class="grid grid-cols-2 gap-1"><input type="number" step="any" id="fin-amount" placeholder="Summa" required class="px-2 py-1 text-xs border rounded"><input type="date" id="fin-date" required class="px-2 py-1 text-xs border rounded"></div>
-                    <input type="text" id="fin-desc" placeholder="Izoh..." class="w-full px-2 py-1 text-xs border rounded">
-                    <button type="submit" class="w-full py-2 bg-emerald-600 text-white font-bold text-xs rounded-xl">Saqlash</button>
+                    <div class="grid grid-cols-2 gap-1.5">
+                        <select id="fin-type" class="px-2 py-1.5 text-xs bg-white border rounded-lg font-bold">
+                            <option value="kirim">➕ Kirim</option>
+                            <option value="chiqim">➖ Chiqim</option>
+                            <option value="qarz_berdim">🟢 Qarz berdim</option>
+                            <option value="qarz_oldim">🔴 Qarz oldim</option>
+                        </select>
+                        <input type="text" id="fin-person" placeholder="Kim / Qayerdan" required class="px-2.5 py-1.5 text-xs bg-white border rounded-lg">
+                    </div>
+                    <div class="grid grid-cols-2 gap-1.5">
+                        <input type="number" step="any" id="fin-amount" placeholder="Summa" required class="px-2.5 py-1.5 text-xs bg-white border rounded-lg">
+                        <input type="date" id="fin-date" required class="px-2 py-1.5 text-xs bg-white border rounded-lg">
+                    </div>
+                    <input type="text" id="fin-desc" placeholder="Izoh..." class="w-full px-2.5 py-1.5 text-xs bg-white border rounded-lg">
+                    <button type="submit" class="w-full py-2 bg-emerald-600 active:bg-emerald-700 text-white font-bold text-xs rounded-xl shadow-sm">
+                        Moliya Qaydini Saqlash
+                    </button>
                 </form>
             </div>
-            <div class="grid grid-cols-2 gap-2"><div class="bg-emerald-50 border p-2.5 rounded-2xl text-center cursor-pointer" onclick="openDetailModal('Kirimlar tarixi', 'Jami kirim va qarzlar')"><span class="text-[9px] font-bold text-emerald-700">KIRIM</span><p id="fin-total-kirim" class="text-xs font-extrabold text-emerald-600">0</p></div><div class="bg-rose-50 border p-2.5 rounded-2xl text-center cursor-pointer" onclick="openDetailModal('Chiqimlar tarixi', 'Jami chiqimlar')"><span class="text-[9px] font-bold text-rose-700">CHIQIM</span><p id="fin-total-chiqim" class="text-xs font-extrabold text-rose-600">0</p></div></div>
-            <div class="bg-white p-3.5 rounded-2xl shadow-sm border space-y-2"><h3 class="text-[11px] font-bold text-slate-500 uppercase">Tarix</h3><div id="fin-list" class="space-y-1.5 max-h-56 overflow-y-auto"></div></div>
+
+            <div class="grid grid-cols-2 gap-2">
+                <div class="bg-emerald-50 border border-emerald-200 p-2.5 rounded-2xl text-center cursor-pointer" onclick="openDetailModal('Kirimlar tarixi', 'Jami kirim va olingan qarzlar')">
+                    <span class="text-[9px] font-bold text-emerald-700">JAMI KIRIM</span>
+                    <p id="fin-total-kirim" class="text-xs font-extrabold text-emerald-600 mt-0.5">0 soʻm</p>
+                </div>
+                <div class="bg-rose-50 border border-rose-200 p-2.5 rounded-2xl text-center cursor-pointer" onclick="openDetailModal('Chiqimlar tarixi', 'Jami chiqim va berilgan qarzlar')">
+                    <span class="text-[9px] font-bold text-rose-700">JAMI CHIQIM</span>
+                    <p id="fin-total-chiqim" class="text-xs font-extrabold text-rose-600 mt-0.5">0 soʻm</p>
+                </div>
+            </div>
+
+            <div class="bg-white p-3.5 rounded-2xl shadow-sm border space-y-2">
+                <h3 class="text-[11px] font-extrabold text-slate-500 uppercase">Moliya Tarixi</h3>
+                <div id="fin-list" class="space-y-1.5 max-h-64 overflow-y-auto"></div>
+            </div>
         </div>
 
     </main>
 
-    <!-- TAFSILOTLAR MODALI -->
-    <div id="detailModal" class="fixed inset-0 modal-bg z-50 hidden flex items-center justify-center p-3" onclick="closeDetailModal()">
+    <!-- ==================== MODAL OYNALAR ==================== -->
+
+    <!-- 1. Tafsilotlar Modali -->
+    <div id="detailModal" class="fixed inset-0 modal-overlay z-50 items-center justify-center p-3" onclick="closeDetailModal()">
         <div class="bg-white rounded-2xl max-w-lg w-full max-h-[85vh] flex flex-col shadow-2xl overflow-hidden" onclick="event.stopPropagation()">
             <div class="px-4 py-3 bg-slate-900 text-white flex items-center justify-between">
                 <h3 id="detailModalTitle" class="font-bold text-xs sm:text-sm">Tafsilotlar</h3>
-                <button onclick="closeDetailModal()" class="w-7 h-7 rounded-lg bg-slate-800 text-slate-300 flex items-center justify-center font-bold">✕</button>
+                <button type="button" onclick="closeDetailModal()" class="w-7 h-7 rounded-lg bg-slate-800 text-slate-300 flex items-center justify-center font-bold">✕</button>
             </div>
             <div id="detailModalBody" class="p-4 overflow-y-auto space-y-2 text-xs"></div>
         </div>
     </div>
 
-    <!-- RASMNI KATTALASHTIRIB KO'RISH MODALI -->
-    <div id="imageModal" class="fixed inset-0 modal-bg z-50 hidden flex items-center justify-center p-3" onclick="closeImageModal()">
+    <!-- 2. Rasmni Kattalashtirib Ko'rish Modali -->
+    <div id="imageModal" class="fixed inset-0 modal-overlay z-50 items-center justify-center p-3" onclick="closeImageModal()">
         <div class="bg-white rounded-2xl max-w-lg w-full p-3 shadow-2xl relative" onclick="event.stopPropagation()">
-            <button onclick="closeImageModal()" class="absolute top-2 right-2 w-8 h-8 rounded-lg bg-slate-900 text-white flex items-center justify-center font-bold">✕</button>
-            <img id="modalImageElem" src="" class="w-full max-h-[80vh] object-contain rounded-xl mt-4">
+            <button type="button" onclick="closeImageModal()" class="absolute top-2 right-2 w-8 h-8 rounded-lg bg-slate-900 text-white flex items-center justify-center font-bold">✕</button>
+            <img id="modalImageElem" src="" alt="Chek" class="w-full max-h-[80vh] object-contain rounded-xl mt-4">
         </div>
     </div>
 
-    <!-- MODALLAR -->
-    <div id="worker-add-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4" style="display: none;">
-        <div class="bg-white rounded-2xl p-4 max-w-sm w-full space-y-3 shadow-xl">
-            <h3 class="text-sm font-extrabold flex justify-between"><span>Xodim qoʻshish</span><button onclick="closeAddWorkerModal()"><i class="fa-solid fa-xmark"></i></button></h3>
+    <!-- 3. Xodim Qo'shish Modali -->
+    <div id="worker-add-modal" class="fixed inset-0 modal-overlay z-50 items-center justify-center p-4" onclick="closeAddWorkerModal()">
+        <div class="bg-white rounded-2xl p-4 max-w-sm w-full space-y-3 shadow-xl" onclick="event.stopPropagation()">
+            <h3 class="text-sm font-extrabold flex justify-between items-center">
+                <span>Yangi xodim qoʻshish</span>
+                <button type="button" onclick="closeAddWorkerModal()" class="text-slate-400 hover:text-slate-700"><i class="fa-solid fa-xmark"></i></button>
+            </h3>
             <input type="text" id="nw-name" placeholder="Ismi..." class="w-full px-3 py-2 text-xs border rounded-xl">
-            <select id="nw-role" class="w-full px-3 py-2 text-xs border rounded-xl"><option value="kuryer">Kuryer</option><option value="operator">Operator</option><option value="razdacha">Razdachachi</option><option value="rahbar">Rahbar</option></select>
-            <input type="number" id="nw-salary" placeholder="Oyligi..." class="w-full px-3 py-2 text-xs border rounded-xl">
-            <button onclick="saveNewWorker()" class="w-full py-2 bg-blue-600 text-white font-bold text-xs rounded-xl">Saqlash</button>
+            <select id="nw-role" class="w-full px-3 py-2 text-xs border rounded-xl font-bold">
+                <option value="kuryer">Kuryer</option>
+                <option value="operator">Operator</option>
+                <option value="razdacha">Razdachachi</option>
+                <option value="rahbar">Rahbar</option>
+            </select>
+            <input type="number" id="nw-salary" placeholder="Oyligi (soʻmda)..." class="w-full px-3 py-2 text-xs border rounded-xl">
+            <button type="button" onclick="saveNewWorker()" class="w-full py-2.5 bg-blue-600 text-white font-bold text-xs rounded-xl shadow">Saqlash</button>
         </div>
     </div>
 
-    <div id="worker-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4" style="display: none;">
-        <div class="bg-white rounded-2xl p-4 max-w-sm w-full space-y-3 shadow-xl">
-            <h3 id="modal-worker-title" class="text-sm font-extrabold flex justify-between"><span>Tarix</span><button onclick="closeWorkerModal()"><i class="fa-solid fa-xmark"></i></button></h3>
-            <div id="modal-worker-body" class="space-y-1.5 max-h-40 overflow-y-auto text-xs"></div>
-            <button onclick="closeWorkerModal()" class="w-full py-2 bg-slate-900 text-white font-bold text-xs rounded-xl">Yopish</button>
+    <!-- 4. Xodim Shaxsiy Tarixi Modali -->
+    <div id="worker-modal" class="fixed inset-0 modal-overlay z-50 items-center justify-center p-4" onclick="closeWorkerModal()">
+        <div class="bg-white rounded-2xl p-4 max-w-sm w-full space-y-3 shadow-xl" onclick="event.stopPropagation()">
+            <h3 id="modal-worker-title" class="text-sm font-extrabold flex justify-between items-center">
+                <span>Tarix</span>
+                <button type="button" onclick="closeWorkerModal()" class="text-slate-400 hover:text-slate-700"><i class="fa-solid fa-xmark"></i></button>
+            </h3>
+            <div id="modal-worker-body" class="space-y-1.5 max-h-60 overflow-y-auto text-xs"></div>
+            <button type="button" onclick="closeWorkerModal()" class="w-full py-2 bg-slate-900 text-white font-bold text-xs rounded-xl">Yopish</button>
         </div>
     </div>
 
-    <div id="partner-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4" style="display: none;">
-        <div class="bg-white rounded-2xl p-4 max-w-sm w-full space-y-3 shadow-xl">
-            <h3 class="text-sm font-extrabold flex justify-between"><span>Muassasalar</span><button onclick="closeAddPartnerModal()"><i class="fa-solid fa-xmark"></i></button></h3>
-            <div id="modal-partners-list" class="space-y-1.5 max-h-36 overflow-y-auto"></div>
-            <div class="space-y-2 pt-2 border-t"><input type="text" id="new-p-name" placeholder="Nomi..." class="w-full px-3 py-1.5 text-xs border rounded-xl"><div class="flex gap-2"><input type="number" id="new-p-percent" placeholder="Foiz" value="10" class="w-20 px-2 py-1.5 text-xs border rounded-xl text-center"><button onclick="addNewPartner()" class="flex-1 py-1.5 bg-purple-600 text-white text-xs font-bold rounded-xl">Qoʻshish</button></div></div>
+    <!-- 5. Chopachop Hamkor Muassasalar Modali -->
+    <div id="partner-modal" class="fixed inset-0 modal-overlay z-50 items-center justify-center p-4" onclick="closeAddPartnerModal()">
+        <div class="bg-white rounded-2xl p-4 max-w-sm w-full space-y-3 shadow-xl" onclick="event.stopPropagation()">
+            <h3 class="text-sm font-extrabold flex justify-between items-center">
+                <span>Chopachop Muassasalari</span>
+                <button type="button" onclick="closeAddPartnerModal()" class="text-slate-400 hover:text-slate-700"><i class="fa-solid fa-xmark"></i></button>
+            </h3>
+            <div id="modal-partners-list" class="space-y-1.5 max-h-44 overflow-y-auto"></div>
+            <div class="space-y-2 pt-2 border-t">
+                <input type="text" id="new-p-name" placeholder="Kafe yoki oshxona nomi..." class="w-full px-3 py-2 text-xs border rounded-xl">
+                <div class="flex gap-2">
+                    <input type="number" id="new-p-percent" placeholder="Foiz %" value="10" class="w-24 px-2 py-2 text-xs border rounded-xl text-center font-bold">
+                    <button type="button" onclick="addNewPartner()" class="flex-1 py-2 bg-purple-600 text-white text-xs font-bold rounded-xl shadow">Qoʻshish</button>
+                </div>
+            </div>
         </div>
     </div>
 
-    <!-- PIN-KOD MODAL OYNASI -->
-    <div id="pin-modal" class="fixed inset-0 bg-slate-900/70 backdrop-blur-sm z-50 flex items-center justify-center p-4" style="display: none;">
-        <div class="bg-white rounded-2xl max-w-xs w-full p-5 shadow-2xl text-center space-y-4">
+    <!-- 6. Rahbar PIN-kod Modali -->
+    <div id="pin-modal" class="fixed inset-0 modal-overlay z-50 items-center justify-center p-4" onclick="closePinModal()">
+        <div class="bg-white rounded-2xl max-w-xs w-full p-5 shadow-2xl text-center space-y-4" onclick="event.stopPropagation()">
             <div class="w-12 h-12 rounded-2xl bg-blue-50 text-blue-600 flex items-center justify-center mx-auto text-xl">
                 <i class="fa-solid fa-user-shield"></i>
             </div>
             <div>
                 <h3 class="font-extrabold text-slate-800 text-base">Rahbar profiliga kirish</h3>
-                <p class="text-xs text-slate-400 mt-0.5">PIN-kodni tering (0609)</p>
+                <p class="text-xs text-slate-400 mt-0.5">PIN-kodni tering</p>
             </div>
-            <input type="password" id="pin-check-input" placeholder="••••" 
+            <input type="password" inputmode="numeric" id="pin-check-input" placeholder="••••" onkeydown="if(event.key==='Enter') verifyPin()"
                 class="w-full text-center text-xl tracking-widest font-extrabold py-2.5 rounded-xl border border-slate-300 focus:outline-none focus:border-blue-600 bg-slate-50">
             <div class="flex gap-2">
-                <button onclick="closePinModal()" class="flex-1 py-2.5 rounded-xl bg-slate-100 text-slate-600 font-semibold text-xs">Bekor qilish</button>
-                <button onclick="verifyPin()" class="flex-1 py-2.5 rounded-xl bg-blue-600 text-white font-bold text-xs shadow">Kirish</button>
+                <button type="button" onclick="closePinModal()" class="flex-1 py-2.5 rounded-xl bg-slate-100 text-slate-600 font-semibold text-xs">Bekor qilish</button>
+                <button type="button" onclick="verifyPin()" class="flex-1 py-2.5 rounded-xl bg-blue-600 text-white font-bold text-xs shadow">Kirish</button>
             </div>
         </div>
     </div>
 
-    <!-- PASTKI MENYU -->
+    <!-- PASTKI MENYU (NAVIGATION BAR) -->
     <nav class="fixed bottom-0 left-0 right-0 z-40 bg-white/95 backdrop-blur border-t border-slate-200 shadow-lg">
         <div class="max-w-xl mx-auto grid grid-cols-7 h-16">
-            <button onclick="switchTab('home')" id="nav-home" class="flex flex-col items-center justify-center gap-0.5 text-blue-600"><i class="fa-solid fa-store text-sm"></i><span class="text-[9px] font-bold">Savdo</span></button>
-            <button onclick="switchTab('analytics')" id="nav-analytics" class="flex flex-col items-center justify-center gap-0.5 text-slate-400"><i class="fa-solid fa-chart-pie text-sm"></i><span class="text-[9px] font-bold">Analitika</span></button>
-            <button onclick="switchTab('bots')" id="nav-bots" class="flex flex-col items-center justify-center gap-0.5 text-slate-400"><i class="fa-solid fa-motorcycle text-sm"></i><span class="text-[9px] font-bold">Kuryer</span></button>
-            <button onclick="switchTab('razdacha')" id="nav-razdacha" class="flex flex-col items-center justify-center gap-0.5 text-slate-400"><i class="fa-solid fa-user-clock text-sm"></i><span class="text-[9px] font-bold">Razdacha</span></button>
-            <button onclick="switchTab('team')" id="nav-team" class="flex flex-col items-center justify-center gap-0.5 text-slate-400"><i class="fa-solid fa-burger text-sm"></i><span class="text-[9px] font-bold">Jamoa</span></button>
-            <button onclick="switchTab('tasks')" id="nav-tasks" class="flex flex-col items-center justify-center gap-0.5 text-slate-400"><i class="fa-solid fa-list-check text-sm"></i><span class="text-[9px] font-bold">Rejalar</span></button>
-            <button onclick="switchTab('finance')" id="nav-finance" class="flex flex-col items-center justify-center gap-0.5 text-slate-400"><i class="fa-solid fa-wallet text-sm"></i><span class="text-[9px] font-bold">Moliya</span></button>
+            <button type="button" onclick="switchTab('home')" id="nav-home" class="flex flex-col items-center justify-center gap-0.5 text-blue-600">
+                <i class="fa-solid fa-store text-sm"></i><span class="text-[9px] font-bold">Savdo</span>
+            </button>
+            <button type="button" onclick="switchTab('analytics')" id="nav-analytics" class="flex flex-col items-center justify-center gap-0.5 text-slate-400">
+                <i class="fa-solid fa-chart-pie text-sm"></i><span class="text-[9px] font-bold">Analitika</span>
+            </button>
+            <button type="button" onclick="switchTab('bots')" id="nav-bots" class="flex flex-col items-center justify-center gap-0.5 text-slate-400">
+                <i class="fa-solid fa-motorcycle text-sm"></i><span class="text-[9px] font-bold">Kuryer</span>
+            </button>
+            <button type="button" onclick="switchTab('razdacha')" id="nav-razdacha" class="flex flex-col items-center justify-center gap-0.5 text-slate-400">
+                <i class="fa-solid fa-user-clock text-sm"></i><span class="text-[9px] font-bold">Razdacha</span>
+            </button>
+            <button type="button" onclick="switchTab('team')" id="nav-team" class="flex flex-col items-center justify-center gap-0.5 text-slate-400">
+                <i class="fa-solid fa-burger text-sm"></i><span class="text-[9px] font-bold">Jamoa</span>
+            </button>
+            <button type="button" onclick="switchTab('tasks')" id="nav-tasks" class="flex flex-col items-center justify-center gap-0.5 text-slate-400">
+                <i class="fa-solid fa-list-check text-sm"></i><span class="text-[9px] font-bold">Rejalar</span>
+            </button>
+            <button type="button" onclick="switchTab('finance')" id="nav-finance" class="flex flex-col items-center justify-center gap-0.5 text-slate-400">
+                <i class="fa-solid fa-wallet text-sm"></i><span class="text-[9px] font-bold">Moliya</span>
+            </button>
         </div>
     </nav>
 
+    <!-- ==================== ASOSIY JAVASCRIPT LOGIKASI ==================== -->
     <script>
+        // 1. KONSTANTALAR VA JSONBIN KONFIGURATSIYASI
+        const API_KEY = "$2a$10$eMODZUKADEWxX5U60.8Kr.noozUDyQXGn2SalN8SzK359pMEBu5se";
+        const MASTER_BIN_NAME = "JaziraChopachopMasterDB";
         const HOURLY_RATE = 2500000 / 360;
+
+        let BIN_ID = localStorage.getItem('jc_pro_bin_id') || "";
+        let isSyncing = false;
+        let pendingSync = false;
+        let lastUpdatedTimestamp = Number(localStorage.getItem('jc_pro_updated_at')) || 0;
+
         let currentRole = 'fayoza';
-        let staffList = JSON.parse(localStorage.getItem('jc_v28_staff')) || [
+
+        const DEFAULT_STAFF = [
             { id: 1, name: "Oʻzim (Rahbar)", role: "rahbar", salary: 0 },
             { id: 2, name: "Xushnud", role: "razdacha", salary: 2500000 },
             { id: 3, name: "Murod", role: "razdacha", salary: 2500000 },
@@ -357,28 +678,305 @@
             { id: 13, name: "Abbos", role: "kuryer", salary: 700000 },
             { id: 14, name: "Umid", role: "kuryer", salary: 700000 }
         ];
-        let partners = JSON.parse(localStorage.getItem('jc_v28_partners')) || [{ id: 1, name: "Kafe 1", percent: 10 }];
-        let branchSales = JSON.parse(localStorage.getItem('jc_v28_sales')) || [];
-        let botCosts = JSON.parse(localStorage.getItem('jc_v28_botcosts')) || [];
-        let attendance = JSON.parse(localStorage.getItem('jc_v28_att')) || [];
-        let expenses = JSON.parse(localStorage.getItem('jc_v28_exp')) || [];
-        let atkazs = JSON.parse(localStorage.getItem('jc_v28_atkazs')) || [];
-        let tasks = JSON.parse(localStorage.getItem('jc_v28_tasks')) || [];
-        let financeItems = JSON.parse(localStorage.getItem('jc_v28_fin')) || [];
+
+        let staffList = safeParse('jc_v28_staff', DEFAULT_STAFF);
+        let partners = safeParse('jc_v28_partners', [{ id: 1, name: "Kafe 1", percent: 10 }]);
+        let branchSales = safeParse('jc_v28_sales', []);
+        let botCosts = safeParse('jc_v28_botcosts', []);
+        let attendance = safeParse('jc_v28_att', []);
+        let expenses = safeParse('jc_v28_exp', []);
+        let atkazs = safeParse('jc_v28_atkazs', []);
+        let tasks = safeParse('jc_v28_tasks', []);
+        let financeItems = safeParse('jc_v28_fin', []);
         let calcMode = localStorage.getItem('jc_v28_calcmode') || 'dastavka';
 
-        let globalSelectedDate = localStorage.getItem('jc_v28_gdate') || new Date().toISOString().split('T')[0];
-
         const todayStr = new Date().toISOString().split('T')[0];
-        ['sale-date', 'att-date', 'fin-date', 'bc-date', 'cp-date', 'exp-date', 'atkaz-date'].forEach(id => {
-            const el = document.getElementById(id);
-            if (el && !el.value) el.value = todayStr;
-        });
+        let globalSelectedDate = localStorage.getItem('jc_v28_gdate') || todayStr;
 
-        function initGlobalDate() {
+        function safeParse(key, fallback) {
+            try {
+                const raw = localStorage.getItem(key);
+                return raw ? JSON.parse(raw) : fallback;
+            } catch (e) {
+                return fallback;
+            }
+        }
+
+        // 2. FORMATLASH FUNKSIYALARI (Cheksiz sikldan xoli va xavfsiz)
+        function normalizeUZS(val) {
+            let n = parseFloat(val);
+            if (isNaN(n) || n <= 0) return 0;
+            if (n > 0 && n < 100000) return Math.round(n * 1000);
+            return Math.round(n);
+        }
+
+        function formatUZS(num) {
+            let n = Math.round(Number(num) || 0);
+            let sign = n < 0 ? "-" : "";
+            let str = Math.abs(n).toString();
+            let formatted = "";
+            let count = 0;
+            for (let i = str.length - 1; i >= 0; i--) {
+                formatted = str[i] + formatted;
+                count++;
+                if (count % 3 === 0 && i !== 0) {
+                    formatted = " " + formatted;
+                }
+            }
+            return sign + formatted + " soʻm";
+        }
+
+        function formatShort(num) {
+            let k = Math.round((Number(num) || 0) / 1000);
+            let sign = k < 0 ? "-" : "";
+            let str = Math.abs(k).toString();
+            let formatted = "";
+            let count = 0;
+            for (let i = str.length - 1; i >= 0; i--) {
+                formatted = str[i] + formatted;
+                count++;
+                if (count % 3 === 0 && i !== 0) {
+                    formatted = "." + formatted;
+                }
+            }
+            return sign + formatted;
+        }
+
+        function formatDateDot(iso) {
+            if (!iso || typeof iso !== 'string') return "";
+            const p = iso.split('-');
+            return p.length === 3 ? `${p[2]}.${p[1]}.${p[0]}` : iso;
+        }
+
+        // 3. ONLAYN CLOUD AVTO-SINXRONIZATSIYA (JSONBIN.IO)
+        function setSyncBadge(state, text) {
+            const badge = document.getElementById('sync-badge');
+            if (!badge) return;
+            if (state === 'syncing') {
+                badge.className = "text-[9px] px-1.5 py-0.5 rounded bg-blue-50 text-blue-600 font-bold border border-blue-200 leading-none flex items-center gap-1";
+                badge.innerHTML = `<i class="fa-solid fa-rotate fa-spin"></i> ${text || 'Sync...'}`;
+            } else if (state === 'online') {
+                badge.className = "text-[9px] px-1.5 py-0.5 rounded bg-emerald-50 text-emerald-700 font-bold border border-emerald-200 leading-none flex items-center gap-1";
+                badge.innerHTML = `<i class="fa-solid fa-cloud-check"></i> ${text || 'Onlayn'}`;
+            } else {
+                badge.className = "text-[9px] px-1.5 py-0.5 rounded bg-amber-50 text-amber-700 font-bold border border-amber-200 leading-none flex items-center gap-1";
+                badge.innerHTML = `<i class="fa-solid fa-cloud-Showers-heavy"></i> ${text || 'Lokal'}`;
+            }
+        }
+
+        // Barcha telefonlarda bitta umumiy BIN_ID ni avtomatik topish funksiyasi
+        async function discoverCloudBin() {
+            try {
+                const res = await fetch("https://api.jsonbin.io/v3/c/uncategorized/bins", {
+                    method: "GET",
+                    headers: { "X-Master-Key": API_KEY }
+                });
+                if (res.ok) {
+                    const bins = await res.json();
+                    if (Array.isArray(bins) && bins.length > 0) {
+                        // Avval maxsus nomli binni qidiramiz, bo'lmasa eng birinchisini olamiz
+                        const masterBin = bins.find(b => b.snippetMeta && b.snippetMeta.name === MASTER_BIN_NAME) || bins[0];
+                        if (masterBin && masterBin.record) {
+                            BIN_ID = masterBin.record;
+                            localStorage.setItem('jc_pro_bin_id', BIN_ID);
+                            return BIN_ID;
+                        }
+                    }
+                }
+            } catch (err) {
+                console.warn("Bin qidirishda xatolik:", err);
+            }
+            return BIN_ID;
+        }
+
+        async function loadFromCloud(silent = false) {
+            if (isSyncing) return;
+            if (!silent) setSyncBadge('syncing', 'Yuklanmoqda...');
+            try {
+                if (!BIN_ID) {
+                    await discoverCloudBin();
+                }
+
+                if (!BIN_ID) {
+                    // Hali onlayn baza yaratilmagan bo'lsa, darhol yangisini yaratamiz
+                    await autoSyncToCloud();
+                    return;
+                }
+
+                const res = await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}/latest`, {
+                    method: "GET",
+                    headers: {
+                        "X-Master-Key": API_KEY,
+                        "X-Bin-Meta": "false"
+                    }
+                });
+
+                if (res.status === 404) {
+                    // Agar eski bin o'chirilgan bo'lsa
+                    BIN_ID = "";
+                    localStorage.removeItem('jc_pro_bin_id');
+                    await discoverCloudBin();
+                    if (!BIN_ID) await autoSyncToCloud();
+                    return;
+                }
+
+                if (res.ok) {
+                    const d = await res.json();
+                    const record = d.record ? d.record : d;
+                    if (record && typeof record === 'object') {
+                        const cloudTime = Number(record.updatedAt) || 0;
+                        const localHasData = branchSales.length > 0 || botCosts.length > 0 || expenses.length > 0 || financeItems.length > 0;
+                        const cloudHasData = (Array.isArray(record.branchSales) && record.branchSales.length > 0) ||
+                                             (Array.isArray(record.botCosts) && record.botCosts.length > 0) ||
+                                             (Array.isArray(record.expenses) && record.expenses.length > 0) ||
+                                             (Array.isArray(record.financeItems) && record.financeItems.length > 0);
+
+                        // Agar bulutda ma'lumot bo'lsa yoki bulutdagi versiya yangi bo'lsa
+                        if (cloudHasData || !localHasData || cloudTime >= lastUpdatedTimestamp) {
+                            if (Array.isArray(record.staffList) && record.staffList.length) staffList = record.staffList;
+                            if (Array.isArray(record.partners) && record.partners.length) partners = record.partners;
+                            if (Array.isArray(record.branchSales)) branchSales = record.branchSales;
+                            if (Array.isArray(record.botCosts)) botCosts = record.botCosts;
+                            if (Array.isArray(record.attendance)) attendance = record.attendance;
+                            if (Array.isArray(record.expenses)) expenses = record.expenses;
+                            if (Array.isArray(record.atkazs)) atkazs = record.atkazs;
+                            if (Array.isArray(record.tasks)) tasks = record.tasks;
+                            if (Array.isArray(record.financeItems)) financeItems = record.financeItems;
+                            if (record.calcMode) calcMode = record.calcMode;
+
+                            lastUpdatedTimestamp = cloudTime || Date.now();
+                            saveToLocalStorageOnly();
+                            renderFormPartners();
+                            renderAll();
+                        } else if (localHasData && !cloudHasData) {
+                            // Lokal telefonda ma'lumot bor, lekin bulut bo'sh bo'lsa -> bulutga yuboramiz
+                            await autoSyncToCloud();
+                        }
+                        setSyncBadge('online', 'Onlayn');
+                    }
+                } else {
+                    setSyncBadge('offline', 'Oflayn');
+                }
+            } catch (e) {
+                console.warn("Cloud load error:", e);
+                setSyncBadge('offline', 'Aloqa yoʻq');
+            }
+        }
+
+        async function autoSyncToCloud() {
+            if (isSyncing) {
+                pendingSync = true;
+                return;
+            }
+            isSyncing = true;
+            setSyncBadge('syncing', 'Saqlanmoqda...');
+
+            const payload = {
+                updatedAt: lastUpdatedTimestamp,
+                staffList,
+                partners,
+                branchSales,
+                botCosts,
+                attendance,
+                expenses,
+                atkazs,
+                tasks,
+                financeItems,
+                calcMode
+            };
+
+            try {
+                if (!BIN_ID) {
+                    await discoverCloudBin();
+                }
+
+                if (!BIN_ID) {
+                    const res = await fetch("https://api.jsonbin.io/v3/b", {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json",
+                            "X-Master-Key": API_KEY,
+                            "X-Bin-Private": "true",
+                            "X-Bin-Name": MASTER_BIN_NAME
+                        },
+                        body: JSON.stringify(payload)
+                    });
+                    if (res.ok) {
+                        const json = await res.json();
+                        if (json && json.metadata && json.metadata.id) {
+                            BIN_ID = json.metadata.id;
+                            localStorage.setItem('jc_pro_bin_id', BIN_ID);
+                        }
+                        setSyncBadge('online', 'Saqlandi');
+                    } else {
+                        setSyncBadge('offline', 'Xato');
+                    }
+                } else {
+                    const res = await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}`, {
+                        method: "PUT",
+                        headers: {
+                            "Content-Type": "application/json",
+                            "X-Master-Key": API_KEY
+                        },
+                        body: JSON.stringify(payload)
+                    });
+                    if (res.ok) {
+                        setSyncBadge('online', 'Onlayn');
+                    } else {
+                        setSyncBadge('offline', 'Xato');
+                    }
+                }
+            } catch (e) {
+                console.warn("Auto-sync error:", e);
+                setSyncBadge('offline', 'Aloqa yoʻq');
+            } finally {
+                isSyncing = false;
+                if (pendingSync) {
+                    pendingSync = false;
+                    autoSyncToCloud();
+                }
+            }
+        }
+
+        function forceCloudRefresh() {
+            loadFromCloud(false);
+        }
+
+        function saveToLocalStorageOnly() {
+            try {
+                localStorage.setItem('jc_v28_staff', JSON.stringify(staffList));
+                localStorage.setItem('jc_v28_partners', JSON.stringify(partners));
+                localStorage.setItem('jc_v28_sales', JSON.stringify(branchSales));
+                localStorage.setItem('jc_v28_botcosts', JSON.stringify(botCosts));
+                localStorage.setItem('jc_v28_att', JSON.stringify(attendance));
+                localStorage.setItem('jc_v28_exp', JSON.stringify(expenses));
+                localStorage.setItem('jc_v28_atkazs', JSON.stringify(atkazs));
+                localStorage.setItem('jc_v28_tasks', JSON.stringify(tasks));
+                localStorage.setItem('jc_v28_fin', JSON.stringify(financeItems));
+                localStorage.setItem('jc_v28_calcmode', calcMode);
+                localStorage.setItem('jc_pro_updated_at', String(lastUpdatedTimestamp));
+            } catch (e) {
+                console.warn("LocalStorage xatosi:", e);
+            }
+        }
+
+        function saveAll() {
+            lastUpdatedTimestamp = Date.now();
+            saveToLocalStorageOnly();
+            autoSyncToCloud();
+        }
+
+        // 4. SANA VA INITIALIZATSIYA
+        function initDates() {
+            const hDate = document.getElementById('header-date');
+            if (hDate) {
+                hDate.innerText = new Date().toLocaleDateString('uz-UZ', { weekday: 'short', day: 'numeric', month: 'short' });
+            }
             const gEl = document.getElementById('global-date');
             if (gEl) gEl.value = globalSelectedDate;
             applyGlobalDateToForms();
+            const cmEl = document.getElementById('calc-mode');
+            if (cmEl) cmEl.value = calcMode;
         }
 
         function onGlobalDateChange(val) {
@@ -395,28 +993,15 @@
             });
         }
 
-        document.getElementById('calc-mode').value = calcMode;
-        document.getElementById('header-date').innerText = new Date().toLocaleDateString('uz-UZ', { weekday: 'short', day: 'numeric', month: 'long' });
-        initGlobalDate();
-
-        function saveAll() {
-            localStorage.setItem('jc_v28_staff', JSON.stringify(staffList));
-            localStorage.setItem('jc_v28_partners', JSON.stringify(partners));
-            localStorage.setItem('jc_v28_sales', JSON.stringify(branchSales));
-            localStorage.setItem('jc_v28_botcosts', JSON.stringify(botCosts));
-            localStorage.setItem('jc_v28_att', JSON.stringify(attendance));
-            localStorage.setItem('jc_v28_exp', JSON.stringify(expenses));
-            localStorage.setItem('jc_v28_atkazs', JSON.stringify(atkazs));
-            localStorage.setItem('jc_v28_tasks', JSON.stringify(tasks));
-            localStorage.setItem('jc_v28_fin', JSON.stringify(financeItems));
-            localStorage.setItem('jc_v28_calcmode', calcMode);
-        }
-
+        // 5. ZAXIRA VA TIKLASH (EXPORT / IMPORT)
         function exportData() {
             const data = { staffList, partners, branchSales, botCosts, attendance, expenses, atkazs, tasks, financeItems, calcMode };
             const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
             const url = URL.createObjectURL(blob);
-            const a = document.createElement('a'); a.href = url; a.download = `jazira_backup_${globalSelectedDate}.json`; a.click();
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `jazira_backup_${globalSelectedDate}.json`;
+            a.click();
             URL.revokeObjectURL(url);
         }
 
@@ -427,64 +1012,59 @@
             reader.onload = function(evt) {
                 try {
                     const data = JSON.parse(evt.target.result);
-                    if (data.staffList) staffList = data.staffList;
-                    if (data.partners) partners = data.partners;
-                    if (data.branchSales) branchSales = data.branchSales;
-                    if (data.botCosts) botCosts = data.botCosts;
-                    if (data.attendance) attendance = data.attendance;
-                    if (data.expenses) expenses = data.expenses;
-                    if (data.atkazs) atkazs = data.atkazs;
-                    if (data.tasks) tasks = data.tasks;
-                    if (data.financeItems) financeItems = data.financeItems;
+                    if (Array.isArray(data.staffList)) staffList = data.staffList;
+                    if (Array.isArray(data.partners)) partners = data.partners;
+                    if (Array.isArray(data.branchSales)) branchSales = data.branchSales;
+                    if (Array.isArray(data.botCosts)) botCosts = data.botCosts;
+                    if (Array.isArray(data.attendance)) attendance = data.attendance;
+                    if (Array.isArray(data.expenses)) expenses = data.expenses;
+                    if (Array.isArray(data.atkazs)) atkazs = data.atkazs;
+                    if (Array.isArray(data.tasks)) tasks = data.tasks;
+                    if (Array.isArray(data.financeItems)) financeItems = data.financeItems;
                     if (data.calcMode) calcMode = data.calcMode;
-                    saveAll(); renderAll(); alert("✅ Tiklandi!");
-                } catch(err) { alert("❌ Xatolik!"); }
+                    saveAll();
+                    renderFormPartners();
+                    renderAll();
+                    alert("✅ Zaxira muvaffaqiyatli tiklandi va onlayn bazaga yuborildi!");
+                } catch (err) {
+                    alert("❌ Fayl xato!");
+                }
             };
             reader.readAsText(file);
         }
 
-        function normalizeUZS(val) {
-            let n = parseFloat(val) || 0;
-            if (n > 0 && n < 100000) return Math.round(n * 1000);
-            return Math.round(n);
-        }
-
-        function formatUZS(num) {
-            let n = Math.round(Number(num) || 0);
-            return n.toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ") + " soʻm";
-        }
-        function formatShort(num) { 
-            let k = Math.round((Number(num) || 0) / 1000); 
-            return k.toString().replace(/\B(?=(\d{3})+(?!\d))/g, "."); 
-        }
-        function formatDateDot(iso) { if (!iso) return ""; const p = iso.split('-'); return p.length === 3 ? `${p[2]}.${p[1]}.${p[0]}` : iso; }
-
-        function changeCalcMode() {
-            calcMode = document.getElementById('calc-mode').value;
-            saveAll(); renderAll();
-        }
-
+        // 6. ROLLAR VA XAVFSIZLIK (PIN: 0609) — Cheksiz siklsiz!
         function toggleRole() {
             if (currentRole === 'fayoza') {
-                document.getElementById('pin-check-input').value = '';
-                document.getElementById('pin-modal').style.display = 'flex';
-                setTimeout(() => document.getElementById('pin-check-input').focus(), 100);
+                const pinInput = document.getElementById('pin-check-input');
+                if (pinInput) pinInput.value = '';
+                document.getElementById('pin-modal').classList.add('open');
+                setTimeout(() => { if (pinInput) pinInput.focus(); }, 100);
             } else {
                 currentRole = 'fayoza';
-                applyRoleUI();
+                updateRoleDOM();
+                renderAll();
             }
         }
 
-        function closePinModal() { document.getElementById('pin-modal').style.display = 'none'; }
-        function verifyPin() {
-            if (document.getElementById('pin-check-input').value.trim() === '0609') {
-                currentRole = 'admin';
-                closePinModal();
-                applyRoleUI();
-            } else { alert("❌ PIN-kod noto'g'ri!"); }
+        function closePinModal() {
+            document.getElementById('pin-modal').classList.remove('open');
         }
 
-        function applyRoleUI() {
+        function verifyPin() {
+            const val = document.getElementById('pin-check-input').value.trim();
+            if (val === '0609') {
+                currentRole = 'admin';
+                closePinModal();
+                updateRoleDOM();
+                renderAll();
+            } else {
+                alert("❌ PIN-kod notoʻgʻri!");
+            }
+        }
+
+        // Faqatgina DOM elementlar ko'rinishini yangilaydi, renderAll() ni chaqirmaydi!
+        function updateRoleDOM() {
             const badge = document.getElementById('role-badge');
             const roleBtn = document.getElementById('role-btn');
             const finCard = document.getElementById('finance-card-wrapper');
@@ -495,8 +1075,8 @@
 
             if (currentRole === 'admin') {
                 badge.innerText = 'Rahbar';
-                badge.className = 'text-[9px] px-1.5 py-0.2 rounded bg-emerald-500/20 text-emerald-300 font-bold';
-                roleBtn.innerHTML = '<i class="fa-solid fa-unlock"></i> Fayoza';
+                badge.className = 'text-[9px] px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-700 font-bold leading-none';
+                roleBtn.innerHTML = '<i class="fa-solid fa-unlock"></i> <span>Fayoza</span>';
                 if (finCard) finCard.style.display = 'block';
                 if (statusBox) statusBox.style.display = 'block';
                 if (botsFinCards) botsFinCards.style.display = 'grid';
@@ -504,66 +1084,129 @@
                 if (taskPanelTitle) taskPanelTitle.innerText = "Fayozaga qoʻyilgan rejalar nazorati";
             } else {
                 badge.innerText = 'Fayoza';
-                badge.className = 'text-[9px] px-1.5 py-0.2 rounded bg-amber-500/20 text-amber-700 font-bold';
-                roleBtn.innerHTML = '<i class="fa-solid fa-lock"></i> Rahbar';
+                badge.className = 'text-[9px] px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-700 font-bold leading-none';
+                roleBtn.innerHTML = '<i class="fa-solid fa-lock"></i> <span>Rahbar</span>';
                 if (finCard) finCard.style.display = 'none';
                 if (statusBox) statusBox.style.display = 'none';
                 if (botsFinCards) botsFinCards.style.display = 'none';
                 if (taskAddForm) taskAddForm.style.display = 'none';
                 if (taskPanelTitle) taskPanelTitle.innerText = "Rahbar tomonidan sizga qoʻyilgan rejalar";
             }
-            renderAll(false);
+        }
+
+        function changeCalcMode() {
+            calcMode = document.getElementById('calc-mode').value;
+            saveAll();
+            renderAll();
         }
 
         function switchTab(tab) {
             ['home', 'analytics', 'bots', 'razdacha', 'team', 'tasks', 'finance'].forEach(t => {
                 const el = document.getElementById(`view-${t}`);
                 const nav = document.getElementById(`nav-${t}`);
-                if (el) el.classList.remove('active');
-                if (nav) nav.className = "flex flex-col items-center justify-center gap-0.5 text-slate-400";
+                if (el) el.classList.toggle('active', t === tab);
+                if (nav) {
+                    nav.className = t === tab
+                        ? "flex flex-col items-center justify-center gap-0.5 text-blue-600"
+                        : "flex flex-col items-center justify-center gap-0.5 text-slate-400";
+                }
             });
-            const targetEl = document.getElementById(`view-${tab}`);
-            const targetNav = document.getElementById(`nav-${tab}`);
-            if (targetEl) targetEl.classList.add('active');
-            if (targetNav) targetNav.className = "flex flex-col items-center justify-center gap-0.5 text-blue-600";
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
-        function openAddWorkerModal() { document.getElementById('worker-add-modal').style.display = 'flex'; }
-        function closeAddWorkerModal() { document.getElementById('worker-add-modal').style.display = 'none'; }
+        // 7. XODIMLAR VA HAMKORLAR MODALLARI
+        function openAddWorkerModal() { document.getElementById('worker-add-modal').classList.add('open'); }
+        function closeAddWorkerModal() { document.getElementById('worker-add-modal').classList.remove('open'); }
+
         function saveNewWorker() {
             const name = document.getElementById('nw-name').value.trim();
             const role = document.getElementById('nw-role').value;
             const salary = normalizeUZS(document.getElementById('nw-salary').value);
             if (!name) return;
             staffList.push({ id: Date.now(), name, role, salary });
-            document.getElementById('nw-name').value = ''; document.getElementById('nw-salary').value = '';
-            saveAll(); closeAddWorkerModal(); renderAll();
+            document.getElementById('nw-name').value = '';
+            document.getElementById('nw-salary').value = '';
+            saveAll();
+            closeAddWorkerModal();
+            renderAll();
         }
-        function deleteWorker(id) { if (confirm("O'chirasizmi?")) { staffList = staffList.filter(s => s.id !== id); saveAll(); renderAll(); } }
-        function updateWorkerSalary(id, val) { const s = staffList.find(x => x.id === id); if (s) { s.salary = normalizeUZS(val); saveAll(); renderAll(); } }
 
-        function openAddPartnerModal() { document.getElementById('partner-modal').style.display = 'flex'; renderModalPartners(); }
-        function closeAddPartnerModal() { document.getElementById('partner-modal').style.display = 'none'; renderFormPartners(); }
+        function deleteWorker(id) {
+            if (confirm("Ushbu xodimni roʻyxatdan oʻchirasizmi?")) {
+                staffList = staffList.filter(s => s.id !== id);
+                saveAll();
+                renderAll();
+            }
+        }
+
+        function updateWorkerSalary(id, val) {
+            const s = staffList.find(x => x.id === id);
+            if (s) {
+                s.salary = normalizeUZS(val);
+                saveAll();
+                renderAll();
+            }
+        }
+
+        function openAddPartnerModal() {
+            document.getElementById('partner-modal').classList.add('open');
+            renderModalPartners();
+        }
+
+        function closeAddPartnerModal() {
+            document.getElementById('partner-modal').classList.remove('open');
+            renderFormPartners();
+            renderAll();
+        }
+
         function renderModalPartners() {
-            const list = document.getElementById('modal-partners-list'); list.innerHTML = '';
+            const list = document.getElementById('modal-partners-list');
+            if (!list) return;
+            list.innerHTML = '';
             partners.forEach(p => {
-                list.innerHTML += `<div class="flex items-center justify-between bg-slate-50 p-2 rounded-xl border text-xs"><b>${p.name} (${p.percent}%)</b><button onclick="deletePartner(${p.id})" class="text-rose-500"><i class="fa-solid fa-trash"></i></button></div>`;
+                list.innerHTML += `
+                    <div class="flex items-center justify-between bg-slate-50 p-2 rounded-xl border text-xs">
+                        <b>${p.name} (${p.percent}%)</b>
+                        <button type="button" onclick="deletePartner(${p.id})" class="text-rose-500 px-2"><i class="fa-solid fa-trash"></i></button>
+                    </div>
+                `;
             });
         }
+
         function addNewPartner() {
             const name = document.getElementById('new-p-name').value.trim();
             const percent = parseFloat(document.getElementById('new-p-percent').value) || 0;
             if (!name) return;
             partners.push({ id: Date.now(), name, percent });
-            document.getElementById('new-p-name').value = ''; saveAll(); renderModalPartners();
+            document.getElementById('new-p-name').value = '';
+            saveAll();
+            renderModalPartners();
+            renderFormPartners();
         }
-        function deletePartner(id) { if (partners.length <= 1) return; partners = partners.filter(p => p.id !== id); saveAll(); renderModalPartners(); }
+
+        function deletePartner(id) {
+            if (partners.length <= 1) {
+                alert("Kamida 1 ta hamkor qolishi kerak!");
+                return;
+            }
+            partners = partners.filter(p => p.id !== id);
+            saveAll();
+            renderModalPartners();
+            renderFormPartners();
+        }
 
         function renderFormPartners() {
-            const c = document.getElementById('form-partners-list'); c.innerHTML = '';
+            const c = document.getElementById('form-partners-list');
+            if (!c) return;
+            c.innerHTML = '';
             partners.forEach(p => {
-                c.innerHTML += `<div class="bg-white p-2 rounded-xl border grid grid-cols-12 gap-1 items-center text-xs"><span class="col-span-4 font-bold truncate">${p.name}</span><input type="number" step="any" id="p-sum-${p.id}" placeholder="Savdo" class="col-span-4 px-2 py-1 bg-slate-50 rounded border font-bold"><input type="number" id="p-soni-${p.id}" placeholder="Soni" class="col-span-4 px-1 py-1 bg-slate-50 rounded border text-center font-bold"></div>`;
+                c.innerHTML += `
+                    <div class="bg-white p-2 rounded-xl border grid grid-cols-12 gap-1.5 items-center text-xs">
+                        <span class="col-span-4 font-bold truncate" title="${p.name}">${p.name} <span class="text-[9px] text-purple-600">(${p.percent}%)</span></span>
+                        <input type="number" step="any" id="p-sum-${p.id}" placeholder="Savdo summasi" class="col-span-5 px-2 py-1 bg-slate-50 rounded-lg border font-bold">
+                        <input type="number" id="p-soni-${p.id}" placeholder="Soni" class="col-span-3 px-1 py-1 bg-slate-50 rounded-lg border text-center font-bold">
+                    </div>
+                `;
             });
             updateDropdowns();
         }
@@ -572,42 +1215,65 @@
             ['atkaz-source', 'bc-source'].forEach(id => {
                 const el = document.getElementById(id);
                 if (el) {
-                    el.innerHTML = `<option value="Jazira: Sarpul">📍 Sarpul</option><option value="Jazira: Vaynkamat">📍 Vaynkamat</option><option value="Jazira: Bot">🤖 Bot</option>`;
-                    partners.forEach(p => el.innerHTML += `<option value="Chopachop: ${p.name}">🚀 ${p.name}</option>`);
+                    const prev = el.value;
+                    el.innerHTML = `
+                        <option value="Jazira: Sarpul">📍 Sarpul</option>
+                        <option value="Jazira: Vaynkamat">📍 Vaynkamat</option>
+                        <option value="Jazira: Bot">🤖 Jazira Bot</option>
+                    `;
+                    partners.forEach(p => {
+                        el.innerHTML += `<option value="Chopachop: ${p.name}">🚀 ${p.name}</option>`;
+                    });
+                    if (prev) el.value = prev;
                 }
             });
+
             ['bc-courier', 'cp-courier'].forEach(id => {
                 const el = document.getElementById(id);
                 if (el) {
+                    const prev = el.value;
                     el.innerHTML = '';
-                    staffList.filter(s => s.role === 'kuryer').forEach(c => el.innerHTML += `<option value="${c.name}">${c.name}</option>`);
+                    staffList.filter(s => s.role === 'kuryer').forEach(c => {
+                        el.innerHTML += `<option value="${c.name}">${c.name}</option>`;
+                    });
+                    if (prev) el.value = prev;
                 }
             });
-            
+
             const atkazW = document.getElementById('atkaz-worker');
             if (atkazW) {
+                const prev = atkazW.value;
                 atkazW.innerHTML = `<option value="Oʻzim (Rahbar)">👤 Rahbarga (Oʻzimga)</option>`;
-                staffList.filter(s => s.role === 'operator' || s.role === 'rahbar').forEach(op => {
-                    atkazW.innerHTML += `<option value="${op.name}">Xodim: ${op.name}</option>`;
+                staffList.filter(s => s.role !== 'rahbar').forEach(op => {
+                    atkazW.innerHTML += `<option value="${op.name}">${op.name} (${op.role})</option>`;
                 });
+                if (prev) atkazW.value = prev;
             }
 
             const expT = document.getElementById('exp-target');
-            if (expT) { expT.innerHTML = ''; staffList.forEach(s => expT.innerHTML += `<option value="${s.name}">${s.name} (${s.role})</option>`); }
+            if (expT) {
+                const prev = expT.value;
+                expT.innerHTML = '';
+                staffList.forEach(s => {
+                    expT.innerHTML += `<option value="${s.name}">${s.name} (${s.role})</option>`;
+                });
+                if (prev) expT.value = prev;
+            }
         }
 
         function toggleMealBranch() {
             const kind = document.getElementById('exp-kind').value;
             const box = document.getElementById('meal-branch-box');
-            if (kind === 'food') box.style.display = 'block'; else box.style.display = 'none';
+            if (box) box.style.display = kind === 'food' ? 'block' : 'none';
         }
 
         function toggleRdBranch() {
             const kind = document.getElementById('rd-kind').value;
             const branchSel = document.getElementById('rd-branch');
-            if (kind === 'food') branchSel.style.display = 'block'; else branchSel.style.display = 'none';
+            if (branchSel) branchSel.style.display = kind === 'food' ? 'block' : 'none';
         }
 
+        // 8. SAVDO QO'SHISH, TAHRIRLASH VA O'CHIRISH
         function addBranchSales(e) {
             e.preventDefault();
             const editId = document.getElementById('edit-sale-id').value;
@@ -625,30 +1291,63 @@
 
             let chopaList = [];
             partners.forEach(p => {
-                const sIn = document.getElementById(`p-sum-${p.id}`), cIn = document.getElementById(`p-soni-${p.id}`);
+                const sIn = document.getElementById(`p-sum-${p.id}`);
+                const cIn = document.getElementById(`p-soni-${p.id}`);
                 if (sIn && cIn) {
-                    const sum = normalizeUZS(sIn.value), soni = parseInt(cIn.value) || 0;
-                    if (sum > 0) chopaList.push({ name: p.name, sum, soni, percent: p.percent, profit: Math.round(sum * (p.percent / 100)) });
+                    const sum = normalizeUZS(sIn.value);
+                    const soni = parseInt(cIn.value) || 0;
+                    if (sum > 0) {
+                        chopaList.push({
+                            name: p.name,
+                            sum,
+                            soni,
+                            percent: p.percent,
+                            profit: Math.round(sum * (p.percent / 100))
+                        });
+                    }
                 }
             });
 
             if (editId) {
                 const idx = branchSales.findIndex(s => s.id == editId);
                 if (idx > -1) {
-                    branchSales[idx] = { id: Number(editId), date, sarpulDastavka, sarpulDSoni, sarpulSaboy, sarpulSSoni, vaynDastavka, vaynDSoni, vaynSaboy, vaynSSoni, jaziraBotSum, jaziraBotSoni, chopaList };
+                    branchSales[idx] = {
+                        id: Number(editId),
+                        date,
+                        sarpulDastavka, sarpulDSoni,
+                        sarpulSaboy, sarpulSSoni,
+                        vaynDastavka, vaynDSoni,
+                        vaynSaboy, vaynSSoni,
+                        jaziraBotSum, jaziraBotSoni,
+                        chopaList
+                    };
                 }
                 resetSaleForm();
             } else {
-                branchSales.push({ id: Date.now(), date, sarpulDastavka, sarpulDSoni, sarpulSaboy, sarpulSSoni, vaynDastavka, vaynDSoni, vaynSaboy, vaynSSoni, jaziraBotSum, jaziraBotSoni, chopaList });
-                ['sarpul-dastavka', 'sarpul-d-soni', 'sarpul-saboy', 'sarpul-s-soni', 'vayn-dastavka', 'vayn-d-soni', 'vayn-saboy', 'vayn-s-soni', 'jazira-bot-sum', 'jazira-bot-soni'].forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; });
+                branchSales.push({
+                    id: Date.now(),
+                    date,
+                    sarpulDastavka, sarpulDSoni,
+                    sarpulSaboy, sarpulSSoni,
+                    vaynDastavka, vaynDSoni,
+                    vaynSaboy, vaynSSoni,
+                    jaziraBotSum, jaziraBotSoni,
+                    chopaList
+                });
+                ['sarpul-dastavka', 'sarpul-d-soni', 'sarpul-saboy', 'sarpul-s-soni', 'vayn-dastavka', 'vayn-d-soni', 'vayn-saboy', 'vayn-s-soni', 'jazira-bot-sum', 'jazira-bot-soni'].forEach(id => {
+                    const el = document.getElementById(id);
+                    if (el) el.value = '';
+                });
                 renderFormPartners();
             }
-            saveAll(); renderAll();
+            saveAll();
+            renderAll();
         }
 
         function editSale(id) {
             const s = branchSales.find(x => x.id === id);
             if (!s) return;
+            renderFormPartners();
             document.getElementById('edit-sale-id').value = s.id;
             document.getElementById('sale-date').value = s.date;
             document.getElementById('sarpul-dastavka').value = s.sarpulDastavka;
@@ -661,18 +1360,20 @@
             document.getElementById('vayn-s-soni').value = s.vaynSSoni;
             document.getElementById('jazira-bot-sum').value = s.jaziraBotSum || '';
             document.getElementById('jazira-bot-soni').value = s.jaziraBotSoni || '';
-            
-            s.chopaList.forEach(c => {
+
+            (s.chopaList || []).forEach(c => {
                 const pObj = partners.find(p => p.name === c.name);
                 if (pObj) {
-                    const sIn = document.getElementById(`p-sum-${pObj.id}`), cIn = document.getElementById(`p-soni-${pObj.id}`);
-                    if (sIn) sIn.value = c.sum; if (cIn) cIn.value = c.soni;
+                    const sIn = document.getElementById(`p-sum-${pObj.id}`);
+                    const cIn = document.getElementById(`p-soni-${pObj.id}`);
+                    if (sIn) sIn.value = c.sum;
+                    if (cIn) cIn.value = c.soni;
                 }
             });
 
-            document.getElementById('sale-form-title').innerText = "Savdoni tahrirlash";
-            document.getElementById('sale-submit-btn').innerText = "O'zgarishni saqlash";
-            document.getElementById('cancel-edit-btn').style.display = 'inline';
+            document.getElementById('sale-form-title').innerText = "✏️ Savdoni tahrirlash";
+            document.getElementById('sale-submit-btn').innerText = "Oʻzgarishni Saqlash";
+            document.getElementById('cancel-edit-btn').style.display = 'inline-block';
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
@@ -681,25 +1382,36 @@
             document.getElementById('sale-form-title').innerText = "Kunlik Savdo Kiritish";
             document.getElementById('sale-submit-btn').innerText = "Kunlik Savdoni Saqlash";
             document.getElementById('cancel-edit-btn').style.display = 'none';
-            ['sarpul-dastavka', 'sarpul-d-soni', 'sarpul-saboy', 'sarpul-s-soni', 'vayn-dastavka', 'vayn-d-soni', 'vayn-saboy', 'vayn-s-soni', 'jazira-bot-sum', 'jazira-bot-soni'].forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; });
+            ['sarpul-dastavka', 'sarpul-d-soni', 'sarpul-saboy', 'sarpul-s-soni', 'vayn-dastavka', 'vayn-d-soni', 'vayn-saboy', 'vayn-s-soni', 'jazira-bot-sum', 'jazira-bot-soni'].forEach(id => {
+                const el = document.getElementById(id);
+                if (el) el.value = '';
+            });
             renderFormPartners();
         }
 
-        function deleteSale(id) { branchSales = branchSales.filter(s => s.id !== id); saveAll(); renderAll(); }
-        
+        function deleteSale(id) {
+            if (confirm("Bu savdo qaydini oʻchirasizmi?")) {
+                branchSales = branchSales.filter(s => s.id !== id);
+                saveAll();
+                renderAll();
+            }
+        }
+
+        // 9. KURYER QOPLANMALARI VA PUL BERISH (Rasm siqish bilan)
         function compressImage(file, callback) {
             const reader = new FileReader();
             reader.onload = function(event) {
                 const img = new Image();
                 img.onload = function() {
                     const canvas = document.createElement('canvas');
-                    const MAX_WIDTH = 650;
+                    // JSONBin 100KB limitidan oshib ketmasligi uchun optimal o'lcham
+                    const MAX_WIDTH = 420;
                     const scaleSize = img.width > MAX_WIDTH ? (MAX_WIDTH / img.width) : 1;
-                    canvas.width = img.width * scaleSize;
-                    canvas.height = img.height * scaleSize;
+                    canvas.width = Math.round(img.width * scaleSize);
+                    canvas.height = Math.round(img.height * scaleSize);
                     const ctx = canvas.getContext('2d');
                     ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-                    callback(canvas.toDataURL('image/jpeg', 0.65));
+                    callback(canvas.toDataURL('image/jpeg', 0.55));
                 };
                 img.src = event.target.result;
             };
@@ -716,15 +1428,24 @@
             const fileInput = document.getElementById('bc-image');
 
             const finalize = (imgBase64) => {
-                botCosts.push({ id: Date.now(), type: 'subsidy', date, source, courier, amount, desc, image: imgBase64 || null });
-                document.getElementById('bc-amount').value = ''; 
+                botCosts.push({
+                    id: Date.now(),
+                    type: 'subsidy',
+                    date,
+                    source,
+                    courier,
+                    amount,
+                    desc,
+                    image: imgBase64 || null
+                });
+                document.getElementById('bc-amount').value = '';
                 document.getElementById('bc-desc').value = '';
-                fileInput.value = '';
-                saveAll(); 
+                if (fileInput) fileInput.value = '';
+                saveAll();
                 renderAll();
             };
 
-            if (fileInput.files && fileInput.files[0]) {
+            if (fileInput && fileInput.files && fileInput.files[0]) {
                 compressImage(fileInput.files[0], finalize);
             } else {
                 finalize(null);
@@ -740,36 +1461,69 @@
             const desc = document.getElementById('cp-desc').value.trim();
             if (!amount) return;
 
-            botCosts.push({ id: Date.now(), type: 'payout', date, courier, amount, payType, desc });
+            botCosts.push({
+                id: Date.now(),
+                type: 'payout',
+                date,
+                courier,
+                amount,
+                payType,
+                desc
+            });
             document.getElementById('cp-amount').value = '';
             document.getElementById('cp-desc').value = '';
             saveAll();
             renderAll();
         }
 
-        function deleteBotCost(id) { botCosts = botCosts.filter(b => b.id !== id); saveAll(); renderAll(); }
+        function deleteBotCost(id) {
+            if (confirm("Oʻchirilsinmi?")) {
+                botCosts = botCosts.filter(b => b.id !== id);
+                saveAll();
+                renderAll();
+            }
+        }
 
         function openImageModal(imgSrc) {
             document.getElementById('modalImageElem').src = imgSrc;
-            document.getElementById('imageModal').classList.remove('hidden');
-        }
-        function closeImageModal() {
-            document.getElementById('imageModal').classList.add('hidden');
+            document.getElementById('imageModal').classList.add('open');
         }
 
+        function closeImageModal() {
+            document.getElementById('imageModal').classList.remove('open');
+        }
+
+        // 10. RAZDACHA, JAMOA XARAJATLARI, ATKAZ, REJALAR VA MOLIYA
         function addAttendance(e) {
             e.preventDefault();
-            const worker = document.getElementById('att-worker').value, date = document.getElementById('att-date').value;
+            const worker = document.getElementById('att-worker').value;
+            const date = document.getElementById('att-date').value;
             const [ah, am] = document.getElementById('att-arrival').value.split(':').map(Number);
             let [lh, lm] = document.getElementById('att-leave').value.split(':').map(Number);
-            let arrMin = ah * 60 + am, lvMin = lh * 60 + lm;
+            let arrMin = ah * 60 + am;
+            let lvMin = lh * 60 + lm;
             if (lvMin <= arrMin) lvMin += 24 * 60;
             let workedHours = Math.max(0, (lvMin - arrMin) / 60 - (parseFloat(document.getElementById('att-leave-hours').value) || 0));
             let earned = Math.round(workedHours * HOURLY_RATE);
-            attendance.push({ id: Date.now(), worker, date, arrival: document.getElementById('att-arrival').value, leave: document.getElementById('att-leave').value, workedHours, earned });
-            saveAll(); renderAll();
+
+            attendance.push({
+                id: Date.now(),
+                worker,
+                date,
+                arrival: document.getElementById('att-arrival').value,
+                leave: document.getElementById('att-leave').value,
+                workedHours: Number(workedHours.toFixed(1)),
+                earned
+            });
+            saveAll();
+            renderAll();
         }
-        function deleteAtt(id) { attendance = attendance.filter(a => a.id !== id); saveAll(); renderAll(); }
+
+        function deleteAtt(id) {
+            attendance = attendance.filter(a => a.id !== id);
+            saveAll();
+            renderAll();
+        }
 
         function addRazdachaExpense(e) {
             e.preventDefault();
@@ -779,245 +1533,576 @@
             const branch = document.getElementById('rd-branch').value;
             const desc = document.getElementById('rd-desc').value.trim();
             if (!amount || !desc) return;
-            const finalDesc = kind === 'food' ? `${desc} (Filial: ${branch})` : `${desc} (Rahbardan avans)`;
-            expenses.push({ id: Date.now(), date: globalSelectedDate, target: worker, kind: kind === 'food' ? 'food' : 'avans', amount, desc: finalDesc });
-            document.getElementById('rd-amount').value = ''; document.getElementById('rd-desc').value = '';
-            saveAll(); renderAll();
+
+            const finalDesc = kind === 'food' ? `${desc} [Filial: ${branch}]` : `${desc} (Avans)`;
+            expenses.push({
+                id: Date.now(),
+                date: globalSelectedDate,
+                target: worker,
+                kind: kind === 'food' ? 'food' : 'avans',
+                amount,
+                desc: finalDesc
+            });
+            document.getElementById('rd-amount').value = '';
+            document.getElementById('rd-desc').value = '';
+            saveAll();
+            renderAll();
         }
 
         function addExpense(e) {
             e.preventDefault();
-            const target = document.getElementById('exp-target').value, kind = document.getElementById('exp-kind').value, date = document.getElementById('exp-date').value, amount = normalizeUZS(document.getElementById('exp-amount').value), desc = document.getElementById('exp-desc').value.trim();
+            const target = document.getElementById('exp-target').value;
+            const kind = document.getElementById('exp-kind').value;
+            const date = document.getElementById('exp-date').value;
+            const amount = normalizeUZS(document.getElementById('exp-amount').value);
+            const desc = document.getElementById('exp-desc').value.trim();
             const branch = document.getElementById('exp-branch').value;
             if (!amount || !desc) return;
+
             const finalDesc = kind === 'food' ? `${desc} [Filial: ${branch}]` : desc;
             expenses.push({ id: Date.now(), date, target, kind, amount, desc: finalDesc });
-            document.getElementById('exp-amount').value = ''; document.getElementById('exp-desc').value = '';
-            saveAll(); renderAll();
+            document.getElementById('exp-amount').value = '';
+            document.getElementById('exp-desc').value = '';
+            saveAll();
+            renderAll();
         }
-        function deleteExp(id) { expenses = expenses.filter(x => x.id !== id); saveAll(); renderAll(); }
+
+        function deleteExp(id) {
+            expenses = expenses.filter(x => x.id !== id);
+            saveAll();
+            renderAll();
+        }
 
         function addAtkaz(e) {
             e.preventDefault();
-            const date = document.getElementById('atkaz-date').value, source = document.getElementById('atkaz-source').value;
+            const date = document.getElementById('atkaz-date').value;
+            const source = document.getElementById('atkaz-source').value;
             const worker = document.getElementById('atkaz-worker').value;
-            const amount = normalizeUZS(document.getElementById('atkaz-amount').value), desc = document.getElementById('atkaz-desc').value.trim();
+            const amount = normalizeUZS(document.getElementById('atkaz-amount').value);
+            const desc = document.getElementById('atkaz-desc').value.trim();
             if (!amount || !desc) return;
+
             atkazs.push({ id: Date.now(), date, source, worker, amount, desc });
-            document.getElementById('atkaz-amount').value = ''; document.getElementById('atkaz-desc').value = '';
-            saveAll(); renderAll();
+            document.getElementById('atkaz-amount').value = '';
+            document.getElementById('atkaz-desc').value = '';
+            saveAll();
+            renderAll();
         }
-        function deleteAtkaz(id) { atkazs = atkazs.filter(a => a.id !== id); saveAll(); renderAll(); }
+
+        function deleteAtkaz(id) {
+            atkazs = atkazs.filter(a => a.id !== id);
+            saveAll();
+            renderAll();
+        }
 
         function addTask(e) {
             e.preventDefault();
-            const type = document.getElementById('task-type').value, text = document.getElementById('task-input').value.trim();
+            const type = document.getElementById('task-type').value;
+            const text = document.getElementById('task-input').value.trim();
             if (!text) return;
             tasks.push({ id: Date.now(), type, text, done: false });
-            document.getElementById('task-input').value = ''; saveAll(); renderAll();
+            document.getElementById('task-input').value = '';
+            saveAll();
+            renderAll();
         }
-        function toggleTask(id) { const t = tasks.find(x => x.id === id); if (t) t.done = !t.done; saveAll(); renderAll(); }
-        function deleteTask(id) { tasks = tasks.filter(x => x.id !== id); saveAll(); renderAll(); }
+
+        function toggleTask(id) {
+            const t = tasks.find(x => x.id === id);
+            if (t) t.done = !t.done;
+            saveAll();
+            renderAll();
+        }
+
+        function deleteTask(id) {
+            tasks = tasks.filter(x => x.id !== id);
+            saveAll();
+            renderAll();
+        }
 
         function addFinanceItem(e) {
             e.preventDefault();
-            const type = document.getElementById('fin-type').value, person = document.getElementById('fin-person').value.trim(), amount = normalizeUZS(document.getElementById('fin-amount').value), date = document.getElementById('fin-date').value, desc = document.getElementById('fin-desc').value.trim();
+            const type = document.getElementById('fin-type').value;
+            const person = document.getElementById('fin-person').value.trim();
+            const amount = normalizeUZS(document.getElementById('fin-amount').value);
+            const date = document.getElementById('fin-date').value;
+            const desc = document.getElementById('fin-desc').value.trim();
             if (!person || !amount) return;
-            financeItems.push({ id: Date.now(), type, person, amount, date, desc, paid: false });
-            document.getElementById('fin-person').value = ''; document.getElementById('fin-amount').value = ''; document.getElementById('fin-desc').value = '';
-            saveAll(); renderAll();
-        }
-        function toggleFinancePaid(id) { const f = financeItems.find(x => x.id === id); if (f) f.paid = !f.paid; saveAll(); renderAll(); }
-        function deleteFinanceItem(id) { financeItems = financeItems.filter(x => x.id !== id); saveAll(); renderAll(); }
 
-        function showWorkerHistory(name) {
-            const modal = document.getElementById('worker-modal'), body = document.getElementById('modal-worker-body');
-            document.getElementById('modal-worker-title').querySelector('span').innerText = `${name} - Tarixi`;
-            body.innerHTML = ''; let tot = 0;
-            expenses.filter(x => x.target === name).forEach(x => {
-                tot += x.amount;
-                body.innerHTML += `<div class="flex justify-between border-b py-1"><span>${formatDateDot(x.date)} (${x.kind}): ${x.desc} <b class="text-rose-600">-${formatUZS(x.amount)}</b></span><button onclick="deleteExp(${x.id}); showWorkerHistory('${name}');" class="text-rose-500"><i class="fa-solid fa-xmark"></i></button></div>`;
-            });
-            if (name === "Oʻzim (Rahbar)") {
-                atkazs.filter(a => a.worker === "Oʻzim (Rahbar)").forEach(a => {
-                    tot += a.amount;
-                    body.innerHTML += `<div class="flex justify-between border-b py-1"><span>${formatDateDot(a.date)} (Atkaz - ${a.source}): ${a.desc} <b class="text-rose-600">-${formatUZS(a.amount)}</b></span></div>`;
-                });
-            }
-            if (tot === 0) body.innerHTML = `<p class="text-slate-400 text-center">Ma'lumot yoʻq</p>`;
-            modal.style.display = 'flex';
+            financeItems.push({ id: Date.now(), type, person, amount, date, desc, paid: false });
+            document.getElementById('fin-person').value = '';
+            document.getElementById('fin-amount').value = '';
+            document.getElementById('fin-desc').value = '';
+            saveAll();
+            renderAll();
         }
-        function closeWorkerModal() { document.getElementById('worker-modal').style.display = 'none'; }
+
+        function toggleFinancePaid(id) {
+            const f = financeItems.find(x => x.id === id);
+            if (f) f.paid = !f.paid;
+            saveAll();
+            renderAll();
+        }
+
+        function deleteFinanceItem(id) {
+            financeItems = financeItems.filter(x => x.id !== id);
+            saveAll();
+            renderAll();
+        }
+
+        // 11. TAFSILOTLAR VA SHAXSIY TARIX MODALLARI
+        function showWorkerHistory(name) {
+            const modal = document.getElementById('worker-modal');
+            const body = document.getElementById('modal-worker-body');
+            document.getElementById('modal-worker-title').querySelector('span').innerText = `${name} — Hisob tarixi`;
+            body.innerHTML = '';
+            let count = 0;
+
+            expenses.filter(x => x.target === name).forEach(x => {
+                count++;
+                const label = x.kind === 'food' ? '🍔 Ovqat' : (x.kind === 'avans' ? '💵 Avans' : '⚠️ Jarima');
+                body.innerHTML += `
+                    <div class="flex justify-between items-center border-b py-1.5 gap-2">
+                        <span><b>${formatDateDot(x.date)}</b> (${label}): ${x.desc} <b class="text-rose-600">-${formatUZS(x.amount)}</b></span>
+                        <button type="button" onclick="deleteExp(${x.id}); showWorkerHistory('${name}');" class="text-rose-500 px-1"><i class="fa-solid fa-xmark"></i></button>
+                    </div>
+                `;
+            });
+
+            atkazs.filter(a => a.worker === name).forEach(a => {
+                count++;
+                body.innerHTML += `
+                    <div class="flex justify-between items-center border-b py-1.5 gap-2">
+                        <span><b>${formatDateDot(a.date)}</b> (Atkaz - ${a.source}): ${a.desc} <b class="text-rose-600">-${formatUZS(a.amount)}</b></span>
+                    </div>
+                `;
+            });
+
+            if (count === 0) {
+                body.innerHTML = `<p class="text-slate-400 text-center py-4">Yozuvlar yoʻq</p>`;
+            }
+            modal.classList.add('open');
+        }
+
+        function closeWorkerModal() {
+            document.getElementById('worker-modal').classList.remove('open');
+        }
 
         function openDetailModal(title, subtitle) {
             const modal = document.getElementById('detailModal');
             document.getElementById('detailModalTitle').innerText = title;
             const body = document.getElementById('detailModalBody');
-            body.innerHTML = `<p class="font-bold text-slate-500 mb-2">${subtitle}</p>`;
+            body.innerHTML = `<p class="font-bold text-slate-500 mb-2 border-b pb-1">${subtitle}</p>`;
 
-            if (title.includes('Jazira Opshi') || title.includes('Jazira Filiallar')) {
+            if (title.includes('Jazira Opshi') || title.includes('Jazira Filiallar') || title.includes('Savdo tafsiloti')) {
                 branchSales.forEach(s => {
-                    const ops = s.sarpulDastavka + s.sarpulSaboy + s.vaynDastavka + s.vaynSaboy + (s.jaziraBotSum || 0);
-                    body.innerHTML += `<div class="p-2 border rounded mb-1 flex justify-between"><span>📅 ${formatDateDot(s.date)}</span><b>${formatUZS(ops)}</b></div>`;
+                    const ops = (s.sarpulDastavka || 0) + (s.sarpulSaboy || 0) + (s.vaynDastavka || 0) + (s.vaynSaboy || 0) + (s.jaziraBotSum || 0);
+                    body.innerHTML += `
+                        <div class="p-2 bg-slate-50 border rounded-xl mb-1 space-y-1">
+                            <div class="flex justify-between font-bold"><span>📅 ${formatDateDot(s.date)}</span><span class="text-blue-700">${formatUZS(ops)}</span></div>
+                            <div class="text-[11px] text-slate-600">
+                                Sarpul: Dastavka ${formatShort(s.sarpulDastavka)} (${s.sarpulDSoni || 0} ta) | Saboy ${formatShort(s.sarpulSaboy)} (${s.sarpulSSoni || 0} ta)<br>
+                                Vaynkamat: Dastavka ${formatShort(s.vaynDastavka)} (${s.vaynDSoni || 0} ta) | Saboy ${formatShort(s.vaynSaboy)} (${s.vaynSSoni || 0} ta)<br>
+                                Bot: ${formatShort(s.jaziraBotSum || 0)} (${s.jaziraBotSoni || 0} ta)
+                            </div>
+                        </div>
+                    `;
                 });
-            } else if (title.includes('Chopachop Foyda')) {
+            } else if (title.includes('Chopachop')) {
                 branchSales.forEach(s => {
-                    s.chopaList.forEach(c => {
-                        body.innerHTML += `<div class="p-2 border rounded mb-1 flex justify-between"><span>📅 ${formatDateDot(s.date)} (${c.name})</span><b class="text-purple-700">+${formatUZS(c.profit)}</b></div>`;
+                    (s.chopaList || []).forEach(c => {
+                        body.innerHTML += `<div class="p-2 border rounded-xl mb-1 flex justify-between"><span>📅 ${formatDateDot(s.date)} — <b>${c.name}</b> (${c.soni} ta)</span><b class="text-purple-700">+${formatUZS(c.profit)}</b></div>`;
                     });
                 });
+            } else if (title.includes('Kuryer tafsiloti')) {
+                const cName = title.split(' - ')[1] || '';
+                botCosts.filter(b => b.courier === cName).forEach(b => {
+                    const isSub = b.type === 'subsidy';
+                    body.innerHTML += `
+                        <div class="p-2 border rounded-xl mb-1 flex justify-between">
+                            <span>📅 ${formatDateDot(b.date)} (${isSub ? b.source : b.payType}): ${b.desc}</span>
+                            <b class="${isSub ? 'text-blue-600' : 'text-emerald-600'}">${isSub ? '+' : '-'}${formatUZS(b.amount)}</b>
+                        </div>
+                    `;
+                });
             } else {
-                body.innerHTML += `<p class="text-slate-400">Tafsilotlar mavjud</p>`;
+                body.innerHTML += `<p class="text-slate-500">Barcha maʼlumotlar asosiy roʻyxatda aks etgan.</p>`;
             }
-            modal.classList.remove('hidden');
+            modal.classList.add('open');
         }
-        function closeDetailModal() { document.getElementById('detailModal').classList.add('hidden'); }
 
+        function closeDetailModal() {
+            document.getElementById('detailModal').classList.remove('open');
+        }
+
+        // 12. ASOSIY RENDER FUNKSIYASI (Toza va yagona oqimli)
         function renderAll() {
             updateDropdowns();
-            let totalJaziraOpshi = 0, totalChopaProfit = 0;
-            const partnerProfits = {}; partners.forEach(p => partnerProfits[p.name] = 0);
+            updateRoleDOM();
 
-            const salesList = document.getElementById('sales-list'); salesList.innerHTML = '';
-            [...branchSales].sort((a,b) => new Date(b.date) - new Date(a.date)).forEach(s => {
-                const jaziraOps = s.sarpulDastavka + s.sarpulSaboy + s.vaynDastavka + s.vaynSaboy + (s.jaziraBotSum || 0);
+            let totalJaziraOpshi = 0;
+            let totalChopaProfit = 0;
+            const partnerProfits = {};
+            partners.forEach(p => partnerProfits[p.name] = 0);
+
+            // 1. Savdolar ro'yxati
+            const salesList = document.getElementById('sales-list');
+            salesList.innerHTML = '';
+
+            [...branchSales].sort((a, b) => new Date(b.date) - new Date(a.date)).forEach(s => {
+                const jaziraOps = (s.sarpulDastavka || 0) + (s.sarpulSaboy || 0) + (s.vaynDastavka || 0) + (s.vaynSaboy || 0) + (s.jaziraBotSum || 0);
                 totalJaziraOpshi += jaziraOps;
-                let chopaHtml = '', dayChopa = 0;
-                s.chopaList.forEach(c => {
-                    dayChopa += c.profit; partnerProfits[c.name] = (partnerProfits[c.name] || 0) + c.profit;
-                    chopaHtml += `<div class="text-[11px] text-purple-800">• <b>${c.name}:</b> ${formatShort(c.sum)}➔ <b>+${formatUZS(c.profit)}</b></div>`;
+
+                let chopaHtml = '';
+                let dayChopa = 0;
+                (s.chopaList || []).forEach(c => {
+                    dayChopa += (c.profit || 0);
+                    partnerProfits[c.name] = (partnerProfits[c.name] || 0) + (c.profit || 0);
+                    chopaHtml += `<div class="text-[10px] text-purple-800">• <b>${c.name}:</b> ${formatShort(c.sum)} (${c.soni} ta) ➔ <b>+${formatUZS(c.profit)}</b></div>`;
                 });
                 totalChopaProfit += dayChopa;
-                const jShare = calcMode === 'dastavka' ? Math.round((s.sarpulDastavka + s.vaynDastavka + (s.jaziraBotSum || 0)) * 0.13) : Math.round(jaziraOps * 0.13);
-                
-                let jShareHtml = currentRole === 'admin' ? `<br>13%: +${formatUZS(jShare)}` : '';
-                let chopachopDisplay = currentRole === 'admin' ? `<div class="bg-purple-50 p-2 rounded-xl cursor-pointer" onclick="openDetailModal('Chopachop tafsiloti - ${s.date}', 'Hamkorlar ulushi')"><b>Chopachop:</b> +${formatUZS(dayChopa)}<br>${chopaHtml}</div>` : `<div class="bg-purple-50 p-2 rounded-xl"><b>Chopachop muassasalari:</b> kiritildi</div>`;
 
-                salesList.innerHTML += `<div class="bg-white p-3 rounded-2xl shadow-sm border space-y-1.5 text-xs"><div class="flex justify-between font-bold border-b pb-1"><span>📅 ${formatDateDot(s.date)}</span><div class="flex gap-2"><button onclick="editSale(${s.id})" class="text-blue-600"><i class="fa-solid fa-pen"></i></button><button onclick="deleteSale(${s.id})" class="text-rose-500"><i class="fa-solid fa-trash"></i></button></div></div><div class="grid grid-cols-2 gap-1.5"><div class="bg-blue-50 p-2 rounded-xl cursor-pointer" onclick="openDetailModal('Savdo tafsiloti - ${s.date}', 'Sarpul va Vaynkamat savdolari')"><b>Jazira:</b> ${formatShort(jaziraOps)}${jShareHtml}</div>${chopachopDisplay}</div></div>`;
+                const jShare = calcMode === 'dastavka'
+                    ? Math.round(((s.sarpulDastavka || 0) + (s.vaynDastavka || 0) + (s.jaziraBotSum || 0)) * 0.13)
+                    : Math.round(jaziraOps * 0.13);
+
+                const jShareHtml = currentRole === 'admin' ? `<div class="text-[10px] text-emerald-700 font-bold mt-0.5">13% ulush: +${formatUZS(jShare)}</div>` : '';
+                const chopachopDisplay = currentRole === 'admin'
+                    ? `<div class="bg-purple-50 p-2 rounded-xl border border-purple-100 cursor-pointer" onclick="openDetailModal('Chopachop tafsiloti - ${s.date}', 'Hamkorlar ulushi')"><b>Chopachop:</b> +${formatUZS(dayChopa)}${chopaHtml}</div>`
+                    : `<div class="bg-purple-50 p-2 rounded-xl border border-purple-100"><b>Chopachop:</b> ${(s.chopaList || []).length} ta muassasa kiritildi</div>`;
+
+                salesList.innerHTML += `
+                    <div class="bg-white p-3 rounded-2xl shadow-sm border space-y-2 text-xs">
+                        <div class="flex justify-between items-center font-bold border-b pb-1.5">
+                            <span>📅 ${formatDateDot(s.date)}</span>
+                            <div class="flex gap-3">
+                                <button type="button" onclick="editSale(${s.id})" class="text-blue-600"><i class="fa-solid fa-pen"></i></button>
+                                <button type="button" onclick="deleteSale(${s.id})" class="text-rose-500"><i class="fa-solid fa-trash"></i></button>
+                            </div>
+                        </div>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-1.5">
+                            <div class="bg-blue-50/70 p-2 rounded-xl border border-blue-100 cursor-pointer" onclick="openDetailModal('Savdo tafsiloti - ${s.date}', 'Sarpul va Vaynkamat savdolari')">
+                                <b>Jazira Jami:</b> ${formatUZS(jaziraOps)}
+                                <div class="text-[10px] text-slate-600 mt-0.5">
+                                    Sarpul: D ${formatShort(s.sarpulDastavka)} (${s.sarpulDSoni}) | S ${formatShort(s.sarpulSaboy)} (${s.sarpulSSoni})<br>
+                                    Vayn: D ${formatShort(s.vaynDastavka)} (${s.vaynDSoni}) | S ${formatShort(s.vaynSaboy)} (${s.vaynSSoni})
+                                </div>
+                                ${jShareHtml}
+                            </div>
+                            ${chopachopDisplay}
+                        </div>
+                    </div>
+                `;
             });
-            if (!branchSales.length) salesList.innerHTML = `<p class="text-center text-xs text-slate-400 py-4">Savdolar yoʻq</p>`;
 
-            let jSub = 0, cSub = 0; const cMap = {}; staffList.filter(s => s.role === 'kuryer').forEach(c => cMap[c.name] = 0);
-            const bcList = document.getElementById('bc-list'); bcList.innerHTML = '';
-            
-            [...botCosts].sort((a,b) => new Date(b.date) - new Date(a.date)).forEach(b => {
+            if (!branchSales.length) {
+                salesList.innerHTML = `<p class="text-center text-xs text-slate-400 py-4 bg-white rounded-2xl border">Hozircha savdolar kiritilmagan</p>`;
+            }
+
+            // 2. Kuryer qoplanmalari va to'lovlari
+            let jSub = 0, cSub = 0;
+            const cSubMap = {}, cPaidMap = {};
+            staffList.filter(s => s.role === 'kuryer').forEach(c => {
+                cSubMap[c.name] = 0;
+                cPaidMap[c.name] = 0;
+            });
+
+            const bcList = document.getElementById('bc-list');
+            bcList.innerHTML = '';
+
+            [...botCosts].sort((a, b) => new Date(b.date) - new Date(a.date)).forEach(b => {
                 if (b.type === 'subsidy') {
-                    if (cMap[b.courier] !== undefined) cMap[b.courier] += b.amount;
-                    if (b.source.toLowerCase().includes('jazira')) jSub += b.amount; else cSub += b.amount;
+                    cSubMap[b.courier] = (cSubMap[b.courier] || 0) + (b.amount || 0);
+                    if ((b.source || '').toLowerCase().includes('jazira')) jSub += (b.amount || 0);
+                    else cSub += (b.amount || 0);
+
                     bcList.innerHTML += `
-                        <div class="p-2.5 bg-blue-50/50 border rounded-xl space-y-1.5 text-xs">
-                            <div class="flex justify-between items-center">
-                                <span><b>[Qoplanma] ${b.source} (${formatDateDot(b.date)}):</b> ${b.courier} - ${b.desc}</span>
-                                <div class="flex items-center gap-2">
+                        <div class="p-2.5 bg-blue-50/60 border border-blue-100 rounded-xl space-y-1.5 text-xs">
+                            <div class="flex justify-between items-center gap-2">
+                                <span><b>[Qoplanma] ${b.source} (${formatDateDot(b.date)}):</b> ${b.courier} — ${b.desc}</span>
+                                <div class="flex items-center gap-2 shrink-0">
                                     <span class="text-blue-700 font-bold">+${formatUZS(b.amount)}</span>
-                                    <button onclick="deleteBotCost(${b.id})" class="text-rose-500"><i class="fa-solid fa-trash"></i></button>
+                                    <button type="button" onclick="deleteBotCost(${b.id})" class="text-rose-500"><i class="fa-solid fa-trash"></i></button>
                                 </div>
                             </div>
-                            ${b.image ? `<div><img src="${b.image}" onclick="openImageModal('${b.image}')" class="w-full max-h-32 object-contain rounded-lg border bg-white cursor-pointer p-1"></div>` : ''}
+                            ${b.image ? `<div><img src="${b.image}" onclick="openImageModal('${b.image}')" class="w-full max-h-28 object-contain rounded-lg border bg-white cursor-pointer p-1"></div>` : ''}
                         </div>
                     `;
                 } else {
+                    cPaidMap[b.courier] = (cPaidMap[b.courier] || 0) + (b.amount || 0);
                     bcList.innerHTML += `
-                        <div class="p-2.5 bg-emerald-50/50 border rounded-xl flex justify-between text-xs items-center">
-                            <span><b>[Pul Berish] (${formatDateDot(b.date)}):</b> ${b.courier} ga berildi — <b>${b.payType}</b> | ${b.desc}</span>
-                            <div class="flex items-center gap-2">
+                        <div class="p-2.5 bg-emerald-50/60 border border-emerald-100 rounded-xl flex justify-between text-xs items-center gap-2">
+                            <span><b>[Pul Berildi] (${formatDateDot(b.date)}):</b> ${b.courier} — <b>${b.payType}</b> | ${b.desc}</span>
+                            <div class="flex items-center gap-2 shrink-0">
                                 <span class="text-emerald-700 font-bold">-${formatUZS(b.amount)}</span>
-                                <button onclick="deleteBotCost(${b.id})" class="text-rose-500"><i class="fa-solid fa-trash"></i></button>
+                                <button type="button" onclick="deleteBotCost(${b.id})" class="text-rose-500"><i class="fa-solid fa-trash"></i></button>
                             </div>
                         </div>
                     `;
                 }
             });
 
-            const cSumEl = document.getElementById('courier-subsidy-summary'); cSumEl.innerHTML = '';
+            const cSumEl = document.getElementById('courier-subsidy-summary');
+            cSumEl.innerHTML = '';
             staffList.filter(s => s.role === 'kuryer').forEach(c => {
-                cSumEl.innerHTML += `<div class="py-1 flex justify-between text-xs cursor-pointer" onclick="openDetailModal('Kuryer tafsiloti - ${c.name}', 'Jami qoplanma summasi')"><span><b>${c.name}</b></span><span class="font-bold text-rose-600">${formatUZS(cMap[c.name])}</span></div>`;
+                const subTot = cSubMap[c.name] || 0;
+                const paidTot = cPaidMap[c.name] || 0;
+                const rem = subTot - paidTot;
+                cSumEl.innerHTML += `
+                    <div class="py-2 flex justify-between items-center text-xs cursor-pointer hover:bg-slate-50 px-1 rounded" onclick="openDetailModal('Kuryer tafsiloti - ${c.name}', 'Qoplanmalar va berilgan pullar tarixi')">
+                        <div>
+                            <b>${c.name}</b>
+                            <span class="text-[10px] text-slate-400 block">Qoplanma: ${formatShort(subTot)} | Berildi: ${formatShort(paidTot)}</span>
+                        </div>
+                        <span class="font-extrabold ${rem > 0 ? 'text-rose-600' : 'text-emerald-600'}">${formatUZS(rem)}</span>
+                    </div>
+                `;
             });
 
-            const jShareTot = branchSales.reduce((acc, s) => acc + (calcMode === 'dastavka' ? Math.round((s.sarpulDastavka + s.vaynDastavka + (s.jaziraBotSum || 0)) * 0.13) : Math.round((s.sarpulDastavka + s.sarpulSaboy + s.vaynDastavka + s.vaynSaboy + (s.jaziraBotSum || 0)) * 0.13)), 0);
-            const jNet = jShareTot - jSub, cNet = totalChopaProfit - cSub;
+            // 3. Moliyaviy ko'rsatkichlar va Analitika
+            const jShareTot = branchSales.reduce((acc, s) => {
+                const dSum = (s.sarpulDastavka || 0) + (s.vaynDastavka || 0) + (s.jaziraBotSum || 0);
+                const oSum = dSum + (s.sarpulSaboy || 0) + (s.vaynSaboy || 0);
+                return acc + (calcMode === 'dastavka' ? Math.round(dSum * 0.13) : Math.round(oSum * 0.13));
+            }, 0);
+
+            const jNet = jShareTot - jSub;
+            const cNet = totalChopaProfit - cSub;
+            const netTot = jNet + cNet;
 
             document.getElementById('stat-jazira-ops').innerText = formatUZS(totalJaziraOpshi);
             document.getElementById('stat-chopa-profit').innerText = formatUZS(totalChopaProfit);
-            document.getElementById('stat-net-balance').innerText = formatUZS(jNet + cNet);
+            document.getElementById('stat-net-balance').innerText = formatUZS(netTot);
+
             document.getElementById('jbot-share').innerText = `+${formatUZS(jShareTot)}`;
             document.getElementById('jbot-subsidy').innerText = `-${formatUZS(jSub)}`;
             document.getElementById('jbot-net').innerText = formatUZS(jNet);
+
             document.getElementById('cbot-share').innerText = `+${formatUZS(totalChopaProfit)}`;
             document.getElementById('cbot-subsidy').innerText = `-${formatUZS(cSub)}`;
             document.getElementById('cbot-net').innerText = formatUZS(cNet);
 
             const statusBox = document.getElementById('analytics-status-box');
-            const netTot = jNet + cNet;
-            statusBox.className = netTot >= 0 ? "p-2.5 rounded-xl text-xs font-bold bg-emerald-50 text-emerald-800 border" : "p-2.5 rounded-xl text-xs font-bold bg-rose-50 text-rose-800 border";
-            statusBox.innerHTML = netTot >= 0 ? `🟢 PLUYSDASIZ (${formatUZS(netTot)})` : `🔴 MINUSDASIZ (${formatUZS(netTot)})`;
+            statusBox.className = netTot >= 0
+                ? "p-3 rounded-xl text-xs font-extrabold bg-emerald-50 text-emerald-800 border border-emerald-200"
+                : "p-3 rounded-xl text-xs font-extrabold bg-rose-50 text-rose-800 border border-rose-200";
+            statusBox.innerHTML = netTot >= 0
+                ? `🟢 PLYUSDASIZ: Sof foyda ${formatUZS(netTot)}`
+                : `🔴 MINUSDASIZ: Zarar ${formatUZS(netTot)}`;
 
-            document.getElementById('ana-jazira-filial').innerText = formatUZS(branchSales.reduce((a,b) => a + b.sarpulDastavka + b.sarpulSaboy + b.vaynDastavka + b.vaynSaboy, 0));
-            document.getElementById('ana-jazira-bot').innerText = formatUZS(branchSales.reduce((a,b) => a + (b.jaziraBotSum || 0), 0));
+            document.getElementById('ana-jazira-filial').innerText = formatUZS(
+                branchSales.reduce((a, b) => a + (b.sarpulDastavka || 0) + (b.sarpulSaboy || 0) + (b.vaynDastavka || 0) + (b.vaynSaboy || 0), 0)
+            );
+            document.getElementById('ana-jazira-bot').innerText = formatUZS(
+                branchSales.reduce((a, b) => a + (b.jaziraBotSum || 0), 0)
+            );
 
-            const tAtkaz = atkazs.reduce((a,b)=>a+b.amount,0), tFood = expenses.filter(x=>x.kind==='food').reduce((a,b)=>a+b.amount,0);
-            document.getElementById('ana-cost-breakdown').innerHTML = `<div class="flex justify-between cursor-pointer" onclick="openDetailModal('Kuryer xarajatlari', 'Jami kuryer qoplanmalari')"><span>Kuryer:</span><b class="text-rose-600">-${formatUZS(jSub + cSub)}</b></div><div class="flex justify-between cursor-pointer" onclick="openDetailModal('Atkazlar', 'Jami atkaz tovarlar')"><span>Atkaz:</span><b class="text-rose-600">-${formatUZS(tAtkaz)}</b></div><div class="flex justify-between cursor-pointer" onclick="openDetailModal('Ovqat xarajatlari', 'Jami ovqatlar')"><span>Ovqat:</span><b class="text-rose-600">-${formatUZS(tFood)}</b></div>`;
+            const tAtkaz = atkazs.reduce((a, b) => a + (b.amount || 0), 0);
+            const tFood = expenses.filter(x => x.kind === 'food').reduce((a, b) => a + (b.amount || 0), 0);
+            document.getElementById('ana-cost-breakdown').innerHTML = `
+                <div class="flex justify-between"><span>Kuryer qoplanmalari:</span><b class="text-rose-600">-${formatUZS(jSub + cSub)}</b></div>
+                <div class="flex justify-between"><span>Atkaz tovarlar:</span><b class="text-rose-600">-${formatUZS(tAtkaz)}</b></div>
+                <div class="flex justify-between"><span>Xodimlar ovqati:</span><b class="text-rose-600">-${formatUZS(tFood)}</b></div>
+            `;
 
-            const rRank = document.getElementById('ana-partner-ranking'); rRank.innerHTML = '';
-            Object.keys(partnerProfits).forEach(k => rRank.innerHTML += `<div class="flex justify-between bg-slate-50 p-2 rounded border text-xs cursor-pointer" onclick="openDetailModal('Hamkor - ${k}', 'Jami foyda')"><span>${k}</span><b class="text-purple-700">+${formatUZS(partnerProfits[k])}</b></div>`);
+            const rRank = document.getElementById('ana-partner-ranking');
+            rRank.innerHTML = '';
+            Object.keys(partnerProfits).forEach(k => {
+                rRank.innerHTML += `
+                    <div class="flex justify-between bg-slate-50 p-2 rounded-xl border text-xs">
+                        <span class="font-bold">${k}</span>
+                        <b class="text-purple-700">+${formatUZS(partnerProfits[k])}</b>
+                    </div>
+                `;
+            });
 
-            const rCards = document.getElementById('razdacha-cards'); rCards.innerHTML = '';
+            // 4. Razdacha bo'limi
+            const rCards = document.getElementById('razdacha-cards');
+            rCards.innerHTML = '';
             ['Xushnud', 'Murod'].forEach(name => {
                 const days = attendance.filter(a => a.worker === name).length;
-                const earned = attendance.filter(a => a.worker === name).reduce((a,b) => a + b.earned, 0);
-                const food = expenses.filter(x => x.target === name && x.kind === 'food').reduce((a,b) => a + b.amount, 0);
-                const av = expenses.filter(x => x.target === name && x.kind === 'avans').reduce((a,b) => a + b.amount, 0);
+                const earned = attendance.filter(a => a.worker === name).reduce((a, b) => a + (b.earned || 0), 0);
+                const food = expenses.filter(x => x.target === name && x.kind === 'food').reduce((a, b) => a + (b.amount || 0), 0);
+                const av = expenses.filter(x => x.target === name && x.kind === 'avans').reduce((a, b) => a + (b.amount || 0), 0);
+                const netPay = earned - food - av;
                 rCards.innerHTML += `
-                    <div class="bg-white p-3 rounded-2xl shadow-sm border-l-4 border-indigo-600 space-y-1">
-                        <div class="flex justify-between">
+                    <div class="bg-white p-3 rounded-2xl shadow-sm border-l-4 border-indigo-600 space-y-1 cursor-pointer" onclick="showWorkerHistory('${name}')">
+                        <div class="flex justify-between items-center">
                             <h3 class="text-xs font-extrabold">👨‍🍳 ${name}</h3>
-                            <span class="text-[9px] bg-indigo-50 text-indigo-600 px-1.5 py-0.5 rounded">${days} smena</span>
+                            <span class="text-[9px] bg-indigo-50 text-indigo-700 font-bold px-2 py-0.5 rounded-lg">${days} smena</span>
                         </div>
-                        <div class="flex justify-between text-xs pt-1 border-t cursor-pointer" onclick="showWorkerHistory('${name}')">
-                            <span>Qoʻlga (Hisob):</span>
-                            <b class="text-emerald-600">${formatUZS(earned - food - av)}</b>
+                        <div class="text-[10px] text-slate-500">Ishladi: +${formatShort(earned)} | Ovqat/Avans: -${formatShort(food + av)}</div>
+                        <div class="flex justify-between text-xs pt-1 border-t">
+                            <span>Qoʻlga (Sof):</span>
+                            <b class="${netPay >= 0 ? 'text-emerald-600' : 'text-rose-600'}">${formatUZS(netPay)}</b>
                         </div>
                     </div>
                 `;
             });
 
-            const attList = document.getElementById('att-list'); attList.innerHTML = '';
-            [...attendance].sort((a,b)=>new Date(b.date)-new Date(a.date)).forEach(a => attList.innerHTML += `<div class="p-2 bg-slate-50 border rounded-xl flex justify-between text-xs"><span><b>${a.worker}</b> (${formatDateDot(a.date)} | ${a.arrival || '12:00'} - ${a.leave || '00:00'}): +${formatUZS(a.earned)}</span><button onclick="deleteAtt(${a.id})" class="text-rose-500"><i class="fa-solid fa-trash"></i></button></div>`);
+            const attList = document.getElementById('att-list');
+            attList.innerHTML = '';
+            [...attendance].sort((a, b) => new Date(b.date) - new Date(a.date)).forEach(a => {
+                attList.innerHTML += `
+                    <div class="p-2 bg-slate-50 border rounded-xl flex justify-between items-center text-xs">
+                        <span><b>${a.worker}</b> (${formatDateDot(a.date)} | ${a.arrival} - ${a.leave}): <b class="text-emerald-700">+${formatUZS(a.earned)}</b></span>
+                        <button type="button" onclick="deleteAtt(${a.id})" class="text-rose-500 px-1"><i class="fa-solid fa-trash"></i></button>
+                    </div>
+                `;
+            });
             expenses.filter(x => x.target === 'Xushnud' || x.target === 'Murod').forEach(x => {
-                attList.innerHTML += `<div class="p-2 bg-amber-50 border rounded-xl flex justify-between text-xs"><span><b>${x.target}</b> (${formatDateDot(x.date)} - ${x.kind}): ${x.desc}</span><div class="flex items-center gap-2"><b class="text-rose-600">-${formatUZS(x.amount)}</b><button onclick="deleteExp(${x.id})" class="text-rose-500"><i class="fa-solid fa-xmark"></i></button></div></div>`;
+                attList.innerHTML += `
+                    <div class="p-2 bg-amber-50/70 border border-amber-200 rounded-xl flex justify-between items-center text-xs">
+                        <span><b>${x.target}</b> (${formatDateDot(x.date)}): ${x.desc}</span>
+                        <div class="flex items-center gap-2">
+                            <b class="text-rose-600">-${formatUZS(x.amount)}</b>
+                            <button type="button" onclick="deleteExp(${x.id})" class="text-rose-500 px-1"><i class="fa-solid fa-xmark"></i></button>
+                        </div>
+                    </div>
+                `;
             });
 
-            const sList = document.getElementById('team-staff-list'); sList.innerHTML = '';
-            staffList.forEach(s => sList.innerHTML += `<div class="flex justify-between items-center bg-slate-50 p-2 rounded-xl border"><b>${s.name}</b><input type="number" value="${s.salary}" onchange="updateWorkerSalary(${s.id}, this.value)" class="w-20 px-1 text-xs border rounded text-center"></div>`);
+            // 5. Jamoa va Oyliklar
+            const sList = document.getElementById('team-staff-list');
+            sList.innerHTML = '';
+            staffList.forEach(s => {
+                sList.innerHTML += `
+                    <div class="flex justify-between items-center bg-slate-50 p-2 rounded-xl border gap-2">
+                        <div>
+                            <b>${s.name}</b>
+                            <span class="text-[10px] text-slate-400 uppercase ml-1">(${s.role})</span>
+                        </div>
+                        <div class="flex items-center gap-1.5">
+                            <input type="number" value="${s.salary}" onchange="updateWorkerSalary(${s.id}, this.value)" class="w-24 px-2 py-1 text-xs bg-white border rounded-lg text-center font-bold">
+                            ${s.role !== 'rahbar' ? `<button type="button" onclick="deleteWorker(${s.id})" class="text-rose-500 px-1"><i class="fa-solid fa-trash"></i></button>` : ''}
+                        </div>
+                    </div>
+                `;
+            });
 
-            const aList = document.getElementById('atkaz-list'); aList.innerHTML = '';
-            [...atkazs].sort((a,b)=>new Date(b.date)-new Date(a.date)).forEach(a => aList.innerHTML += `<div class="p-2 bg-rose-50 border rounded-xl flex justify-between text-xs"><span><b>${a.source} (${formatDateDot(a.date)}):</b> [Masʼul: ${a.worker}] ${a.desc}</span><div class="flex items-center gap-2"><span class="text-rose-700 font-bold">-${formatUZS(a.amount)}</span><button onclick="deleteAtkaz(${a.id})" class="text-rose-500"><i class="fa-solid fa-trash"></i></button></div></div>`);
+            const aList = document.getElementById('atkaz-list');
+            aList.innerHTML = '';
+            [...atkazs].sort((a, b) => new Date(b.date) - new Date(a.date)).forEach(a => {
+                aList.innerHTML += `
+                    <div class="p-2 bg-rose-50/70 border border-rose-200 rounded-xl flex justify-between items-center text-xs gap-2">
+                        <span><b>${a.source} (${formatDateDot(a.date)}):</b> [${a.worker}] ${a.desc}</span>
+                        <div class="flex items-center gap-2 shrink-0">
+                            <span class="text-rose-700 font-bold">-${formatUZS(a.amount)}</span>
+                            <button type="button" onclick="deleteAtkaz(${a.id})" class="text-rose-500"><i class="fa-solid fa-trash"></i></button>
+                        </div>
+                    </div>
+                `;
+            });
 
-            const sTable = document.getElementById('staff-salary-table'); sTable.innerHTML = '';
-            const wFood = {}, wAv = {}; expenses.forEach(x => { if(x.kind==='food') wFood[x.target]=(wFood[x.target]||0)+x.amount; else if(x.kind==='avans') wAv[x.target]=(wAv[x.target]||0)+x.amount; });
+            const sTable = document.getElementById('staff-salary-table');
+            sTable.innerHTML = '';
+            const wDeduct = {};
+            expenses.forEach(x => {
+                wDeduct[x.target] = (wDeduct[x.target] || 0) + (x.amount || 0);
+            });
+            atkazs.forEach(a => {
+                wDeduct[a.worker] = (wDeduct[a.worker] || 0) + (a.amount || 0);
+            });
+
             staffList.filter(s => s.role !== 'rahbar').forEach(s => {
-                let rem = s.salary - (wFood[s.name]||0) - (wAv[s.name]||0);
-                sTable.innerHTML += `<div onclick="showWorkerHistory('${s.name}')" class="py-2 flex justify-between items-center cursor-pointer hover:bg-slate-50 px-2 rounded"><span>${s.name}</span><b class="${rem>=0?'text-emerald-600':'text-rose-600'}">${formatUZS(rem)}</b></div>`;
+                const baseSal = s.role === 'razdacha'
+                    ? attendance.filter(a => a.worker === s.name).reduce((acc, b) => acc + (b.earned || 0), 0)
+                    : (s.salary || 0);
+                const ded = wDeduct[s.name] || 0;
+                const rem = baseSal - ded;
+                sTable.innerHTML += `
+                    <div onclick="showWorkerHistory('${s.name}')" class="py-2 flex justify-between items-center cursor-pointer hover:bg-slate-50 px-2 rounded-lg">
+                        <div>
+                            <span class="font-bold">${s.name}</span>
+                            <span class="text-[10px] text-slate-400 block">Hisoblandi: ${formatShort(baseSal)} | Ushlandi: -${formatShort(ded)}</span>
+                        </div>
+                        <b class="${rem >= 0 ? 'text-emerald-600' : 'text-rose-600'}">${formatUZS(rem)}</b>
+                    </div>
+                `;
             });
 
-            const tList = document.getElementById('task-list'); tList.innerHTML = '';
-            tasks.filter(t => t.type === document.getElementById('task-filter').value).forEach(t => {
-                tList.innerHTML += `<div class="p-2 border rounded-xl flex justify-between text-xs ${t.done?'opacity-50 line-through':''}"><label class="flex items-center gap-2 cursor-pointer flex-1"><input type="checkbox" ${t.done?'checked':''} onchange="toggleTask(${t.id})"><span>${t.text}</span></label><button onclick="deleteTask(${t.id})" class="text-rose-500"><i class="fa-solid fa-xmark"></i></button></div>`;
+            // 6. Rejalar
+            const tList = document.getElementById('task-list');
+            tList.innerHTML = '';
+            const filterVal = document.getElementById('task-filter').value;
+            const filteredTasks = tasks.filter(t => t.type === filterVal);
+            filteredTasks.forEach(t => {
+                tList.innerHTML += `
+                    <div class="p-2.5 bg-slate-50 border rounded-xl flex justify-between items-center text-xs ${t.done ? 'opacity-50 line-through' : ''}">
+                        <label class="flex items-center gap-2.5 cursor-pointer flex-1">
+                            <input type="checkbox" ${t.done ? 'checked' : ''} onchange="toggleTask(${t.id})" class="w-4 h-4 rounded">
+                            <span class="font-medium">${t.text}</span>
+                        </label>
+                        <button type="button" onclick="deleteTask(${t.id})" class="text-rose-500 px-1.5"><i class="fa-solid fa-xmark"></i></button>
+                    </div>
+                `;
+            });
+            if (!filteredTasks.length) {
+                tList.innerHTML = `<p class="text-center text-xs text-slate-400 py-4">Bu boʻlimda rejalar yoʻq</p>`;
+            }
+
+            // 7. Moliya
+            let fKirim = Math.max(0, netTot);
+            let fChiqim = 0;
+            const fList = document.getElementById('fin-list');
+            fList.innerHTML = '';
+
+            const badgeColors = {
+                kirim: 'bg-emerald-100 text-emerald-800',
+                chiqim: 'bg-rose-100 text-rose-800',
+                qarz_berdim: 'bg-amber-100 text-amber-800',
+                qarz_oldim: 'bg-purple-100 text-purple-800'
+            };
+
+            [...financeItems].sort((a, b) => new Date(b.date) - new Date(a.date)).forEach(f => {
+                if (!f.paid) {
+                    if (f.type === 'kirim' || f.type === 'qarz_oldim') fKirim += (f.amount || 0);
+                    else fChiqim += (f.amount || 0);
+                }
+                const bc = badgeColors[f.type] || 'bg-slate-100 text-slate-800';
+                fList.innerHTML += `
+                    <div class="p-2.5 border rounded-xl flex justify-between items-center text-xs ${f.paid ? 'opacity-50 bg-slate-50' : 'bg-white'}">
+                        <div>
+                            <div class="flex items-center gap-1.5">
+                                <span class="px-1.5 py-0.5 rounded text-[10px] font-bold uppercase ${bc}">${f.type.replace('_', ' ')}</span>
+                                <span class="text-[10px] text-slate-400">${formatDateDot(f.date)}</span>
+                            </div>
+                            <b class="block mt-1">${f.person}: ${formatUZS(f.amount)}</b>
+                            ${f.desc ? `<span class="text-[11px] text-slate-500">${f.desc}</span>` : ''}
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <button type="button" onclick="toggleFinancePaid(${f.id})" title="Yopildi deb belgilash" class="px-2 py-1 rounded border text-[10px] font-bold ${f.paid ? 'bg-slate-200 text-slate-600' : 'bg-emerald-50 text-emerald-700 border-emerald-200'}">
+                                ${f.paid ? 'Yopilgan' : 'Yopish ✓'}
+                            </button>
+                            <button type="button" onclick="deleteFinanceItem(${f.id})" class="text-rose-500 px-1"><i class="fa-solid fa-trash"></i></button>
+                        </div>
+                    </div>
+                `;
             });
 
-            let fKirim = jNet + cNet, fChiqim = 0;
-            const fList = document.getElementById('fin-list'); fList.innerHTML = '';
-            [...financeItems].sort((a,b)=>new Date(b.date)-new Date(a.date)).forEach(f => {
-                if (f.type === 'kirim' || f.type === 'qarz_oldim') fKirim += f.amount; else fChiqim += f.amount;
-                const bc = {kirim:'bg-emerald-100 text-emerald-800',chiqim:'bg-rose-100 text-rose-800',qarz_berdim:'bg-amber-100 text-amber-800',qarz_oldim:'bg-purple-100 text-purple-800'}[f.type];
-                fList.innerHTML += `<div class="p-2.5 border rounded-xl flex justify-between text-xs ${f.paid?'opacity-50':''}"><div><span class="px-1.5 py-0.5 rounded font-bold ${bc}">${f.type}</span><b class="block mt-1">${f.person}: ${formatUZS(f.amount)}</b></div><button onclick="deleteFinanceItem(${f.id})" class="text-rose-500"><i class="fa-solid fa-trash"></i></button></div>`;
-            });
             document.getElementById('fin-total-kirim').innerText = formatUZS(fKirim);
             document.getElementById('fin-total-chiqim').innerText = formatUZS(fChiqim);
-            applyRoleUI();
         }
 
-        renderFormPartners(); renderAll();
+        // 13. DASTURNI ISHGA TUSHIRISH VA AVTO-YANGILASH
+        initDates();
+        renderFormPartners();
+        renderAll();
+        loadFromCloud(false);
+
+        // Telefon ekrani yoqilganda yoki brauzerga qaytilganda avtomatik yangilash
+        document.addEventListener("visibilitychange", () => {
+            if (document.visibilityState === "visible") {
+                loadFromCloud(true);
+            }
+        });
+
+        // Har 25 soniyada fonda sokin yangilab turish (inputga yozilmayotgan paytda)
+        setInterval(() => {
+            const activeTag = document.activeElement ? document.activeElement.tagName : '';
+            if (activeTag !== 'INPUT' && activeTag !== 'SELECT' && activeTag !== 'TEXTAREA') {
+                loadFromCloud(true);
+            }
+        }, 25000);
     </script>
 </body>
 </html>
