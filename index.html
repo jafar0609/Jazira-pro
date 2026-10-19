@@ -5,6 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>Jazira & Chopachop PRO</title>
 
+    <!-- Telegram WebApp SDK -->
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
@@ -36,7 +39,6 @@
             display: block !important;
         }
 
-        /* Honor X6 va barcha Androidlarda modal ekranni to'sib qolmasligi uchun qat'iy qoida */
         .modal-overlay {
             display: none !important;
             pointer-events: none !important;
@@ -50,6 +52,25 @@
     </style>
 </head>
 <body class="text-slate-800">
+
+    <!-- BEGONA FOYDALANUVCHILAR VA BRAUZER UCHUN QULF EKRANI -->
+    <div id="auth-lock-screen" class="fixed inset-0 z-50 bg-slate-900 text-white flex flex-col items-center justify-center p-6 text-center" style="display: none;">
+        <div class="w-16 h-16 rounded-2xl bg-rose-500/20 text-rose-400 flex items-center justify-center text-3xl mb-3 shadow">
+            <i class="fa-solid fa-user-lock"></i>
+        </div>
+        <h2 id="auth-lock-title" class="text-base font-extrabold text-white">Kirish Cheklangan</h2>
+        <p id="auth-lock-msg" class="text-xs text-slate-400 mt-2 max-w-xs leading-relaxed"></p>
+
+        <!-- Kompyuter yoki oddiy brauzer uchun PIN kiritish -->
+        <div id="browser-pin-box" class="mt-5 w-full max-w-xs space-y-2" style="display: none;">
+            <p class="text-[11px] text-slate-400">Kompyuterdan kirish uchun PIN-kodni tering:</p>
+            <input type="password" inputmode="numeric" id="browser-pin-input" placeholder="••••" onkeydown="if(event.key==='Enter') checkBrowserPin()"
+                class="w-full text-center text-xl tracking-widest font-extrabold py-2.5 rounded-xl border border-slate-700 bg-slate-800 text-white focus:outline-none focus:border-blue-500">
+            <button type="button" onclick="checkBrowserPin()" class="w-full py-2.5 bg-blue-600 active:bg-blue-700 text-white rounded-xl text-xs font-bold shadow">
+                Kirish
+            </button>
+        </div>
+    </div>
 
     <!-- YUQORI PANEL (HEADER) -->
     <header class="sticky top-0 z-30 bg-white/95 backdrop-blur border-b border-slate-200 px-3 py-2 shadow-sm">
@@ -89,10 +110,8 @@
     <!-- ASOSIY KONTENT -->
     <main class="max-w-xl mx-auto p-3 space-y-3">
 
-        <!-- ==================== 1. SAVDO BO'LIMI ==================== -->
+        <!-- 1. SAVDO -->
         <div id="view-home" class="tab-content active space-y-3">
-            
-            <!-- Rahbar uchun umumiy moliyaviy natija kartasi -->
             <div id="finance-card-wrapper" class="bg-slate-900 text-white p-3.5 rounded-2xl shadow-lg space-y-2.5" style="display: none;">
                 <div class="flex items-center justify-between">
                     <span class="text-[11px] font-extrabold text-blue-300 tracking-wide">UMUMIY MOLIYAVIY NATIJA</span>
@@ -117,7 +136,6 @@
                 </div>
             </div>
 
-            <!-- Kunlik savdo kiritish formasi -->
             <div class="bg-white p-3.5 rounded-2xl shadow-sm border border-slate-200/80 space-y-3">
                 <div class="flex justify-between items-center border-b pb-2">
                     <h2 id="sale-form-title" class="text-xs font-extrabold text-slate-800">Kunlik Savdo Kiritish</h2>
@@ -132,62 +150,38 @@
                         <input type="date" id="sale-date" required class="text-xs font-extrabold bg-transparent focus:outline-none">
                     </div>
 
-                    <!-- Sarpul -->
                     <div class="p-2.5 rounded-xl bg-blue-50/50 border border-blue-100 space-y-1.5">
                         <span class="text-[11px] font-extrabold text-blue-900 block">📍 Jazira: Sarpul</span>
                         <div class="grid grid-cols-3 gap-1.5">
-                            <div class="col-span-2">
-                                <input type="number" step="any" id="sarpul-dastavka" placeholder="Dastavka summasi" required class="w-full px-2.5 py-1.5 text-xs bg-white border rounded-lg focus:outline-none focus:border-blue-500">
-                            </div>
-                            <div>
-                                <input type="number" id="sarpul-d-soni" placeholder="Soni" required class="w-full px-2 py-1.5 text-xs bg-white border rounded-lg text-center focus:outline-none focus:border-blue-500">
-                            </div>
+                            <div class="col-span-2"><input type="number" step="any" id="sarpul-dastavka" placeholder="Dastavka summasi" required class="w-full px-2.5 py-1.5 text-xs bg-white border rounded-lg focus:outline-none focus:border-blue-500"></div>
+                            <div><input type="number" id="sarpul-d-soni" placeholder="Soni" required class="w-full px-2 py-1.5 text-xs bg-white border rounded-lg text-center focus:outline-none focus:border-blue-500"></div>
                         </div>
                         <div class="grid grid-cols-3 gap-1.5">
-                            <div class="col-span-2">
-                                <input type="number" step="any" id="sarpul-saboy" placeholder="Saboy summasi" required class="w-full px-2.5 py-1.5 text-xs bg-white border rounded-lg focus:outline-none focus:border-blue-500">
-                            </div>
-                            <div>
-                                <input type="number" id="sarpul-s-soni" placeholder="Soni" required class="w-full px-2 py-1.5 text-xs bg-white border rounded-lg text-center focus:outline-none focus:border-blue-500">
-                            </div>
+                            <div class="col-span-2"><input type="number" step="any" id="sarpul-saboy" placeholder="Saboy summasi" required class="w-full px-2.5 py-1.5 text-xs bg-white border rounded-lg focus:outline-none focus:border-blue-500"></div>
+                            <div><input type="number" id="sarpul-s-soni" placeholder="Soni" required class="w-full px-2 py-1.5 text-xs bg-white border rounded-lg text-center focus:outline-none focus:border-blue-500"></div>
                         </div>
                     </div>
 
-                    <!-- Vaynkamat -->
                     <div class="p-2.5 rounded-xl bg-indigo-50/50 border border-indigo-100 space-y-1.5">
                         <span class="text-[11px] font-extrabold text-indigo-900 block">📍 Jazira: Vaynkamat</span>
                         <div class="grid grid-cols-3 gap-1.5">
-                            <div class="col-span-2">
-                                <input type="number" step="any" id="vayn-dastavka" placeholder="Dastavka summasi" required class="w-full px-2.5 py-1.5 text-xs bg-white border rounded-lg focus:outline-none focus:border-indigo-500">
-                            </div>
-                            <div>
-                                <input type="number" id="vayn-d-soni" placeholder="Soni" required class="w-full px-2 py-1.5 text-xs bg-white border rounded-lg text-center focus:outline-none focus:border-indigo-500">
-                            </div>
+                            <div class="col-span-2"><input type="number" step="any" id="vayn-dastavka" placeholder="Dastavka summasi" required class="w-full px-2.5 py-1.5 text-xs bg-white border rounded-lg focus:outline-none focus:border-indigo-500"></div>
+                            <div><input type="number" id="vayn-d-soni" placeholder="Soni" required class="w-full px-2 py-1.5 text-xs bg-white border rounded-lg text-center focus:outline-none focus:border-indigo-500"></div>
                         </div>
                         <div class="grid grid-cols-3 gap-1.5">
-                            <div class="col-span-2">
-                                <input type="number" step="any" id="vayn-saboy" placeholder="Saboy summasi" required class="w-full px-2.5 py-1.5 text-xs bg-white border rounded-lg focus:outline-none focus:border-indigo-500">
-                            </div>
-                            <div>
-                                <input type="number" id="vayn-s-soni" placeholder="Soni" required class="w-full px-2 py-1.5 text-xs bg-white border rounded-lg text-center focus:outline-none focus:border-indigo-500">
-                            </div>
+                            <div class="col-span-2"><input type="number" step="any" id="vayn-saboy" placeholder="Saboy summasi" required class="w-full px-2.5 py-1.5 text-xs bg-white border rounded-lg focus:outline-none focus:border-indigo-500"></div>
+                            <div><input type="number" id="vayn-s-soni" placeholder="Soni" required class="w-full px-2 py-1.5 text-xs bg-white border rounded-lg text-center focus:outline-none focus:border-indigo-500"></div>
                         </div>
                     </div>
 
-                    <!-- Jazira Bot -->
                     <div class="p-2.5 rounded-xl bg-emerald-50/60 border border-emerald-100 space-y-1.5">
                         <span class="text-[11px] font-extrabold text-emerald-900 block">🤖 Jazira Bot</span>
                         <div class="grid grid-cols-3 gap-1.5">
-                            <div class="col-span-2">
-                                <input type="number" step="any" id="jazira-bot-sum" placeholder="Bot savdosi (ixtiyoriy)" class="w-full px-2.5 py-1.5 text-xs bg-white border rounded-lg focus:outline-none focus:border-emerald-500">
-                            </div>
-                            <div>
-                                <input type="number" id="jazira-bot-soni" placeholder="Soni" class="w-full px-2 py-1.5 text-xs bg-white border rounded-lg text-center focus:outline-none focus:border-emerald-500">
-                            </div>
+                            <div class="col-span-2"><input type="number" step="any" id="jazira-bot-sum" placeholder="Bot savdosi (ixtiyoriy)" class="w-full px-2.5 py-1.5 text-xs bg-white border rounded-lg focus:outline-none focus:border-emerald-500"></div>
+                            <div><input type="number" id="jazira-bot-soni" placeholder="Soni" class="w-full px-2 py-1.5 text-xs bg-white border rounded-lg text-center focus:outline-none focus:border-emerald-500"></div>
                         </div>
                     </div>
 
-                    <!-- Chopachop Muassasalari -->
                     <div class="p-2.5 rounded-xl bg-purple-50/60 border border-purple-100 space-y-2">
                         <div class="flex justify-between items-center">
                             <span class="text-[11px] font-extrabold text-purple-900">🚀 Chopachop Muassasalari</span>
@@ -210,7 +204,7 @@
             </div>
         </div>
 
-        <!-- ==================== 2. ANALITIKA BO'LIMI ==================== -->
+        <!-- 2. ANALITIKA -->
         <div id="view-analytics" class="tab-content space-y-3">
             <div class="bg-white p-3.5 rounded-2xl shadow-sm border border-slate-200/80 space-y-3">
                 <h2 class="text-xs font-extrabold text-slate-900">Biznes Holati va Tahlil</h2>
@@ -239,7 +233,7 @@
             </div>
         </div>
 
-        <!-- ==================== 3. KURYER BO'LIMI ==================== -->
+        <!-- 3. KURYER -->
         <div id="view-bots" class="tab-content space-y-3">
             <div id="bots-finance-cards" class="grid grid-cols-2 gap-2" style="display: none;">
                 <div class="bg-white p-3 rounded-2xl shadow-sm border-t-4 border-emerald-500 space-y-1 text-xs">
@@ -256,7 +250,7 @@
                 </div>
             </div>
 
-            <!-- 1-QISM: Kuryerga kundalik qoplanma yozish -->
+            <!-- Qoplanma yozish -->
             <div class="bg-white p-3.5 rounded-2xl shadow-sm border border-slate-200/80 space-y-2.5">
                 <div class="flex items-center gap-2 border-b pb-2">
                     <div class="w-6 h-6 rounded-lg bg-blue-600 text-white flex items-center justify-center font-bold text-xs shrink-0">1</div>
@@ -282,7 +276,7 @@
                 </form>
             </div>
 
-            <!-- 2-QISM: Kuryerga pul berish -->
+            <!-- Pul berish -->
             <div class="bg-white p-3.5 rounded-2xl shadow-sm border border-slate-200/80 space-y-2.5">
                 <div class="flex items-center gap-2 border-b pb-2">
                     <div class="w-6 h-6 rounded-lg bg-emerald-600 text-white flex items-center justify-center font-bold text-xs shrink-0">2</div>
@@ -319,7 +313,7 @@
             </div>
         </div>
 
-        <!-- ==================== 4. RAZDACHA BO'LIMI ==================== -->
+        <!-- 4. RAZDACHA -->
         <div id="view-razdacha" class="tab-content space-y-3">
             <div id="razdacha-cards" class="grid grid-cols-1 sm:grid-cols-2 gap-2"></div>
             
@@ -386,7 +380,7 @@
             </div>
         </div>
 
-        <!-- ==================== 5. JAMOA BO'LIMI ==================== -->
+        <!-- 5. JAMOA -->
         <div id="view-team" class="tab-content space-y-3">
             <div class="bg-white p-3.5 rounded-2xl shadow-sm border space-y-2.5">
                 <div class="flex justify-between items-center border-b pb-2">
@@ -417,8 +411,8 @@
                     </div>
                     <div class="grid grid-cols-3 gap-1.5">
                         <input type="date" id="exp-date" required class="px-1.5 py-1.5 text-xs bg-white border rounded-lg">
-                        <input type="number" step="any" id="exp-amount" placeholder="Summa" required class="px-2 py-1.5 text-xs bg-white border rounded-lg">
-                        <input type="text" id="exp-desc" placeholder="Izoh" required class="px-2 py-1.5 text-xs bg-white border rounded-lg">
+                        <input type="number" step="any" id="exp-amount" placeholder="Summa" required class="px-2.5 py-1.5 text-xs bg-white border rounded-lg">
+                        <input type="text" id="exp-desc" placeholder="Izoh" required class="px-2.5 py-1.5 text-xs bg-white border rounded-lg">
                     </div>
                     <button type="submit" class="w-full py-2 bg-slate-900 active:bg-slate-800 text-white font-bold text-xs rounded-xl shadow-sm">
                         Saqlash
@@ -456,7 +450,7 @@
             </div>
         </div>
 
-        <!-- ==================== 6. REJALAR BO'LIMI ==================== -->
+        <!-- 6. REJALAR -->
         <div id="view-tasks" class="tab-content space-y-3">
             <div class="bg-white p-3.5 rounded-2xl shadow-sm border space-y-3">
                 <div class="flex items-center justify-between border-b pb-2">
@@ -488,7 +482,7 @@
             </div>
         </div>
 
-        <!-- ==================== 7. MOLIYA BO'LIMI ==================== -->
+        <!-- 7. MOLIYA -->
         <div id="view-finance" class="tab-content space-y-3">
             <div class="bg-white p-3.5 rounded-2xl shadow-sm border space-y-2.5">
                 <h2 class="text-xs font-extrabold text-slate-800">Kirim, Chiqim va Qarzlar</h2>
@@ -621,7 +615,7 @@
         </div>
     </div>
 
-    <!-- PASTKI MENYU (NAVIGATION BAR) -->
+    <!-- PASTKI MENYU -->
     <nav class="fixed bottom-0 left-0 right-0 z-40 bg-white/95 backdrop-blur border-t border-slate-200 shadow-lg">
         <div class="max-w-xl mx-auto grid grid-cols-7 h-16">
             <button type="button" onclick="switchTab('home')" id="nav-home" class="flex flex-col items-center justify-center gap-0.5 text-blue-600">
@@ -648,9 +642,14 @@
         </div>
     </nav>
 
-    <!-- ==================== ASOSIY JAVASCRIPT LOGIKASI ==================== -->
+    <!-- ==================== JAVASCRIPT ==================== -->
     <script>
-        // 1. KONSTANTALAR VA JSONBIN KONFIGURATSIYASI
+        // 1. XAVFSIZLIK VA TELEGRAM ID BO'YICHA RUXSATLAR
+        const ALLOWED_USERS = {
+            "6079513231": { name: "Oʻzim (Rahbar)", role: "admin" },
+            "8315845444": { name: "Fayoza", role: "fayoza" }
+        };
+
         const API_KEY = "$2a$10$eMODZUKADEWxX5U60.8Kr.noozUDyQXGn2SalN8SzK359pMEBu5se";
         const MASTER_BIN_NAME = "JaziraChopachopMasterDB";
         const HOURLY_RATE = 2500000 / 360;
@@ -702,7 +701,64 @@
             }
         }
 
-        // 2. FORMATLASH FUNKSIYALARI (Cheksiz sikldan xoli va xavfsiz)
+        // TELEGRAM AVTORIZATSIYA TEKSHIRUVI
+        function initTelegramAuth() {
+            const tg = window.Telegram && window.Telegram.WebApp;
+            const lockScreen = document.getElementById('auth-lock-screen');
+            const lockTitle = document.getElementById('auth-lock-title');
+            const lockMsg = document.getElementById('auth-lock-msg');
+            const browserPinBox = document.getElementById('browser-pin-box');
+
+            if (tg && tg.initDataUnsafe && tg.initDataUnsafe.user && tg.initDataUnsafe.user.id) {
+                tg.ready();
+                try { tg.expand(); } catch(e){}
+
+                const tgId = String(tg.initDataUnsafe.user.id);
+                if (ALLOWED_USERS[tgId]) {
+                    // Ruxsat berilgan shaxs
+                    currentRole = ALLOWED_USERS[tgId].role;
+                    lockScreen.style.display = 'none';
+                    updateRoleDOM();
+                } else {
+                    // Begona Telegram hisobi
+                    lockScreen.style.display = 'flex';
+                    lockTitle.innerText = "Kirish Taqiqlangan!";
+                    lockMsg.innerHTML = `Sizning Telegram ID raqamingiz: <b class="text-white">${tgId}</b>.<br><br>Ushbu boshqaruv paneliga faqat Jazira maʼmuriyati kira oladi.`;
+                    browserPinBox.style.display = 'none';
+                    return false;
+                }
+            } else {
+                // Oddiy brauzer yoki kompyuter orqali ochilganda
+                const savedRole = sessionStorage.getItem('jc_auth_role');
+                if (savedRole === 'admin') {
+                    currentRole = 'admin';
+                    lockScreen.style.display = 'none';
+                    updateRoleDOM();
+                } else {
+                    lockScreen.style.display = 'flex';
+                    lockTitle.innerText = "Avtorizatsiya Talab Qilinadi";
+                    lockMsg.innerText = "Ushbu tizim Telegram bot orqali yoki kompyuterda maxfiy PIN-kod orqali ochiladi.";
+                    browserPinBox.style.display = 'block';
+                    return false;
+                }
+            }
+            return true;
+        }
+
+        function checkBrowserPin() {
+            const val = document.getElementById('browser-pin-input').value.trim();
+            if (val === '0609') {
+                currentRole = 'admin';
+                sessionStorage.setItem('jc_auth_role', 'admin');
+                document.getElementById('auth-lock-screen').style.display = 'none';
+                updateRoleDOM();
+                renderAll();
+            } else {
+                alert("❌ Maxfiy PIN-kod notoʻgʻri!");
+            }
+        }
+
+        // 2. FORMATLASH FUNKSIYALARI
         function normalizeUZS(val) {
             let n = parseFloat(val);
             if (isNaN(n) || n <= 0) return 0;
@@ -748,7 +804,7 @@
             return p.length === 3 ? `${p[2]}.${p[1]}.${p[0]}` : iso;
         }
 
-        // 3. ONLAYN CLOUD AVTO-SINXRONIZATSIYA (JSONBIN.IO)
+        // 3. ONLAYN CLOUD AVTO-SINXRONIZATSIYA
         function setSyncBadge(state, text) {
             const badge = document.getElementById('sync-badge');
             if (!badge) return;
@@ -764,7 +820,6 @@
             }
         }
 
-        // Barcha telefonlarda bitta umumiy BIN_ID ni avtomatik topish funksiyasi
         async function discoverCloudBin() {
             try {
                 const res = await fetch("https://api.jsonbin.io/v3/c/uncategorized/bins", {
@@ -774,7 +829,6 @@
                 if (res.ok) {
                     const bins = await res.json();
                     if (Array.isArray(bins) && bins.length > 0) {
-                        // Avval maxsus nomli binni qidiramiz, bo'lmasa eng birinchisini olamiz
                         const masterBin = bins.find(b => b.snippetMeta && b.snippetMeta.name === MASTER_BIN_NAME) || bins[0];
                         if (masterBin && masterBin.record) {
                             BIN_ID = masterBin.record;
@@ -793,26 +847,15 @@
             if (isSyncing) return;
             if (!silent) setSyncBadge('syncing', 'Yuklanmoqda...');
             try {
-                if (!BIN_ID) {
-                    await discoverCloudBin();
-                }
-
-                if (!BIN_ID) {
-                    // Hali onlayn baza yaratilmagan bo'lsa, darhol yangisini yaratamiz
-                    await autoSyncToCloud();
-                    return;
-                }
+                if (!BIN_ID) await discoverCloudBin();
+                if (!BIN_ID) { await autoSyncToCloud(); return; }
 
                 const res = await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}/latest`, {
                     method: "GET",
-                    headers: {
-                        "X-Master-Key": API_KEY,
-                        "X-Bin-Meta": "false"
-                    }
+                    headers: { "X-Master-Key": API_KEY, "X-Bin-Meta": "false" }
                 });
 
                 if (res.status === 404) {
-                    // Agar eski bin o'chirilgan bo'lsa
                     BIN_ID = "";
                     localStorage.removeItem('jc_pro_bin_id');
                     await discoverCloudBin();
@@ -825,13 +868,10 @@
                     const record = d.record ? d.record : d;
                     if (record && typeof record === 'object') {
                         const cloudTime = Number(record.updatedAt) || 0;
-                        const localHasData = branchSales.length > 0 || botCosts.length > 0 || expenses.length > 0 || financeItems.length > 0;
+                        const localHasData = branchSales.length > 0 || botCosts.length > 0 || expenses.length > 0;
                         const cloudHasData = (Array.isArray(record.branchSales) && record.branchSales.length > 0) ||
-                                             (Array.isArray(record.botCosts) && record.botCosts.length > 0) ||
-                                             (Array.isArray(record.expenses) && record.expenses.length > 0) ||
-                                             (Array.isArray(record.financeItems) && record.financeItems.length > 0);
+                                             (Array.isArray(record.botCosts) && record.botCosts.length > 0);
 
-                        // Agar bulutda ma'lumot bo'lsa yoki bulutdagi versiya yangi bo'lsa
                         if (cloudHasData || !localHasData || cloudTime >= lastUpdatedTimestamp) {
                             if (Array.isArray(record.staffList) && record.staffList.length) staffList = record.staffList;
                             if (Array.isArray(record.partners) && record.partners.length) partners = record.partners;
@@ -849,7 +889,6 @@
                             renderFormPartners();
                             renderAll();
                         } else if (localHasData && !cloudHasData) {
-                            // Lokal telefonda ma'lumot bor, lekin bulut bo'sh bo'lsa -> bulutga yuboramiz
                             await autoSyncToCloud();
                         }
                         setSyncBadge('online', 'Onlayn');
@@ -858,37 +897,22 @@
                     setSyncBadge('offline', 'Oflayn');
                 }
             } catch (e) {
-                console.warn("Cloud load error:", e);
                 setSyncBadge('offline', 'Aloqa yoʻq');
             }
         }
 
         async function autoSyncToCloud() {
-            if (isSyncing) {
-                pendingSync = true;
-                return;
-            }
+            if (isSyncing) { pendingSync = true; return; }
             isSyncing = true;
             setSyncBadge('syncing', 'Saqlanmoqda...');
 
             const payload = {
                 updatedAt: lastUpdatedTimestamp,
-                staffList,
-                partners,
-                branchSales,
-                botCosts,
-                attendance,
-                expenses,
-                atkazs,
-                tasks,
-                financeItems,
-                calcMode
+                staffList, partners, branchSales, botCosts, attendance, expenses, atkazs, tasks, financeItems, calcMode
             };
 
             try {
-                if (!BIN_ID) {
-                    await discoverCloudBin();
-                }
+                if (!BIN_ID) await discoverCloudBin();
 
                 if (!BIN_ID) {
                     const res = await fetch("https://api.jsonbin.io/v3/b", {
@@ -908,39 +932,25 @@
                             localStorage.setItem('jc_pro_bin_id', BIN_ID);
                         }
                         setSyncBadge('online', 'Saqlandi');
-                    } else {
-                        setSyncBadge('offline', 'Xato');
-                    }
+                    } else { setSyncBadge('offline', 'Xato'); }
                 } else {
                     const res = await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}`, {
                         method: "PUT",
-                        headers: {
-                            "Content-Type": "application/json",
-                            "X-Master-Key": API_KEY
-                        },
+                        headers: { "Content-Type": "application/json", "X-Master-Key": API_KEY },
                         body: JSON.stringify(payload)
                     });
-                    if (res.ok) {
-                        setSyncBadge('online', 'Onlayn');
-                    } else {
-                        setSyncBadge('offline', 'Xato');
-                    }
+                    if (res.ok) setSyncBadge('online', 'Onlayn');
+                    else setSyncBadge('offline', 'Xato');
                 }
             } catch (e) {
-                console.warn("Auto-sync error:", e);
                 setSyncBadge('offline', 'Aloqa yoʻq');
             } finally {
                 isSyncing = false;
-                if (pendingSync) {
-                    pendingSync = false;
-                    autoSyncToCloud();
-                }
+                if (pendingSync) { pendingSync = false; autoSyncToCloud(); }
             }
         }
 
-        function forceCloudRefresh() {
-            loadFromCloud(false);
-        }
+        function forceCloudRefresh() { loadFromCloud(false); }
 
         function saveToLocalStorageOnly() {
             try {
@@ -955,9 +965,7 @@
                 localStorage.setItem('jc_v28_fin', JSON.stringify(financeItems));
                 localStorage.setItem('jc_v28_calcmode', calcMode);
                 localStorage.setItem('jc_pro_updated_at', String(lastUpdatedTimestamp));
-            } catch (e) {
-                console.warn("LocalStorage xatosi:", e);
-            }
+            } catch (e) {}
         }
 
         function saveAll() {
@@ -993,7 +1001,7 @@
             });
         }
 
-        // 5. ZAXIRA VA TIKLASH (EXPORT / IMPORT)
+        // 5. ZAXIRA VA TIKLASH
         function exportData() {
             const data = { staffList, partners, branchSales, botCosts, attendance, expenses, atkazs, tasks, financeItems, calcMode };
             const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
@@ -1025,15 +1033,13 @@
                     saveAll();
                     renderFormPartners();
                     renderAll();
-                    alert("✅ Zaxira muvaffaqiyatli tiklandi va onlayn bazaga yuborildi!");
-                } catch (err) {
-                    alert("❌ Fayl xato!");
-                }
+                    alert("✅ Zaxira tiklandi!");
+                } catch (err) { alert("❌ Fayl xato!"); }
             };
             reader.readAsText(file);
         }
 
-        // 6. ROLLAR VA XAVFSIZLIK (PIN: 0609) — Cheksiz siklsiz!
+        // 6. ROLLAR BOSHQARUVI
         function toggleRole() {
             if (currentRole === 'fayoza') {
                 const pinInput = document.getElementById('pin-check-input');
@@ -1047,9 +1053,7 @@
             }
         }
 
-        function closePinModal() {
-            document.getElementById('pin-modal').classList.remove('open');
-        }
+        function closePinModal() { document.getElementById('pin-modal').classList.remove('open'); }
 
         function verifyPin() {
             const val = document.getElementById('pin-check-input').value.trim();
@@ -1063,7 +1067,6 @@
             }
         }
 
-        // Faqatgina DOM elementlar ko'rinishini yangilaydi, renderAll() ni chaqirmaydi!
         function updateRoleDOM() {
             const badge = document.getElementById('role-badge');
             const roleBtn = document.getElementById('role-btn');
@@ -1114,7 +1117,7 @@
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
-        // 7. XODIMLAR VA HAMKORLAR MODALLARI
+        // 7. XODIMLAR VA HAMKORLAR
         function openAddWorkerModal() { document.getElementById('worker-add-modal').classList.add('open'); }
         function closeAddWorkerModal() { document.getElementById('worker-add-modal').classList.remove('open'); }
 
@@ -1132,7 +1135,7 @@
         }
 
         function deleteWorker(id) {
-            if (confirm("Ushbu xodimni roʻyxatdan oʻchirasizmi?")) {
+            if (confirm("Xodimni roʻyxatdan oʻchirasizmi?")) {
                 staffList = staffList.filter(s => s.id !== id);
                 saveAll();
                 renderAll();
@@ -1273,7 +1276,7 @@
             if (branchSel) branchSel.style.display = kind === 'food' ? 'block' : 'none';
         }
 
-        // 8. SAVDO QO'SHISH, TAHRIRLASH VA O'CHIRISH
+        // 8. SAVDO QO'SHISH VA TAHRIRLASH
         function addBranchSales(e) {
             e.preventDefault();
             const editId = document.getElementById('edit-sale-id').value;
@@ -1397,14 +1400,13 @@
             }
         }
 
-        // 9. KURYER QOPLANMALARI VA PUL BERISH (Rasm siqish bilan)
+        // 9. KURYER QOPLANMASI VA PUL BERISH
         function compressImage(file, callback) {
             const reader = new FileReader();
             reader.onload = function(event) {
                 const img = new Image();
                 img.onload = function() {
                     const canvas = document.createElement('canvas');
-                    // JSONBin 100KB limitidan oshib ketmasligi uchun optimal o'lcham
                     const MAX_WIDTH = 420;
                     const scaleSize = img.width > MAX_WIDTH ? (MAX_WIDTH / img.width) : 1;
                     canvas.width = Math.round(img.width * scaleSize);
@@ -1489,11 +1491,9 @@
             document.getElementById('imageModal').classList.add('open');
         }
 
-        function closeImageModal() {
-            document.getElementById('imageModal').classList.remove('open');
-        }
+        function closeImageModal() { document.getElementById('imageModal').classList.remove('open'); }
 
-        // 10. RAZDACHA, JAMOA XARAJATLARI, ATKAZ, REJALAR VA MOLIYA
+        // 10. RAZDACHA, JAMOA, ATKAZ, REJA VA MOLIYA
         function addAttendance(e) {
             e.preventDefault();
             const worker = document.getElementById('att-worker').value;
@@ -1649,7 +1649,7 @@
             renderAll();
         }
 
-        // 11. TAFSILOTLAR VA SHAXSIY TARIX MODALLARI
+        // 11. SHAXSIY TARIX VA TAFSILOTLAR
         function showWorkerHistory(name) {
             const modal = document.getElementById('worker-modal');
             const body = document.getElementById('modal-worker-body');
@@ -1683,9 +1683,7 @@
             modal.classList.add('open');
         }
 
-        function closeWorkerModal() {
-            document.getElementById('worker-modal').classList.remove('open');
-        }
+        function closeWorkerModal() { document.getElementById('worker-modal').classList.remove('open'); }
 
         function openDetailModal(title, subtitle) {
             const modal = document.getElementById('detailModal');
@@ -1730,11 +1728,9 @@
             modal.classList.add('open');
         }
 
-        function closeDetailModal() {
-            document.getElementById('detailModal').classList.remove('open');
-        }
+        function closeDetailModal() { document.getElementById('detailModal').classList.remove('open'); }
 
-        // 12. ASOSIY RENDER FUNKSIYASI (Toza va yagona oqimli)
+        // 12. ASOSIY RENDER
         function renderAll() {
             updateDropdowns();
             updateRoleDOM();
@@ -1744,7 +1740,7 @@
             const partnerProfits = {};
             partners.forEach(p => partnerProfits[p.name] = 0);
 
-            // 1. Savdolar ro'yxati
+            // 1. Savdolar
             const salesList = document.getElementById('sales-list');
             salesList.innerHTML = '';
 
@@ -1798,7 +1794,7 @@
                 salesList.innerHTML = `<p class="text-center text-xs text-slate-400 py-4 bg-white rounded-2xl border">Hozircha savdolar kiritilmagan</p>`;
             }
 
-            // 2. Kuryer qoplanmalari va to'lovlari
+            // 2. Kuryerlar
             let jSub = 0, cSub = 0;
             const cSubMap = {}, cPaidMap = {};
             staffList.filter(s => s.role === 'kuryer').forEach(c => {
@@ -1858,7 +1854,7 @@
                 `;
             });
 
-            // 3. Moliyaviy ko'rsatkichlar va Analitika
+            // 3. Analitika
             const jShareTot = branchSales.reduce((acc, s) => {
                 const dSum = (s.sarpulDastavka || 0) + (s.vaynDastavka || 0) + (s.jaziraBotSum || 0);
                 const oSum = dSum + (s.sarpulSaboy || 0) + (s.vaynSaboy || 0);
@@ -1915,7 +1911,7 @@
                 `;
             });
 
-            // 4. Razdacha bo'limi
+            // 4. Razdacha
             const rCards = document.getElementById('razdacha-cards');
             rCards.innerHTML = '';
             ['Xushnud', 'Murod'].forEach(name => {
@@ -1961,7 +1957,7 @@
                 `;
             });
 
-            // 5. Jamoa va Oyliklar
+            // 5. Jamoa
             const sList = document.getElementById('team-staff-list');
             sList.innerHTML = '';
             staffList.forEach(s => {
@@ -1996,12 +1992,8 @@
             const sTable = document.getElementById('staff-salary-table');
             sTable.innerHTML = '';
             const wDeduct = {};
-            expenses.forEach(x => {
-                wDeduct[x.target] = (wDeduct[x.target] || 0) + (x.amount || 0);
-            });
-            atkazs.forEach(a => {
-                wDeduct[a.worker] = (wDeduct[a.worker] || 0) + (a.amount || 0);
-            });
+            expenses.forEach(x => { wDeduct[x.target] = (wDeduct[x.target] || 0) + (x.amount || 0); });
+            atkazs.forEach(a => { wDeduct[a.worker] = (wDeduct[a.worker] || 0) + (a.amount || 0); });
 
             staffList.filter(s => s.role !== 'rahbar').forEach(s => {
                 const baseSal = s.role === 'razdacha'
@@ -2083,20 +2075,23 @@
             document.getElementById('fin-total-chiqim').innerText = formatUZS(fChiqim);
         }
 
-        // 13. DASTURNI ISHGA TUSHIRISH VA AVTO-YANGILASH
+        // 13. ISHGA TUSHIRISH
         initDates();
         renderFormPartners();
         renderAll();
-        loadFromCloud(false);
 
-        // Telefon ekrani yoqilganda yoki brauzerga qaytilganda avtomatik yangilash
+        // Birinchi bo'lib Telegram orqali kirishni tekshiramiz
+        const authOk = initTelegramAuth();
+        if (authOk) {
+            loadFromCloud(false);
+        }
+
         document.addEventListener("visibilitychange", () => {
             if (document.visibilityState === "visible") {
                 loadFromCloud(true);
             }
         });
 
-        // Har 25 soniyada fonda sokin yangilab turish (inputga yozilmayotgan paytda)
         setInterval(() => {
             const activeTag = document.activeElement ? document.activeElement.tagName : '';
             if (activeTag !== 'INPUT' && activeTag !== 'SELECT' && activeTag !== 'TEXTAREA') {
