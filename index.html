@@ -168,8 +168,8 @@
             <div class="bg-white p-3.5 rounded-2xl shadow-sm border space-y-2">
                 <h2 class="text-xs font-bold text-amber-700">Xushnud yoki Murodga Ovqat / Avans yozish</h2>
                 <form onsubmit="addRazdachaExpense(event)" class="space-y-2 bg-amber-50/50 p-3 rounded-xl border border-amber-200">
-                    <div class="grid grid-cols-2 gap-1"><select id="rd-worker" class="px-2 py-1 text-xs border rounded"><option value="Xushnud">Xushnud</option><option value="Murod">Murod</option></select><select id="rd-kind" class="px-2 py-1 text-xs border rounded"><option value="food">🍔 Ovqat</option><option value="avans">💵 Avans</option></select></div>
-                    <div class="grid grid-cols-2 gap-1"><input type="number" step="any" id="rd-amount" placeholder="Summa" required class="px-2 py-1 text-xs border rounded"><select id="rd-branch" class="px-2 py-1 text-xs border rounded"><option value="Sarpul">🍗 Sarpul</option><option value="Vaynkamat">🍔 Vaynkamat</option></select></div>
+                    <div class="grid grid-cols-2 gap-1"><select id="rd-worker" class="px-2 py-1 text-xs border rounded"><option value="Xushnud">Xushnud</option><option value="Murod">Murod</option></select><select id="rd-kind" onchange="toggleRdBranch()" class="px-2 py-1 text-xs border rounded"><option value="food">🍔 Ovqat</option><option value="avans">💵 Avans</option></select></div>
+                    <div class="grid grid-cols-2 gap-1"><input type="number" step="any" id="rd-amount" placeholder="Summa" required class="px-2 py-1 text-xs border rounded"><select id="rd-branch" class="px-2 py-1 text-xs border rounded bg-amber-50 font-bold"><option value="Sarpul">🍗 Sarpul</option><option value="Vaynkamat">🍔 Vaynkamat</option></select></div>
                     <input type="text" id="rd-desc" placeholder="Izoh..." required class="w-full px-2 py-1 text-xs border rounded">
                     <button type="submit" class="w-full py-2 bg-amber-600 text-white font-bold text-xs rounded-xl">Yozib qoʻyish</button>
                 </form>
@@ -205,7 +205,7 @@
             <div class="bg-white p-3.5 rounded-2xl shadow-sm border space-y-2"><h3 class="text-xs font-extrabold uppercase">Oylik Qoldigʻi</h3><div id="staff-salary-table" class="divide-y text-xs"></div></div>
         </div>
 
-        <!-- 6. REJALAR (RAHBAR VA FAYOZA UCHUN) -->
+        <!-- 6. REJALAR -->
         <div id="view-tasks" class="tab-content space-y-3">
             <div class="bg-white p-3.5 rounded-2xl shadow-sm border space-y-3">
                 <div class="flex items-center justify-between">
@@ -240,7 +240,7 @@
 
     </main>
 
-    <!-- TAFSILOTLAR MODALI (HAR QAKDAY RAQAM BOSILGANDA OCHILADI) -->
+    <!-- TAFSILOTLAR MODALI -->
     <div id="detailModal" class="fixed inset-0 modal-bg z-50 hidden flex items-center justify-center p-3" onclick="closeDetailModal()">
         <div class="bg-white rounded-2xl max-w-lg w-full max-h-[85vh] flex flex-col shadow-2xl overflow-hidden" onclick="event.stopPropagation()">
             <div class="px-4 py-3 bg-slate-900 text-white flex items-center justify-between">
@@ -488,6 +488,7 @@
                 if (taskAddForm) taskAddForm.style.display = 'none';
                 if (taskPanelTitle) taskPanelTitle.innerText = "Rahbar tomonidan sizga qoʻyilgan rejalar";
             }
+            renderAll();
         }
 
         function switchTab(tab) {
@@ -570,6 +571,12 @@
             const kind = document.getElementById('exp-kind').value;
             const box = document.getElementById('meal-branch-box');
             if (kind === 'food') box.style.display = 'block'; else box.style.display = 'none';
+        }
+
+        function toggleRdBranch() {
+            const kind = document.getElementById('rd-kind').value;
+            const branchSel = document.getElementById('rd-branch');
+            if (kind === 'food') branchSel.style.display = 'block'; else branchSel.style.display = 'none';
         }
 
         function addBranchSales(e) {
@@ -726,7 +733,8 @@
             const branch = document.getElementById('rd-branch').value;
             const desc = document.getElementById('rd-desc').value.trim();
             if (!amount || !desc) return;
-            expenses.push({ id: Date.now(), date: globalSelectedDate, target: worker, kind: kind === 'food' ? 'food' : 'avans', amount, desc: `${desc} (${branch})` });
+            const finalDesc = kind === 'food' ? `${desc} (Filial: ${branch})` : `${desc} (Rahbardan avans)`;
+            expenses.push({ id: Date.now(), date: globalSelectedDate, target: worker, kind: kind === 'food' ? 'food' : 'avans', amount, desc: finalDesc });
             document.getElementById('rd-amount').value = ''; document.getElementById('rd-desc').value = '';
             saveAll(); renderAll();
         }
@@ -835,7 +843,10 @@
                 });
                 totalChopaProfit += dayChopa;
                 const jShare = calcMode === 'dastavka' ? Math.round((s.sarpulDastavka + s.vaynDastavka + (s.jaziraBotSum || 0)) * 0.13) : Math.round(jaziraOps * 0.13);
-                salesList.innerHTML += `<div class="bg-white p-3 rounded-2xl shadow-sm border space-y-1.5 text-xs"><div class="flex justify-between font-bold border-b pb-1"><span>📅 ${formatDateDot(s.date)}</span><div class="flex gap-2"><button onclick="editSale(${s.id})" class="text-blue-600"><i class="fa-solid fa-pen"></i></button><button onclick="deleteSale(${s.id})" class="text-rose-500"><i class="fa-solid fa-trash"></i></button></div></div><div class="grid grid-cols-2 gap-1.5"><div class="bg-blue-50 p-2 rounded-xl cursor-pointer" onclick="openDetailModal('Savdo tafsiloti - ${s.date}', 'Sarpul va Vaynkamat savdolari')"><b>Jazira:</b> ${formatShort(jaziraOps)}<br>13%: +${formatUZS(jShare)}</div><div class="bg-purple-50 p-2 rounded-xl cursor-pointer" onclick="openDetailModal('Chopachop tafsiloti - ${s.date}', 'Hamkorlar ulushi')"><b>Chopachop:</b> +${formatUZS(dayChopa)}<br>${chopaHtml}</div></div></div>`;
+                
+                let jShareHtml = currentRole === 'admin' ? `<br>13%: +${formatUZS(jShare)}` : '';
+
+                salesList.innerHTML += `<div class="bg-white p-3 rounded-2xl shadow-sm border space-y-1.5 text-xs"><div class="flex justify-between font-bold border-b pb-1"><span>📅 ${formatDateDot(s.date)}</span><div class="flex gap-2"><button onclick="editSale(${s.id})" class="text-blue-600"><i class="fa-solid fa-pen"></i></button><button onclick="deleteSale(${s.id})" class="text-rose-500"><i class="fa-solid fa-trash"></i></button></div></div><div class="grid grid-cols-2 gap-1.5"><div class="bg-blue-50 p-2 rounded-xl cursor-pointer" onclick="openDetailModal('Savdo tafsiloti - ${s.date}', 'Sarpul va Vaynkamat savdolari')"><b>Jazira:</b> ${formatShort(jaziraOps)}${jShareHtml}</div><div class="bg-purple-50 p-2 rounded-xl cursor-pointer" onclick="openDetailModal('Chopachop tafsiloti - ${s.date}', 'Hamkorlar ulushi')"><b>Chopachop:</b> +${formatUZS(dayChopa)}<br>${chopaHtml}</div></div></div>`;
             });
             if (!branchSales.length) salesList.innerHTML = `<p class="text-center text-xs text-slate-400 py-4">Savdolar yoʻq</p>`;
 
