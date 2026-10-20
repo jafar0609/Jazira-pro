@@ -26,6 +26,7 @@
             margin: 0;
             overflow-x: hidden;
             touch-action: manipulation;
+            overscroll-behavior-y: none;
         }
 
         button, input, select, label {
@@ -710,8 +711,13 @@
             const browserPinBox = document.getElementById('browser-pin-box');
 
             if (tg && tg.initDataUnsafe && tg.initDataUnsafe.user && tg.initDataUnsafe.user.id) {
-                tg.ready();
-                try { tg.expand(); } catch(e){}
+               tg.ready();
+try {
+    tg.expand();
+    if (tg.disableVerticalSwipes) {
+        tg.disableVerticalSwipes();
+    }
+} catch(e) {}
 
                 const tgId = String(tg.initDataUnsafe.user.id);
                 if (ALLOWED_USERS[tgId]) {
