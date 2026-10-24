@@ -12,13 +12,13 @@
         .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
     </style>
 </head>
-<body class="bg-slate-100 text-slate-800 pb-24 antialiased select-none">
+<body class="bg-slate-100 text-slate-800 pb-28 antialiased select-none">
 
     <!-- HEADER -->
     <header class="bg-white border-b border-slate-200 sticky top-0 z-30 px-4 py-3 shadow-sm">
         <div class="flex items-center justify-between">
             <div class="flex items-center gap-2">
-                <div class="w-10 h-10 rounded-full bg-slate-900 text-white flex items-center justify-center font-bold text-sm tracking-wider">JC</div>
+                <div class="w-10 h-10 rounded-full bg-slate-900 text-white flex items-center justify-center font-bold text-sm tracking-wider shadow">JC</div>
                 <div>
                     <div class="flex items-center gap-1.5">
                         <h1 class="font-bold text-slate-900 text-base leading-tight">Jazira & Chopachop</h1>
@@ -28,19 +28,19 @@
                         </span>
                     </div>
                     <div class="flex items-center gap-2 text-xs text-slate-500 mt-0.5">
-                        <span>Shan, 24-okt</span>
+                        <span id="currentDay">Shanba</span>
                         <span class="text-slate-300">•</span>
-                        <span class="bg-blue-50 text-blue-700 font-medium px-1.5 py-0.5 rounded border border-blue-200 text-[11px]">24 okt. 2026 y.</span>
+                        <span id="currentDateBadge" class="bg-blue-50 text-blue-700 font-medium px-1.5 py-0.5 rounded border border-blue-200 text-[11px]">24 okt. 2026 y.</span>
                     </div>
                 </div>
             </div>
 
-            <!-- TUGMALAR -->
+            <!-- TEPA TUGMALAR -->
             <div class="flex items-center gap-1.5">
-                <button onclick="exportData()" class="w-8 h-8 rounded-lg bg-emerald-600 text-white flex items-center justify-center shadow hover:bg-emerald-700 active:scale-95 transition-all text-xs" title="Yuklab olish">
+                <button onclick="exportData()" class="w-8 h-8 rounded-lg bg-emerald-600 text-white flex items-center justify-center shadow hover:bg-emerald-700 active:scale-95 transition-all text-xs" title="Eksport">
                     <i class="fa-solid fa-download"></i>
                 </button>
-                <button onclick="importData()" class="w-8 h-8 rounded-lg bg-amber-500 text-white flex items-center justify-center shadow hover:bg-amber-600 active:scale-95 transition-all text-xs" title="Yuklash">
+                <button onclick="importData()" class="w-8 h-8 rounded-lg bg-amber-500 text-white flex items-center justify-center shadow hover:bg-amber-600 active:scale-95 transition-all text-xs" title="Import">
                     <i class="fa-solid fa-upload"></i>
                 </button>
                 <button id="authBtn" onclick="toggleRoleModal()" class="px-2.5 h-8 rounded-lg bg-slate-900 text-white font-medium text-xs flex items-center gap-1.5 shadow active:scale-95 transition-all">
@@ -49,18 +49,32 @@
                 </button>
             </div>
         </div>
+
+        <!-- FAYOZA VA OPERATORLAR UCHUN RAHBAR TOPSHIRIQLARI (BANNER) -->
+        <div id="staffTaskBanner" class="mt-2.5 p-2.5 bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200/80 rounded-xl flex items-center justify-between">
+            <div class="flex items-center gap-2 overflow-hidden">
+                <span class="w-6 h-6 rounded-lg bg-blue-600 text-white flex items-center justify-center text-[10px] shrink-0 font-bold">
+                    <i class="fa-solid fa-bell"></i>
+                </span>
+                <div class="truncate">
+                    <p class="text-[10px] font-bold text-blue-900">👑 Rahbardan Topshiriq:</p>
+                    <p class="text-[11px] text-slate-700 truncate" id="taskBannerText">Sarpul kassa chiqimlarini Shahzod hisobiga to'g'ri bog'lang!</p>
+                </div>
+            </div>
+            <button onclick="switchTab('rejalar')" class="text-[10px] bg-blue-600 text-white px-2 py-1 rounded-lg font-bold shrink-0 ml-2">Ko'rish</button>
+        </div>
     </header>
 
     <!-- ASOSIY KONTEYNER -->
     <main class="max-w-md mx-auto p-4 space-y-4">
 
-        <!-- 1. TAB: SAVDO VA KIRITISH (Fayoza va Operatorlar uchun asosiy ekran) -->
+        <!-- ================= 1. TAB: SAVDO (Toza Savdo Oynasi) ================= -->
         <section id="tab-savdo" class="space-y-4">
             
-            <!-- Filiallar bo'yicha savdo kiritish -->
+            <!-- Vaynkamat -->
             <div class="bg-white rounded-2xl p-4 shadow-sm border border-slate-200/80 space-y-3">
                 <div class="flex items-center gap-2 pb-2 border-b border-slate-100">
-                    <span class="text-rose-500"><i class="fa-solid fa-location-dot"></i></span>
+                    <span class="text-rose-500 text-sm"><i class="fa-solid fa-location-dot"></i></span>
                     <h2 class="font-bold text-slate-900 text-sm">Jazira: Vaynkamat</h2>
                 </div>
                 <div class="grid grid-cols-3 gap-2">
@@ -85,10 +99,10 @@
                 </div>
             </div>
 
-            <!-- Jazira: Sarpul filial -->
+            <!-- Sarpul -->
             <div class="bg-white rounded-2xl p-4 shadow-sm border border-slate-200/80 space-y-3">
                 <div class="flex items-center gap-2 pb-2 border-b border-slate-100">
-                    <span class="text-indigo-500"><i class="fa-solid fa-location-dot"></i></span>
+                    <span class="text-indigo-500 text-sm"><i class="fa-solid fa-location-dot"></i></span>
                     <h2 class="font-bold text-slate-900 text-sm">Jazira: Sarpul</h2>
                 </div>
                 <div class="grid grid-cols-3 gap-2">
@@ -117,81 +131,100 @@
             <div class="bg-white rounded-2xl p-4 shadow-sm border border-slate-200/80 space-y-3">
                 <div class="flex items-center justify-between pb-2 border-b border-slate-100">
                     <div class="flex items-center gap-2">
-                        <span class="text-violet-600"><i class="fa-solid fa-rocket"></i></span>
+                        <span class="text-violet-600 text-sm"><i class="fa-solid fa-rocket"></i></span>
                         <h2 class="font-bold text-slate-900 text-sm">Chopachop Muassasalari</h2>
                     </div>
-                    <!-- Sozlash tugmasi faqat Rahbarga ko'rinadi -->
-                    <button id="adminPercentSettingBtn" onclick="openPercentModal()" class="hidden px-2 py-1 bg-violet-600 text-white rounded-lg text-[11px] font-medium flex items-center gap-1 shadow-sm">
+                    <button id="adminPercentSettingBtn" onclick="openPercentModal()" class="hidden px-2 py-1 bg-violet-600 text-white rounded-lg text-[11px] font-medium items-center gap-1 shadow-sm">
                         <i class="fa-solid fa-gear"></i> Sozlash
                     </button>
                 </div>
 
                 <div class="space-y-2.5">
-                    <!-- Jazira -->
                     <div class="flex items-center gap-2">
                         <span class="w-24 text-xs font-semibold text-slate-800">
-                            Jazira <span class="admin-percent-tag text-violet-600 text-[10px] hidden font-bold">(13%)</span>
+                            Jazira <span class="admin-only text-violet-600 text-[10px] hidden font-bold">(13%)</span>
                         </span>
-                        <input type="number" placeholder="Savdo summasi" class="flex-1 px-3 py-1.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:border-violet-500">
-                        <input type="number" placeholder="Soni" class="w-16 px-2 py-1.5 bg-slate-50 border border-slate-200 rounded-xl text-sm text-center focus:outline-none focus:border-violet-500">
+                        <input type="number" placeholder="Savdo summasi" class="flex-1 px-3 py-1.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none">
+                        <input type="number" placeholder="Soni" class="w-16 px-2 py-1.5 bg-slate-50 border border-slate-200 rounded-xl text-sm text-center focus:outline-none">
                     </div>
-                    <!-- Qazi -->
                     <div class="flex items-center gap-2">
                         <span class="w-24 text-xs font-semibold text-slate-800">
-                            Qazi <span class="admin-percent-tag text-violet-600 text-[10px] hidden font-bold">(0%)</span>
+                            Qazi <span class="admin-only text-violet-600 text-[10px] hidden font-bold">(0%)</span>
                         </span>
-                        <input type="number" placeholder="Savdo summasi" class="flex-1 px-3 py-1.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:border-violet-500">
-                        <input type="number" placeholder="Soni" class="w-16 px-2 py-1.5 bg-slate-50 border border-slate-200 rounded-xl text-sm text-center focus:outline-none focus:border-violet-500">
+                        <input type="number" placeholder="Savdo summasi" class="flex-1 px-3 py-1.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none">
+                        <input type="number" placeholder="Soni" class="w-16 px-2 py-1.5 bg-slate-50 border border-slate-200 rounded-xl text-sm text-center focus:outline-none">
                     </div>
-                    <!-- Dehqon -->
                     <div class="flex items-center gap-2">
                         <span class="w-24 text-xs font-semibold text-slate-800">
-                            Dehqon <span class="admin-percent-tag text-violet-600 text-[10px] hidden font-bold">(0%)</span>
+                            Dehqon <span class="admin-only text-violet-600 text-[10px] hidden font-bold">(0%)</span>
                         </span>
-                        <input type="number" placeholder="Savdo summasi" class="flex-1 px-3 py-1.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:border-violet-500">
-                        <input type="number" placeholder="Soni" class="w-16 px-2 py-1.5 bg-slate-50 border border-slate-200 rounded-xl text-sm text-center focus:outline-none focus:border-violet-500">
+                        <input type="number" placeholder="Savdo summasi" class="flex-1 px-3 py-1.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none">
+                        <input type="number" placeholder="Soni" class="w-16 px-2 py-1.5 bg-slate-50 border border-slate-200 rounded-xl text-sm text-center focus:outline-none">
                     </div>
-                    <!-- Said Ota -->
                     <div class="flex items-center gap-2">
                         <span class="w-24 text-xs font-semibold text-slate-800">
-                            Said Ota <span class="admin-percent-tag text-violet-600 text-[10px] hidden font-bold">(0%)</span>
+                            Said Ota <span class="admin-only text-violet-600 text-[10px] hidden font-bold">(0%)</span>
                         </span>
-                        <input type="number" placeholder="Savdo summasi" class="flex-1 px-3 py-1.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:border-violet-500">
-                        <input type="number" placeholder="Soni" class="w-16 px-2 py-1.5 bg-slate-50 border border-slate-200 rounded-xl text-sm text-center focus:outline-none focus:border-violet-500">
+                        <input type="number" placeholder="Savdo summasi" class="flex-1 px-3 py-1.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none">
+                        <input type="number" placeholder="Soni" class="w-16 px-2 py-1.5 bg-slate-50 border border-slate-200 rounded-xl text-sm text-center focus:outline-none">
                     </div>
                 </div>
             </div>
 
-            <!-- Saqlash tugmasi -->
             <button onclick="saveDailySales()" class="w-full py-3.5 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-2xl shadow-lg shadow-blue-500/20 active:scale-[0.99] transition-all flex items-center justify-center gap-2 text-sm">
                 <i class="fa-solid fa-floppy-disk"></i> Kunlik Savdoni Saqlash
             </button>
+
+            <!-- SAVDOLAR TARIXI (Tahrirlash va O'chirish bilan) -->
+            <div class="bg-white rounded-2xl p-4 shadow-sm border border-slate-200/80 space-y-3">
+                <div class="flex items-center justify-between pb-2 border-b border-slate-100">
+                    <h3 class="font-bold text-slate-900 text-xs uppercase tracking-wider">Savdolar Tarixi</h3>
+                    <span class="text-[11px] text-slate-400">Oxirgi kunlar</span>
+                </div>
+                <div class="space-y-2">
+                    <div class="p-3 bg-slate-50 rounded-xl border border-slate-100 flex items-center justify-between text-xs">
+                        <div onclick="openSaleHistoryDetail('22.10.2026')" class="cursor-pointer flex-1">
+                            <span class="font-bold text-slate-900 block">📅 22.10.2026</span>
+                            <span class="text-slate-500 text-[11px]">Jazira Jami: 7 045 000 so'm</span>
+                        </div>
+                        <div class="flex items-center gap-1.5">
+                            <button onclick="editSaleRecord('22.10.2026')" class="w-7 h-7 rounded-lg bg-blue-100 text-blue-700 flex items-center justify-center text-xs"><i class="fa-solid fa-pen"></i></button>
+                            <button onclick="deleteSaleRecord('22.10.2026')" class="w-7 h-7 rounded-lg bg-rose-100 text-rose-700 flex items-center justify-center text-xs"><i class="fa-solid fa-trash"></i></button>
+                        </div>
+                    </div>
+                    <div class="p-3 bg-slate-50 rounded-xl border border-slate-100 flex items-center justify-between text-xs">
+                        <div onclick="openSaleHistoryDetail('21.10.2026')" class="cursor-pointer flex-1">
+                            <span class="font-bold text-slate-900 block">📅 21.10.2026</span>
+                            <span class="text-slate-500 text-[11px]">Jazira Jami: 6 890 000 so'm</span>
+                        </div>
+                        <div class="flex items-center gap-1.5">
+                            <button onclick="editSaleRecord('21.10.2026')" class="w-7 h-7 rounded-lg bg-blue-100 text-blue-700 flex items-center justify-center text-xs"><i class="fa-solid fa-pen"></i></button>
+                            <button onclick="deleteSaleRecord('21.10.2026')" class="w-7 h-7 rounded-lg bg-rose-100 text-rose-700 flex items-center justify-center text-xs"><i class="fa-solid fa-trash"></i></button>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </section>
 
-        <!-- 2. TAB: ANALITIKA VA FOYDA / ARENDA / KREDITLAR (Rahbar Markazi) -->
+        <!-- ================= 2. TAB: ANALITIKA (Fayozaga Ochiq, Faqat Maxfiy Foyda Berkitilgan) ================= -->
         <section id="tab-analitika" class="hidden space-y-4">
             
-            <!-- Bosh Karta: Sof Foyda va Biznes Holati -->
-            <div class="bg-white rounded-3xl p-5 shadow-sm border border-slate-200/80 space-y-4">
-                <div class="flex items-center justify-between pb-2 border-b border-slate-100">
-                    <span class="text-xs font-bold uppercase tracking-wider text-slate-400">Biznes Holati va Tahlil</span>
-                    <span class="px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-600 text-xs font-semibold border border-emerald-200">Faol Rejim</span>
-                </div>
-
-                <!-- PLYUSDASIZ / MINUSDASIZ BLOKI -->
+            <!-- FAQAT RAHBAR KO'RADIGAN SOF FOYDA VA ARENDA / KREDIT NORMA BLOKI -->
+            <div id="adminSecretFinanceBlock" class="hidden space-y-4">
+                <!-- Sof Foyda -->
                 <div class="bg-gradient-to-br from-emerald-500 to-teal-600 text-white rounded-2xl p-4 shadow-md">
                     <div class="flex items-center justify-between">
                         <div>
                             <p class="text-emerald-100 text-xs font-medium flex items-center gap-1.5">
-                                <i class="fa-solid fa-circle-check"></i> Sof Foyda (Kunlik)
+                                <i class="fa-solid fa-circle-check"></i> Sof Foyda (Kunlik Hisob)
                             </p>
                             <h3 class="text-2xl font-black mt-1 tracking-tight">+2 728 476 <span class="text-sm font-normal opacity-90">so'm</span></h3>
                         </div>
-                        <span class="bg-white/20 px-2.5 py-1 rounded-xl text-[11px] font-bold">13% Jazira</span>
+                        <span class="bg-white/20 px-2.5 py-1 rounded-xl text-[11px] font-bold">13% Ulush</span>
                     </div>
                 </div>
 
-                <!-- DOIMIY CHIQIMLAR VA RENTABELLIK (Arenda, Kredit, Majburiy to'lovlar) -->
+                <!-- Arenda va Kredit Qoplami -->
                 <div class="bg-amber-50/70 border border-amber-200/80 rounded-2xl p-3.5 space-y-2">
                     <div class="flex items-center justify-between">
                         <span class="text-xs font-bold text-amber-900 flex items-center gap-1.5">
@@ -200,100 +233,179 @@
                         <button onclick="openFixedCostsModal()" class="text-[11px] text-amber-700 font-semibold underline">Sozlash</button>
                     </div>
                     <p class="text-[11px] text-amber-800 leading-relaxed">
-                        Arenda, kredit va doimiy xarajatlarning kunlik normasi: <b>450 000 so'm</b>.
+                        Arenda, kredit va majburiyatlar normasi: <b>450 000 so'm/kun</b>.
                     </p>
                     <div class="w-full bg-amber-200/60 rounded-full h-2.5 overflow-hidden">
                         <div class="bg-emerald-500 h-full rounded-full" style="width: 100%"></div>
                     </div>
                     <div class="flex items-center justify-between text-[10px] font-medium text-amber-900">
-                        <span>Kunlik norma: 450 000 so'm</span>
+                        <span>Norma: 450 000 so'm</span>
                         <span class="text-emerald-700 font-bold"><i class="fa-solid fa-check"></i> 100% Qoplandi (+2.2 mln zaxira)</span>
                     </div>
                 </div>
+            </div>
 
-                <!-- Tushumlar va Filiallar bloklari -->
+            <!-- FAYOZA HAM KO'RA OLADIGAN FILIALLAR VA CHIQIMLAR -->
+            <div class="bg-white rounded-3xl p-4 shadow-sm border border-slate-200/80 space-y-4">
+                <div class="flex items-center justify-between pb-2 border-b border-slate-100">
+                    <span class="text-xs font-bold uppercase tracking-wider text-slate-500">Filiallar va Chiqimlar Tahlili</span>
+                    <span class="text-[10px] bg-slate-100 text-slate-600 px-2 py-0.5 rounded-full font-medium">Barchaga ko'rinadi</span>
+                </div>
+
+                <!-- Filiallar soni -->
                 <div class="grid grid-cols-2 gap-3">
-                    <div onclick="openBranchDetails('saripul')" class="p-3 bg-slate-50 border border-slate-200/70 rounded-2xl cursor-pointer hover:bg-slate-100 active:scale-95 transition-all">
-                        <div class="flex items-center justify-between text-slate-500 text-[11px] mb-1">
-                            <span>Saripul filial</span>
-                            <i class="fa-solid fa-chevron-right text-[10px]"></i>
-                        </div>
-                        <p class="font-black text-slate-900 text-sm">1 256 zakaz</p>
-                        <p class="text-[10px] text-emerald-600 font-semibold mt-0.5">14 250 000 so'm</p>
+                    <div onclick="openExpensesModal('saripul')" class="p-3 bg-slate-50 border border-slate-200/70 rounded-2xl cursor-pointer hover:bg-slate-100 transition-all">
+                        <span class="text-slate-500 text-[11px] block">Saripul filial</span>
+                        <p class="font-black text-slate-900 text-sm mt-0.5">1 256 zakaz</p>
+                        <p class="text-[10px] text-emerald-600 font-bold mt-0.5">14 250 000 so'm</p>
                     </div>
 
-                    <div onclick="openBranchDetails('vaynkamat')" class="p-3 bg-slate-50 border border-slate-200/70 rounded-2xl cursor-pointer hover:bg-slate-100 active:scale-95 transition-all">
-                        <div class="flex items-center justify-between text-slate-500 text-[11px] mb-1">
-                            <span>Vaynkamat filial</span>
-                            <i class="fa-solid fa-chevron-right text-[10px]"></i>
-                        </div>
-                        <p class="font-black text-slate-900 text-sm">2 536 zakaz</p>
-                        <p class="text-[10px] text-emerald-600 font-semibold mt-0.5">16 529 000 so'm</p>
+                    <div onclick="openExpensesModal('vaynkamat')" class="p-3 bg-slate-50 border border-slate-200/70 rounded-2xl cursor-pointer hover:bg-slate-100 transition-all">
+                        <span class="text-slate-500 text-[11px] block">Vaynkamat filial</span>
+                        <p class="font-black text-slate-900 text-sm mt-0.5">2 536 zakaz</p>
+                        <p class="text-[10px] text-emerald-600 font-bold mt-0.5">16 529 000 so'm</p>
                     </div>
                 </div>
 
-                <!-- CHIQIMLAR VA ZIYONLAR RO'YXATI (Har biri bosiladi va ichiga kiradi) -->
+                <!-- 3 ta asosiy chiqim (Har biri bosiladi, tahrirlanadi, o'chiriladi) -->
                 <div class="space-y-2 pt-2 border-t border-slate-100">
                     <div class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Chiqimlar va Ziyonlar</div>
                     
                     <!-- Kuryer qoplanmalari -->
-                    <div onclick="openExpensesModal('qoplama')" class="flex items-center justify-between p-3 bg-rose-50/60 border border-rose-100 rounded-xl cursor-pointer hover:bg-rose-100/60 active:scale-[0.99] transition-all">
-                        <div class="flex items-center gap-2.5">
+                    <div class="flex items-center justify-between p-3 bg-rose-50/60 border border-rose-100 rounded-xl">
+                        <div onclick="openExpensesModal('qoplama')" class="flex items-center gap-2.5 cursor-pointer flex-1">
                             <span class="w-7 h-7 rounded-lg bg-rose-100 text-rose-600 flex items-center justify-center text-xs"><i class="fa-solid fa-motorcycle"></i></span>
                             <div>
                                 <h4 class="text-xs font-bold text-slate-900">Kuryer qoplanmalari</h4>
-                                <p class="text-[10px] text-slate-500">6 ta kuryer (Saripul kassa bilan bog'langan)</p>
+                                <p class="text-[10px] text-slate-500">6 ta kuryer (Sarpul kassa bilan bog'langan)</p>
                             </div>
                         </div>
-                        <span class="text-xs font-black text-rose-600">-816 000 so'm</span>
+                        <div class="flex items-center gap-2">
+                            <span class="text-xs font-black text-rose-600">-816 000 so'm</span>
+                            <button onclick="openExpensesModal('qoplama')" class="w-6 h-6 rounded bg-rose-200/60 text-rose-800 flex items-center justify-center text-[10px]"><i class="fa-solid fa-pen"></i></button>
+                        </div>
                     </div>
 
                     <!-- Atkaz tovarlar -->
-                    <div onclick="openExpensesModal('atkaz')" class="flex items-center justify-between p-3 bg-rose-50/60 border border-rose-100 rounded-xl cursor-pointer hover:bg-rose-100/60 active:scale-[0.99] transition-all">
-                        <div class="flex items-center gap-2.5">
+                    <div class="flex items-center justify-between p-3 bg-rose-50/60 border border-rose-100 rounded-xl">
+                        <div onclick="openExpensesModal('atkaz')" class="flex items-center gap-2.5 cursor-pointer flex-1">
                             <span class="w-7 h-7 rounded-lg bg-rose-100 text-rose-600 flex items-center justify-center text-xs"><i class="fa-solid fa-circle-xmark"></i></span>
                             <div>
                                 <h4 class="text-xs font-bold text-slate-900">Atkaz tovarlar zarari</h4>
                                 <p class="text-[10px] text-slate-500">Bekor qilingan zakazlar tahlili</p>
                             </div>
                         </div>
-                        <span class="text-xs font-black text-rose-600">-345 000 so'm</span>
+                        <div class="flex items-center gap-2">
+                            <span class="text-xs font-black text-rose-600">-345 000 so'm</span>
+                            <button onclick="openExpensesModal('atkaz')" class="w-6 h-6 rounded bg-rose-200/60 text-rose-800 flex items-center justify-center text-[10px]"><i class="fa-solid fa-pen"></i></button>
+                        </div>
                     </div>
 
                     <!-- Xodimlar ovqati -->
-                    <div onclick="openExpensesModal('ovqat')" class="flex items-center justify-between p-3 bg-rose-50/60 border border-rose-100 rounded-xl cursor-pointer hover:bg-rose-100/60 active:scale-[0.99] transition-all">
-                        <div class="flex items-center gap-2.5">
+                    <div class="flex items-center justify-between p-3 bg-rose-50/60 border border-rose-100 rounded-xl">
+                        <div onclick="openExpensesModal('ovqat')" class="flex items-center gap-2.5 cursor-pointer flex-1">
                             <span class="w-7 h-7 rounded-lg bg-rose-100 text-rose-600 flex items-center justify-center text-xs"><i class="fa-solid fa-burger"></i></span>
                             <div>
                                 <h4 class="text-xs font-bold text-slate-900">Xodimlar ovqati</h4>
                                 <p class="text-[10px] text-slate-500">Razdacha, operator va oshxona</p>
                             </div>
                         </div>
-                        <span class="text-xs font-black text-rose-600">-522 000 so'm</span>
+                        <div class="flex items-center gap-2">
+                            <span class="text-xs font-black text-rose-600">-522 000 so'm</span>
+                            <button onclick="openExpensesModal('ovqat')" class="w-6 h-6 rounded bg-rose-200/60 text-rose-800 flex items-center justify-center text-[10px]"><i class="fa-solid fa-pen"></i></button>
+                        </div>
                     </div>
                 </div>
             </div>
         </section>
 
-        <!-- 3. TAB: RAZDACHA (Tartibga solingan: Ish soatlari va Ovqatlar alohida) -->
+        <!-- ================= 3. TAB: KURYER (6 ta Kuryer va Shahzodning Sarpul Kassa Zanjiri) ================= -->
+        <section id="tab-kuryer" class="hidden space-y-4">
+            <div class="bg-white rounded-2xl p-4 shadow-sm border border-slate-200/80 space-y-3">
+                <div class="flex items-center justify-between pb-2 border-b border-slate-100">
+                    <h3 class="font-bold text-slate-900 text-xs uppercase tracking-wider">Kuryerlar Ro'yxati va Balansi</h3>
+                    <span class="text-[11px] text-slate-400">6 ta kuryer faol</span>
+                </div>
+
+                <div class="space-y-2 text-xs">
+                    <!-- Shahzod -->
+                    <div onclick="openCourierFullDetails('Shahzod')" class="p-3 bg-slate-50 border border-slate-200/80 rounded-xl cursor-pointer hover:bg-slate-100 transition-all flex items-center justify-between">
+                        <div>
+                            <div class="font-bold text-slate-900 flex items-center gap-1.5">
+                                <span>Shahzod</span>
+                                <span class="bg-indigo-100 text-indigo-700 text-[10px] px-1.5 py-0.2 rounded font-normal">Sarpul kassa -55 ming</span>
+                            </div>
+                            <span class="text-[11px] text-slate-500">Hisoblandi: 700 000 | Berildi: -55 000</span>
+                        </div>
+                        <span class="font-bold text-emerald-600">645 000 so'm</span>
+                    </div>
+
+                    <!-- Fazliddin -->
+                    <div onclick="openCourierFullDetails('Fazliddin')" class="p-3 bg-slate-50 border border-slate-200/80 rounded-xl cursor-pointer hover:bg-slate-100 transition-all flex items-center justify-between">
+                        <div>
+                            <div class="font-bold text-slate-900">Fazliddin</div>
+                            <span class="text-[11px] text-slate-500">Hisoblandi: 700 000 | Ushlandi: 0</span>
+                        </div>
+                        <span class="font-bold text-emerald-600">700 000 so'm</span>
+                    </div>
+
+                    <!-- Zoir -->
+                    <div onclick="openCourierFullDetails('Zoir')" class="p-3 bg-slate-50 border border-slate-200/80 rounded-xl cursor-pointer hover:bg-slate-100 transition-all flex items-center justify-between">
+                        <div>
+                            <div class="font-bold text-slate-900">Zoir</div>
+                            <span class="text-[11px] text-slate-500">Hisoblandi: 700 000 | Ushlandi: 0</span>
+                        </div>
+                        <span class="font-bold text-emerald-600">700 000 so'm</span>
+                    </div>
+
+                    <!-- Shoxi -->
+                    <div onclick="openCourierFullDetails('Shoxi')" class="p-3 bg-slate-50 border border-slate-200/80 rounded-xl cursor-pointer hover:bg-slate-100 transition-all flex items-center justify-between">
+                        <div>
+                            <div class="font-bold text-slate-900">Shoxi</div>
+                            <span class="text-[11px] text-slate-500">Hisoblandi: 700 000 | Ushlandi: 0</span>
+                        </div>
+                        <span class="font-bold text-emerald-600">700 000 so'm</span>
+                    </div>
+
+                    <!-- Abbos -->
+                    <div onclick="openCourierFullDetails('Abbos')" class="p-3 bg-slate-50 border border-slate-200/80 rounded-xl cursor-pointer hover:bg-slate-100 transition-all flex items-center justify-between">
+                        <div>
+                            <div class="font-bold text-slate-900">Abbos</div>
+                            <span class="text-[11px] text-slate-500">Hisoblandi: 700 000 | Ushlandi: 0</span>
+                        </div>
+                        <span class="font-bold text-emerald-600">700 000 so'm</span>
+                    </div>
+
+                    <!-- Umid -->
+                    <div onclick="openCourierFullDetails('Umid')" class="p-3 bg-slate-50 border border-slate-200/80 rounded-xl cursor-pointer hover:bg-slate-100 transition-all flex items-center justify-between">
+                        <div>
+                            <div class="font-bold text-slate-900">Umid</div>
+                            <span class="text-[11px] text-slate-500">Hisoblandi: 700 000 | Ushlandi: 0</span>
+                        </div>
+                        <span class="font-bold text-emerald-600">700 000 so'm</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ================= 4. TAB: RAZDACHA (Faqat Xushnud va Murod) ================= -->
         <section id="tab-razdacha" class="hidden space-y-4">
             
-            <!-- Razdacha tablari: 1) Soatlik ish 2) Ovqat va Avans -->
             <div class="flex bg-slate-200/80 p-1 rounded-2xl text-xs font-semibold">
                 <button id="razdachaSubTab1" onclick="switchRazdachaSubTab('hours')" class="flex-1 py-2 rounded-xl bg-white text-slate-900 shadow-sm transition-all">
                     🕒 Ish Soatlari va Oylik
                 </button>
                 <button id="razdachaSubTab2" onclick="switchRazdachaSubTab('meals')" class="flex-1 py-2 rounded-xl text-slate-600 transition-all">
-                    🍔 Yegan Ovqatlari / Avans
+                    🍔 Faqat Razdachi Ovqati
                 </button>
             </div>
 
-            <!-- 3.A: ISH SOATLARI VA SMENALAR -->
+            <!-- 4.A: ISH SOATLARI (Faqat Xushnud & Murod) -->
             <div id="razdachaHoursSection" class="space-y-4">
                 <div class="bg-white rounded-2xl p-4 shadow-sm border border-slate-200/80 space-y-3">
                     <h3 class="text-xs font-bold text-slate-900">Razdachi Smenasini Yopish</h3>
                     <div class="grid grid-cols-2 gap-2">
-                        <select id="razdachiNameInput" class="px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:outline-none">
+                        <select id="razdachiNameInput" class="px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:outline-none font-medium">
                             <option value="Xushnud">Xushnud</option>
                             <option value="Murod">Murod</option>
                         </select>
@@ -301,102 +413,168 @@
                     </div>
                     <div class="grid grid-cols-2 gap-2">
                         <div>
-                            <label class="text-[10px] text-slate-500">Boshlanish vaqti</label>
+                            <label class="text-[10px] text-slate-500">Boshlanish</label>
                             <input type="time" value="12:00" class="w-full mt-1 px-3 py-1.5 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:outline-none">
                         </div>
                         <div>
-                            <label class="text-[10px] text-slate-500">Tugash vaqti</label>
+                            <label class="text-[10px] text-slate-500">Tugash</label>
                             <input type="time" value="00:00" class="w-full mt-1 px-3 py-1.5 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:outline-none">
                         </div>
                     </div>
-                    <button class="w-full py-2.5 bg-blue-600 text-white font-bold rounded-xl text-xs shadow hover:bg-blue-700">
-                        Smena va Haqni Saqlash
+                    <button onclick="saveRazdachiShift()" class="w-full py-2.5 bg-blue-600 text-white font-bold rounded-xl text-xs shadow hover:bg-blue-700">
+                        Smena Haqini Hisoblash
                     </button>
                 </div>
 
-                <!-- Soatlik hisoblar tarixi -->
+                <!-- Soatlik tarix (Tahrirlash va O'chirish bilan) -->
                 <div class="bg-white rounded-2xl p-4 shadow-sm border border-slate-200/80 space-y-2">
                     <h4 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Tasdiqlangan Ish Soatlari</h4>
                     <div class="space-y-1.5">
                         <div class="flex items-center justify-between p-2.5 bg-slate-50 rounded-xl border border-slate-100 text-xs">
                             <div>
                                 <span class="font-bold text-slate-800">Xushnud</span>
-                                <span class="text-slate-400 text-[11px] ml-1">(20.10.2026 | 12:52 - 00:00)</span>
+                                <span class="text-slate-400 text-[11px] block">(20.10.2026 | 12:52 - 00:00)</span>
                             </div>
-                            <span class="font-bold text-emerald-600">+77 315 so'm</span>
+                            <div class="flex items-center gap-2">
+                                <span class="font-bold text-emerald-600">+77 315 so'm</span>
+                                <button onclick="editGenericRecord('Xushnud soati')" class="w-6 h-6 rounded bg-blue-50 text-blue-600 flex items-center justify-center text-[10px]"><i class="fa-solid fa-pen"></i></button>
+                                <button onclick="deleteGenericRecord('Xushnud soati')" class="w-6 h-6 rounded bg-rose-50 text-rose-600 flex items-center justify-center text-[10px]"><i class="fa-solid fa-trash"></i></button>
+                            </div>
                         </div>
                         <div class="flex items-center justify-between p-2.5 bg-slate-50 rounded-xl border border-slate-100 text-xs">
                             <div>
                                 <span class="font-bold text-slate-800">Murod</span>
-                                <span class="text-slate-400 text-[11px] ml-1">(20.10.2026 | 13:00 - 00:00)</span>
+                                <span class="text-slate-400 text-[11px] block">(20.10.2026 | 13:00 - 00:00)</span>
                             </div>
-                            <span class="font-bold text-emerald-600">+76 389 so'm</span>
+                            <div class="flex items-center gap-2">
+                                <span class="font-bold text-emerald-600">+76 389 so'm</span>
+                                <button onclick="editGenericRecord('Murod soati')" class="w-6 h-6 rounded bg-blue-50 text-blue-600 flex items-center justify-center text-[10px]"><i class="fa-solid fa-pen"></i></button>
+                                <button onclick="deleteGenericRecord('Murod soati')" class="w-6 h-6 rounded bg-rose-50 text-rose-600 flex items-center justify-center text-[10px]"><i class="fa-solid fa-trash"></i></button>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <!-- 3.B: YEGAN OVQATLARI VA AVANSLAR (Alohida kiritish va alohida tarix) -->
+            <!-- 4.B: FAQAT RAZDACHILAR OVQATI (Xushnud & Murod) -->
             <div id="razdachaMealsSection" class="hidden space-y-4">
                 <div class="bg-white rounded-2xl p-4 shadow-sm border border-amber-200/70 space-y-3">
-                    <h3 class="text-xs font-bold text-amber-900">Xodim yoki Rahbarga Ovqat / Avans Yozish</h3>
+                    <h3 class="text-xs font-bold text-amber-900">Xushnud yoki Murodga Ovqat / Avans Yozish</h3>
                     <div class="grid grid-cols-2 gap-2">
-                        <!-- Rahbar (Jafar) ham ro'yxatga qo'shildi -->
-                        <select id="mealPersonSelect" class="px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:outline-none font-medium">
+                        <select class="px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-medium">
                             <option value="Xushnud">Xushnud</option>
                             <option value="Murod">Murod</option>
-                            <option value="Rahbar">👑 Rahbar (Jafar)</option>
                         </select>
-                        <select class="px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:outline-none">
+                        <select class="px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs">
                             <option value="ovqat">🍔 Ovqat</option>
-                            <option value="avans">💵 Avans (Pul)</option>
+                            <option value="avans">💵 Avans</option>
                         </select>
                     </div>
                     <div class="grid grid-cols-2 gap-2">
-                        <input type="number" placeholder="Summa (so'm)" class="px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:outline-none">
-                        <select class="px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:outline-none">
+                        <input type="number" placeholder="Summa (so'm)" class="px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs">
+                        <select class="px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs">
                             <option value="Sarpul">🍗 Sarpul kassa</option>
                             <option value="Vaynkamat">📍 Vaynkamat kassa</option>
                         </select>
                     </div>
-                    <input type="text" placeholder="Izoh (masalan: 1 ta Lavash, 1 ta Kola)" class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:outline-none">
-                    <button class="w-full py-2.5 bg-amber-600 text-white font-bold rounded-xl text-xs shadow hover:bg-amber-700">
-                        Chiqimni Yozib Qo'yish
+                    <input type="text" placeholder="Izoh (masalan: 1x Lavash)" class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs">
+                    <button onclick="saveRazdachiMeal()" class="w-full py-2.5 bg-amber-600 text-white font-bold rounded-xl text-xs shadow hover:bg-amber-700">
+                        Yozib Qo'yish
                     </button>
-                </div>
-
-                <!-- Ovqatlar tarixi -->
-                <div class="bg-white rounded-2xl p-4 shadow-sm border border-slate-200/80 space-y-2">
-                    <h4 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Yegan Ovqatlari va Chiqimlar</h4>
-                    <div class="space-y-1.5">
-                        <div class="flex items-center justify-between p-2.5 bg-rose-50/50 rounded-xl border border-rose-100 text-xs">
-                            <div>
-                                <span class="font-bold text-slate-900">Murod</span>
-                                <span class="text-slate-400 text-[11px] block">Xoddok yegan [Filial: Vaynkamat] (19.10)</span>
-                            </div>
-                            <span class="font-bold text-rose-600">-15 000 so'm</span>
-                        </div>
-                    </div>
                 </div>
             </div>
         </section>
 
-        <!-- 4. TAB: JAMOA VA RAHBARNING SHAXSIY HISOBI -->
+        <!-- ================= 5. TAB: JAMOA (Mahsulot Olish, Atkaz va Xodimlar Balansi) ================= -->
         <section id="tab-jamoa" class="hidden space-y-4">
-            
-            <!-- RAHBAR (JAFAR) SHAXSIY HISOBI (Faqat Rahbar rejimida ochiladi) -->
-            <div id="adminSelfCard" class="bg-gradient-to-r from-slate-900 to-indigo-950 text-white rounded-2xl p-4 shadow-lg border border-indigo-800 space-y-2">
+
+            <!-- 1. MODUL: XODIM MAHSULOT / YEGAN OVQATINI YOZISH (Pari, Sevar, Fayoza va boshqalar) -->
+            <div class="bg-white rounded-2xl p-4 shadow-sm border border-indigo-200/80 space-y-3">
+                <div class="flex items-center gap-2 pb-1 border-b border-indigo-50">
+                    <span class="text-indigo-600 text-sm"><i class="fa-solid fa-basket-shopping"></i></span>
+                    <h3 class="text-xs font-bold text-slate-900">Xodim Mahsulot / Yeb-ichganini Yozish</h3>
+                </div>
+                <div class="grid grid-cols-2 gap-2">
+                    <select id="staffMealSelect" class="px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-medium">
+                        <option value="Pari">Pari (Operator)</option>
+                        <option value="Sevar">Sevar (Operator)</option>
+                        <option value="Guli">Guli (Operator)</option>
+                        <option value="Madina">Madina (Operator)</option>
+                        <option value="Fayoza">Fayoza (Operator)</option>
+                        <option value="Fazliddin">Fazliddin (Kuryer)</option>
+                        <option value="Zoir">Zoir (Kuryer)</option>
+                        <option value="Shoxi">Shoxi (Kuryer)</option>
+                        <option value="Shahzod">Shahzod (Kuryer)</option>
+                        <option value="Abbos">Abbos (Kuryer)</option>
+                        <option value="Umid">Umid (Kuryer)</option>
+                        <option value="Rahbar">👑 Rahbar (Jafar)</option>
+                    </select>
+                    <select id="staffItemType" class="px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-medium">
+                        <option value="mahsulot">🛍️ Oshxona Mahsuloti</option>
+                        <option value="ovqat">🍔 Tayyor Ovqat</option>
+                        <option value="avans">💵 Naqd Avans</option>
+                    </select>
+                </div>
+                <div class="grid grid-cols-2 gap-2">
+                    <input type="number" id="staffMealSum" placeholder="Summa (so'm)" class="px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:outline-none">
+                    <select id="staffMealBranch" class="px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-medium">
+                        <option value="Sarpul">🍗 Sarpul kassa</option>
+                        <option value="Vaynkamat">📍 Vaynkamat kassa</option>
+                    </select>
+                </div>
+                <input type="text" id="staffMealDesc" placeholder="Mahsulot nomi yoki sababi (masalan: Go'sht, Pishloq yoki 1x Lavash)" class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:outline-none">
+                <button onclick="saveStaffExpense()" class="w-full py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl text-xs shadow flex items-center justify-center gap-1.5">
+                    <i class="fa-solid fa-check"></i> Xodim Hisobiga Yozish (Chiqim)
+                </button>
+            </div>
+
+            <!-- 2. MODUL: ATKAZ TOVARLARNI YOZISH (Jamoaga ko'chirildi) -->
+            <div class="bg-white rounded-2xl p-4 shadow-sm border border-rose-200/80 space-y-3">
+                <div class="flex items-center gap-2 pb-1 border-b border-rose-50">
+                    <span class="text-rose-600 text-sm"><i class="fa-solid fa-triangle-exclamation"></i></span>
+                    <h3 class="text-xs font-bold text-slate-900">🚫 Atkaz Tovarni Ro'yxatga Olish</h3>
+                </div>
+                <div class="grid grid-cols-2 gap-2">
+                    <select id="atkazBranch" class="px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-medium">
+                        <option value="Vaynkamat">📍 Jazira Vaynkamat</option>
+                        <option value="Sarpul">🍗 Jazira Sarpul</option>
+                    </select>
+                    <input type="number" id="atkazSum" placeholder="Zarar summasi" class="px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:outline-none">
+                </div>
+                <div class="grid grid-cols-2 gap-2">
+                    <select id="atkazCourier" class="px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-medium">
+                        <option value="Fazliddin">Kuryer: Fazliddin</option>
+                        <option value="Zoir">Kuryer: Zoir</option>
+                        <option value="Shoxi">Kuryer: Shoxi</option>
+                        <option value="Shahzod">Kuryer: Shahzod</option>
+                        <option value="Abbos">Kuryer: Abbos</option>
+                        <option value="Umid">Kuryer: Umid</option>
+                    </select>
+                    <select id="atkazReason" class="px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-medium">
+                        <option value="Mijoz olmadi">Mijoz olmadi (Aloqasiz)</option>
+                        <option value="Kechikdi">Kuryer kechikdi</option>
+                        <option value="Oshxona xatosi">Oshxona xatosi</option>
+                        <option value="Operator xatosi">Operator xatosi</option>
+                    </select>
+                </div>
+                <input type="text" id="atkazItems" placeholder="Qaysi taomlar atkaz bo'ldi? (masalan: 2 ta Dabl Lavash, 1 ta Fanta)" class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:outline-none">
+                <button onclick="saveAtkazRecord()" class="w-full py-2.5 bg-rose-600 hover:bg-rose-700 text-white font-bold rounded-xl text-xs shadow flex items-center justify-center gap-1.5">
+                    <i class="fa-solid fa-ban"></i> Atkaz Zararini Yozish
+                </button>
+            </div>
+
+            <!-- RAHBAR (JAFAR) SHAXSIY HISOBI (Faqat Rahbar rejimi yoqilganda ko'rinadi) -->
+            <div id="adminSelfCard" class="hidden bg-gradient-to-r from-slate-900 to-indigo-950 text-white rounded-2xl p-4 shadow-lg border border-indigo-800 space-y-2">
                 <div class="flex items-center justify-between">
                     <div class="flex items-center gap-2">
                         <div class="w-8 h-8 rounded-full bg-amber-400 text-slate-950 flex items-center justify-center font-black text-xs">J</div>
                         <div>
                             <h3 class="font-bold text-sm text-white">Rahbar: Shodiev Jafar</h3>
-                            <p class="text-[10px] text-indigo-200">Shaxsiy hisob-kitob, ovqat va xarajatlar</p>
+                            <p class="text-[10px] text-indigo-200">Shaxsiy hisob-kitob, ovqat va kassa xarajatlari</p>
                         </div>
                     </div>
                     <span class="px-2 py-0.5 rounded bg-amber-400/20 text-amber-300 text-[10px] font-bold border border-amber-400/30">MAXFIY</span>
                 </div>
-                
                 <div class="grid grid-cols-2 gap-2 pt-2 border-t border-indigo-800/60 text-xs">
                     <div>
                         <span class="text-[10px] text-indigo-300 block">Jami olingan shaxsiy pul:</span>
@@ -407,12 +585,12 @@
                         <span class="font-black text-amber-300">-120 000 so'm</span>
                     </div>
                 </div>
-                <button onclick="openAdminPersonalHistoryModal()" class="w-full mt-2 py-1.5 bg-white/10 hover:bg-white/20 text-white rounded-xl text-xs font-semibold transition-all">
+                <button onclick="openExpensesModal('rahbar')" class="w-full mt-2 py-1.5 bg-white/10 hover:bg-white/20 text-white rounded-xl text-xs font-semibold transition-all">
                     Shaxsiy Tarixni Ko'rish
                 </button>
             </div>
 
-            <!-- Xodimlar Oylik Qoldig'i Ro'yxati -->
+            <!-- XODIMLAR OYLIK QOLDIG'I RO'YXATI -->
             <div class="bg-white rounded-2xl p-4 shadow-sm border border-slate-200/80 space-y-3">
                 <div class="flex items-center justify-between pb-2 border-b border-slate-100">
                     <h3 class="font-bold text-slate-900 text-xs uppercase tracking-wider">Xodimlar Oylik Qoldig'i</h3>
@@ -420,32 +598,43 @@
                 </div>
 
                 <div class="space-y-1.5 text-xs">
-                    <!-- Razdachilar -->
-                    <div onclick="openStaffDetails('Xushnud', 315972, 0)" class="flex items-center justify-between p-2.5 rounded-xl hover:bg-slate-50 cursor-pointer border border-slate-100 transition-all">
-                        <div>
-                            <div class="font-bold text-slate-800">Xushnud <span class="text-[10px] text-slate-400 font-normal">(Razdacha)</span></div>
-                            <div class="text-[10px] text-slate-400">Hisoblandi: 316 | Ushlandi: -0</div>
-                        </div>
-                        <span class="font-bold text-emerald-600">315 972 so'm</span>
-                    </div>
-
-                    <div onclick="openStaffDetails('Murod', 288935, 15000)" class="flex items-center justify-between p-2.5 rounded-xl hover:bg-slate-50 cursor-pointer border border-slate-100 transition-all">
-                        <div>
-                            <div class="font-bold text-slate-800">Murod <span class="text-[10px] text-slate-400 font-normal">(Razdacha)</span></div>
-                            <div class="text-[10px] text-slate-400">Hisoblandi: 304 | Ushlandi: -15 000</div>
-                        </div>
-                        <span class="font-bold text-emerald-600">288 935 so'm</span>
-                    </div>
-
-                    <!-- Operatorlar -->
+                    <!-- Pari -->
                     <div onclick="openStaffDetails('Pari', 1397000, 103000)" class="flex items-center justify-between p-2.5 rounded-xl hover:bg-slate-50 cursor-pointer border border-slate-100 transition-all">
                         <div>
                             <div class="font-bold text-slate-800">Pari <span class="text-[10px] text-slate-400 font-normal">(Operator)</span></div>
-                            <div class="text-[10px] text-slate-400">Hisoblandi: 1 500 | Ushlandi: -103</div>
+                            <div class="text-[10px] text-slate-400">Hisoblandi: 1 500 000 | Mahsulot/Ovqat: -103 000</div>
                         </div>
                         <span class="font-bold text-emerald-600">1 397 000 so'm</span>
                     </div>
 
+                    <!-- Sevar -->
+                    <div onclick="openStaffDetails('Sevar', 1458000, 42000)" class="flex items-center justify-between p-2.5 rounded-xl hover:bg-slate-50 cursor-pointer border border-slate-100 transition-all">
+                        <div>
+                            <div class="font-bold text-slate-800">Sevar <span class="text-[10px] text-slate-400 font-normal">(Operator)</span></div>
+                            <div class="text-[10px] text-slate-400">Hisoblandi: 1 500 000 | Ushlandi: -42 000</div>
+                        </div>
+                        <span class="font-bold text-emerald-600">1 458 000 so'm</span>
+                    </div>
+
+                    <!-- Guli -->
+                    <div onclick="openStaffDetails('Guli', 1943000, 57000)" class="flex items-center justify-between p-2.5 rounded-xl hover:bg-slate-50 cursor-pointer border border-slate-100 transition-all">
+                        <div>
+                            <div class="font-bold text-slate-800">Guli <span class="text-[10px] text-slate-400 font-normal">(Operator)</span></div>
+                            <div class="text-[10px] text-slate-400">Hisoblandi: 2 000 000 | Ushlandi: -57 000</div>
+                        </div>
+                        <span class="font-bold text-emerald-600">1 943 000 so'm</span>
+                    </div>
+
+                    <!-- Madina -->
+                    <div onclick="openStaffDetails('Madina', 1903000, 97000)" class="flex items-center justify-between p-2.5 rounded-xl hover:bg-slate-50 cursor-pointer border border-slate-100 transition-all">
+                        <div>
+                            <div class="font-bold text-slate-800">Madina <span class="text-[10px] text-slate-400 font-normal">(Operator)</span></div>
+                            <div class="text-[10px] text-slate-400">Hisoblandi: 2 000 000 | Ushlandi: -97 000</div>
+                        </div>
+                        <span class="font-bold text-emerald-600">1 903 000 so'm</span>
+                    </div>
+
+                    <!-- Fayoza -->
                     <div onclick="openStaffDetails('Fayoza', 0, 56000)" class="flex items-center justify-between p-2.5 rounded-xl hover:bg-slate-50 cursor-pointer border border-slate-100 transition-all">
                         <div>
                             <div class="font-bold text-slate-800">Fayoza <span class="text-[10px] text-slate-400 font-normal">(Operator)</span></div>
@@ -453,23 +642,49 @@
                         </div>
                         <span class="font-bold text-rose-600">-56 000 so'm</span>
                     </div>
+                </div>
+            </div>
+        </section>
 
-                    <!-- Kuryerlar -->
-                    <div onclick="openStaffDetails('Shahzod', 700000, 55000)" class="flex items-center justify-between p-2.5 rounded-xl hover:bg-slate-50 cursor-pointer border border-slate-100 transition-all">
-                        <div>
-                            <div class="font-bold text-slate-800">Shahzod <span class="text-[10px] text-slate-400 font-normal">(Kuryer)</span></div>
-                            <div class="text-[10px] text-slate-400">Hisoblandi: 700 | Berildi: -55 000 (Sarpul kassa)</div>
+        <!-- ================= 6. TAB: REJALAR (Rahbar Topshiriqlari) ================= -->
+        <section id="tab-rejalar" class="hidden space-y-4">
+            <div class="bg-white rounded-2xl p-4 shadow-sm border border-slate-200/80 space-y-3">
+                <div class="flex items-center justify-between pb-2 border-b border-slate-100">
+                    <h3 class="font-bold text-slate-900 text-xs uppercase tracking-wider">Topshiriqlar va Rejalar</h3>
+                    <span class="text-[11px] text-blue-600 font-bold">Faol: 3 ta</span>
+                </div>
+                <div class="space-y-2 text-xs">
+                    <div class="p-3 bg-blue-50 border border-blue-200 rounded-xl space-y-1">
+                        <div class="flex justify-between font-bold text-blue-950">
+                            <span>Kuryer Shahzod qoplanmasi tekshiruvi</span>
+                            <span class="text-[10px] bg-blue-200 text-blue-800 px-1.5 py-0.5 rounded">Fayoza</span>
                         </div>
-                        <span class="font-bold text-emerald-600">645 000 so'm</span>
+                        <p class="text-[11px] text-slate-600">Sarpul kassa chiqimlarini Shahzod hisobiga to'g'ri bog'lang!</p>
+                    </div>
+                    <div class="p-3 bg-slate-50 border border-slate-200 rounded-xl space-y-1">
+                        <div class="flex justify-between font-bold text-slate-900">
+                            <span>Vaynkamat kechki smena atkazlarini tekshirish</span>
+                            <span class="text-[10px] bg-slate-200 text-slate-700 px-1.5 py-0.5 rounded">Barchaga</span>
+                        </div>
+                        <p class="text-[11px] text-slate-600">Oshxonadan chiqayotgan mahsulotlarning sifatini nazorat qiling.</p>
                     </div>
                 </div>
             </div>
         </section>
 
+        <!-- ================= 7. TAB: MOLIYA ================= -->
+        <section id="tab-moliya" class="hidden space-y-4">
+            <div class="bg-white rounded-2xl p-4 shadow-sm border border-slate-200/80 text-center py-8 space-y-2">
+                <div class="w-12 h-12 bg-blue-50 text-blue-600 rounded-full flex items-center justify-center mx-auto text-lg"><i class="fa-solid fa-wallet"></i></div>
+                <h3 class="font-bold text-slate-900 text-sm">Moliyaviy Hisobotlar</h3>
+                <p class="text-xs text-slate-500 max-w-xs mx-auto">Filial kassalari, xarajatlar va oylik sof balans hisoboti.</p>
+            </div>
+        </section>
+
     </main>
 
-    <!-- BOTTOM NAVBAR -->
-    <nav class="fixed bottom-0 left-0 right-0 bg-white border-t border-slate-200 z-40 max-w-md mx-auto px-2 py-2 flex justify-around text-[10px] font-semibold text-slate-500 shadow-lg">
+    <!-- BOTTOM NAVBAR (7 ta asosiy bo'lim to'liq) -->
+    <nav class="fixed bottom-0 left-0 right-0 bg-white border-t border-slate-200 z-40 max-w-md mx-auto px-1 py-2 flex justify-around text-[9px] font-semibold text-slate-500 shadow-lg">
         <button onclick="switchTab('savdo')" id="nav-savdo" class="flex flex-col items-center gap-1 text-blue-600">
             <i class="fa-solid fa-store text-base"></i>
             <span>Savdo</span>
@@ -477,6 +692,10 @@
         <button onclick="switchTab('analitika')" id="nav-analitika" class="flex flex-col items-center gap-1 hover:text-slate-800">
             <i class="fa-solid fa-chart-pie text-base"></i>
             <span>Analitika</span>
+        </button>
+        <button onclick="switchTab('kuryer')" id="nav-kuryer" class="flex flex-col items-center gap-1 hover:text-slate-800">
+            <i class="fa-solid fa-motorcycle text-base"></i>
+            <span>Kuryer</span>
         </button>
         <button onclick="switchTab('razdacha')" id="nav-razdacha" class="flex flex-col items-center gap-1 hover:text-slate-800">
             <i class="fa-solid fa-clock-rotate-left text-base"></i>
@@ -486,55 +705,40 @@
             <i class="fa-solid fa-users text-base"></i>
             <span>Jamoa</span>
         </button>
+        <button onclick="switchTab('rejalar')" id="nav-rejalar" class="flex flex-col items-center gap-1 hover:text-slate-800">
+            <i class="fa-solid fa-list-check text-base"></i>
+            <span>Rejalar</span>
+        </button>
+        <button onclick="switchTab('moliya')" id="nav-moliya" class="flex flex-col items-center gap-1 hover:text-slate-800">
+            <i class="fa-solid fa-wallet text-base"></i>
+            <span>Moliya</span>
+        </button>
     </nav>
 
-    <!-- MODAL 1: CHIQIMLAR VA DETALLAR (Kuryer Qoplanmasi -816 000 / Atkazlar / Ovqat) -->
-    <div id="expenseDetailModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex items-end sm:items-center justify-center p-0 sm:p-4">
-        <div class="bg-white w-full max-w-md rounded-t-3xl sm:rounded-3xl max-h-[85vh] overflow-y-auto p-5 space-y-4">
-            <div class="flex items-center justify-between pb-3 border-b border-slate-100">
-                <h3 id="modalExpenseTitle" class="font-bold text-slate-900 text-sm">Chiqim Tafsiloti</h3>
-                <button onclick="closeModal('expenseDetailModal')" class="w-7 h-7 rounded-full bg-slate-100 text-slate-500 flex items-center justify-center text-xs">
+    <!-- KATTA ICHMA-ICH MODAL OYNA (92vh - TO'LIQ TARIX VA TAHRIRLASH) -->
+    <div id="fullDetailModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex items-end sm:items-center justify-center p-0 sm:p-4">
+        <div class="bg-white w-full max-w-md rounded-t-3xl sm:rounded-3xl h-[92vh] flex flex-col overflow-hidden shadow-2xl">
+            <!-- Modal Header -->
+            <div class="p-4 border-b border-slate-100 flex items-center justify-between bg-slate-50">
+                <div class="flex items-center gap-2">
+                    <button id="modalBackBtn" onclick="modalGoBack()" class="hidden w-7 h-7 rounded-full bg-white border border-slate-200 text-slate-700 flex items-center justify-center text-xs shadow-sm">
+                        <i class="fa-solid fa-arrow-left"></i>
+                    </button>
+                    <h3 id="modalMainTitle" class="font-bold text-slate-900 text-sm">Tafsilot</h3>
+                </div>
+                <button onclick="closeModal('fullDetailModal')" class="w-7 h-7 rounded-full bg-white border border-slate-200 text-slate-500 flex items-center justify-center text-xs shadow-sm">
                     <i class="fa-solid fa-xmark"></i>
                 </button>
             </div>
             
-            <!-- Tafsilotlar ro'yxati -->
-            <div id="modalExpenseContent" class="space-y-2 text-xs">
-                <!-- JS orqali to'ldiriladi -->
+            <!-- Modal Body (Scrollable) -->
+            <div id="modalMainContent" class="flex-1 overflow-y-auto p-4 space-y-2 text-xs">
+                <!-- Dinamik kontent -->
             </div>
         </div>
     </div>
 
-    <!-- MODAL 2: ARENDA VA KREDITLARNI SOZLASH -->
-    <div id="fixedCostsModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
-        <div class="bg-white w-full max-w-sm rounded-3xl p-5 space-y-4">
-            <div class="flex items-center justify-between pb-2 border-b border-slate-100">
-                <h3 class="font-bold text-slate-900 text-sm">Doimiy Chiqimlarni Sozlash</h3>
-                <button onclick="closeModal('fixedCostsModal')" class="w-7 h-7 rounded-full bg-slate-100 text-slate-500 flex items-center justify-center text-xs">
-                    <i class="fa-solid fa-xmark"></i>
-                </button>
-            </div>
-            <div class="space-y-2.5 text-xs">
-                <div>
-                    <label class="text-slate-500 font-medium">Oylik Arenda (so'm)</label>
-                    <input type="number" id="monthlyRent" value="6000000" class="w-full mt-1 px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none">
-                </div>
-                <div>
-                    <label class="text-slate-500 font-medium">Oylik Bank Krediti (so'm)</label>
-                    <input type="number" id="monthlyCredit" value="4500000" class="w-full mt-1 px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none">
-                </div>
-                <div>
-                    <label class="text-slate-500 font-medium">Boshqa oylik to'lovlar (so'm)</label>
-                    <input type="number" id="monthlyOther" value="3000000" class="w-full mt-1 px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none">
-                </div>
-            </div>
-            <button onclick="saveFixedCosts()" class="w-full py-2.5 bg-blue-600 text-white font-bold rounded-xl text-xs shadow hover:bg-blue-700">
-                Saqlash va Hisoblash
-            </button>
-        </div>
-    </div>
-
-    <!-- MODAL 3: RAHBAR PAROLI ORQALI REJIMNI O'ZGARTIRISH -->
+    <!-- RAHBAR PAROLI MODALI -->
     <div id="authModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
         <div class="bg-white w-full max-w-xs rounded-3xl p-5 space-y-4 text-center">
             <div class="w-12 h-12 rounded-full bg-indigo-50 text-indigo-600 flex items-center justify-center mx-auto text-lg">
@@ -542,9 +746,9 @@
             </div>
             <div>
                 <h3 class="font-bold text-slate-900 text-sm">Rahbar Rejimi</h3>
-                <p class="text-[11px] text-slate-500 mt-0.5">Maxfiy ma'lumotlar va foizlarni ko'rish uchun parolni tering</p>
+                <p class="text-[11px] text-slate-500 mt-0.5">Parolni kiriting (Standart: 7777)</p>
             </div>
-            <input type="password" id="adminPasswordInput" placeholder="Parolni kiriting..." class="w-full px-3 py-2 text-center text-sm tracking-widest bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:border-indigo-600">
+            <input type="password" id="adminPasswordInput" placeholder="Parol..." class="w-full px-3 py-2 text-center text-sm tracking-widest bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:border-indigo-600">
             <div class="grid grid-cols-2 gap-2">
                 <button onclick="closeModal('authModal')" class="py-2 bg-slate-100 text-slate-600 font-semibold rounded-xl text-xs">Bekor qilish</button>
                 <button onclick="verifyAdminPassword()" class="py-2 bg-indigo-600 text-white font-bold rounded-xl text-xs">Tasdiqlash</button>
@@ -552,50 +756,44 @@
         </div>
     </div>
 
-    <!-- JAVASCRIPT VA MANTIQIY BOSHQARUV -->
+    <!-- JAVASCRIPT VA TO'LIQ MANTIQ -->
     <script>
-        // Foydalanuvchi holati (Boshlang'ichda Fayoza - ya'ni xodim)
-        let currentUser = 'Fayoza'; 
         let isAdmin = false;
+        let modalHistoryStack = [];
 
-        // TABLARNI O'ZGARTIRISH
         function switchTab(tabName) {
             document.querySelectorAll('main > section').forEach(sec => sec.classList.add('hidden'));
-            document.getElementById('tab-' + tabName).classList.remove('hidden');
+            const targetSection = document.getElementById('tab-' + tabName);
+            if (targetSection) targetSection.classList.remove('hidden');
 
             document.querySelectorAll('nav button').forEach(btn => {
                 btn.classList.remove('text-blue-600');
                 btn.classList.add('text-slate-500');
             });
-            document.getElementById('nav-' + tabName).classList.add('text-blue-600');
-            document.getElementById('nav-' + tabName).classList.remove('text-slate-500');
+            const activeNav = document.getElementById('nav-' + tabName);
+            if (activeNav) {
+                activeNav.classList.add('text-blue-600');
+                activeNav.classList.remove('text-slate-500');
+            }
         }
 
-        // RAZDACHA SUB-TABLARI (Soatlar va Ovqatlar)
         function switchRazdachaSubTab(type) {
             if (type === 'hours') {
                 document.getElementById('razdachaHoursSection').classList.remove('hidden');
                 document.getElementById('razdachaMealsSection').classList.add('hidden');
                 document.getElementById('razdachaSubTab1').classList.add('bg-white', 'text-slate-900', 'shadow-sm');
-                document.getElementById('razdachaSubTab1').classList.remove('text-slate-600');
                 document.getElementById('razdachaSubTab2').classList.remove('bg-white', 'text-slate-900', 'shadow-sm');
-                document.getElementById('razdachaSubTab2').classList.add('text-slate-600');
             } else {
                 document.getElementById('razdachaHoursSection').classList.add('hidden');
                 document.getElementById('razdachaMealsSection').classList.remove('hidden');
                 document.getElementById('razdachaSubTab2').classList.add('bg-white', 'text-slate-900', 'shadow-sm');
-                document.getElementById('razdachaSubTab2').classList.remove('text-slate-600');
                 document.getElementById('razdachaSubTab1').classList.remove('bg-white', 'text-slate-900', 'shadow-sm');
-                document.getElementById('razdachaSubTab1').classList.add('text-slate-600');
             }
         }
 
-        // RAHBAR PAROLINI TEKSHIRISH VA FOIZLARNI KO'RSATISH
         function toggleRoleModal() {
             if (isAdmin) {
-                // Chiqish
                 isAdmin = false;
-                currentUser = 'Fayoza';
                 updateSecurityView();
             } else {
                 document.getElementById('authModal').classList.remove('hidden');
@@ -604,10 +802,8 @@
 
         function verifyAdminPassword() {
             const pass = document.getElementById('adminPasswordInput').value;
-            // Shartli parol: 7777 (o'zingiz xohlagan parolni qo'yishingiz mumkin)
             if (pass === '7777' || pass === 'admin') {
                 isAdmin = true;
-                currentUser = 'Rahbar';
                 closeModal('authModal');
                 document.getElementById('adminPasswordInput').value = '';
                 updateSecurityView();
@@ -621,7 +817,8 @@
             const authText = document.getElementById('authText');
             const authIcon = document.getElementById('authIcon');
             const settingBtn = document.getElementById('adminPercentSettingBtn');
-            const percentTags = document.querySelectorAll('.admin-percent-tag');
+            const adminOnlyTags = document.querySelectorAll('.admin-only');
+            const adminSecretFinance = document.getElementById('adminSecretFinanceBlock');
             const selfCard = document.getElementById('adminSelfCard');
 
             if (isAdmin) {
@@ -630,7 +827,9 @@
                 authText.textContent = "Chiqish";
                 authIcon.className = "fa-solid fa-lock-open text-[11px]";
                 settingBtn.classList.remove('hidden');
-                percentTags.forEach(el => el.classList.remove('hidden'));
+                settingBtn.classList.add('flex');
+                adminOnlyTags.forEach(el => el.classList.remove('hidden'));
+                adminSecretFinance.classList.remove('hidden');
                 selfCard.classList.remove('hidden');
             } else {
                 roleBadge.textContent = "Fayoza";
@@ -638,133 +837,295 @@
                 authText.textContent = "Rahbar";
                 authIcon.className = "fa-solid fa-lock text-[11px]";
                 settingBtn.classList.add('hidden');
-                percentTags.forEach(el => el.classList.add('hidden'));
+                settingBtn.classList.remove('flex');
+                adminOnlyTags.forEach(el => el.classList.add('hidden'));
+                adminSecretFinance.classList.add('hidden');
                 selfCard.classList.add('hidden');
             }
         }
 
-        // MODALLARNI OCHISH / YOPISH
         function closeModal(id) {
             document.getElementById(id).classList.add('hidden');
         }
 
-        function openFixedCostsModal() {
-            document.getElementById('fixedCostsModal').classList.remove('hidden');
+        // ================= KURYER TO'LIQ TARIXI VA -55 MING KASSA BOG'LANISHI =================
+        function openCourierFullDetails(courierName) {
+            const modal = document.getElementById('fullDetailModal');
+            const title = document.getElementById('modalMainTitle');
+            const content = document.getElementById('modalMainContent');
+            const backBtn = document.getElementById('modalBackBtn');
+            backBtn.classList.add('hidden');
+            modalHistoryStack = [];
+
+            title.textContent = `Kuryer tafsiloti - ${courierName}`;
+            
+            if (courierName === 'Shahzod') {
+                content.innerHTML = `
+                    <div class="space-y-2">
+                        <div class="p-2.5 bg-slate-50 border border-slate-200 rounded-xl flex justify-between items-center">
+                            <div>
+                                <span class="font-bold text-slate-800 block">📅 19.10.2026 (Chopachop: Qazi)</span>
+                                <span class="text-slate-500 text-[11px]">Lakatsiya xato kiritilgan</span>
+                            </div>
+                            <span class="font-bold text-blue-600">+20 000 so'm</span>
+                        </div>
+                        <div class="p-2.5 bg-slate-50 border border-slate-200 rounded-xl flex justify-between items-center">
+                            <div>
+                                <span class="font-bold text-slate-800 block">📅 19.10.2026 (Chopachop: jazira)</span>
+                                <span class="text-slate-500 text-[11px]">Lakatsiya notug'ri kiritilgan</span>
+                            </div>
+                            <span class="font-bold text-blue-600">+10 000 so'm</span>
+                        </div>
+                        <!-- Sarpul kassa -55 ming qoplama to'lovi -->
+                        <div onclick="openNestedDetail('sarpul_shahzod_55')" class="p-3 bg-amber-50 border-2 border-amber-300 rounded-xl flex justify-between items-center cursor-pointer shadow-sm hover:bg-amber-100 transition-all">
+                            <div>
+                                <span class="font-black text-amber-950 flex items-center gap-1.5">
+                                    <i class="fa-solid fa-money-bill-wave text-amber-600"></i> 20.10.2026 (Naqd - Sarpul kassa)
+                                </span>
+                                <span class="text-[11px] text-amber-800 block">2 kunlik qoplama puli berildi (Bosing ➔)</span>
+                            </div>
+                            <span class="font-black text-rose-600 text-sm">-55 000 so'm</span>
+                        </div>
+                        <div class="p-2.5 bg-slate-50 border border-slate-200 rounded-xl flex justify-between items-center">
+                            <div>
+                                <span class="font-bold text-slate-800 block">📅 21.10.2026 (Chopachop: Qazi)</span>
+                                <span class="text-slate-500 text-[11px]">Lakatsiya xato</span>
+                            </div>
+                            <span class="font-bold text-blue-600">+20 000 so'm</span>
+                        </div>
+                    </div>
+                `;
+            } else {
+                content.innerHTML = `
+                    <div class="p-4 text-center text-slate-500 space-y-2">
+                        <i class="fa-solid fa-motorcycle text-3xl text-slate-300"></i>
+                        <p class="font-bold text-slate-700">${courierName} hisobi faol</p>
+                        <p class="text-[11px]">Barcha smenalar va buyurtmalar yetkazilishi me'yorda.</p>
+                    </div>
+                `;
+            }
+            modal.classList.remove('hidden');
         }
 
-        function saveFixedCosts() {
-            alert("Doimiy chiqimlar normasi yangilandi!");
-            closeModal('fixedCostsModal');
+        // ICHMA-ICH OYNA
+        function openNestedDetail(type) {
+            const title = document.getElementById('modalMainTitle');
+            const content = document.getElementById('modalMainContent');
+            const backBtn = document.getElementById('modalBackBtn');
+            modalHistoryStack.push({ title: title.textContent, content: content.innerHTML });
+            backBtn.classList.remove('hidden');
+
+            if (type === 'sarpul_shahzod_55') {
+                title.textContent = "Kassa Bog'liqligi: Shahzod (-55 000)";
+                content.innerHTML = `
+                    <div class="p-4 bg-slate-50 border border-slate-200 rounded-2xl space-y-3">
+                        <div class="flex items-center gap-2 text-rose-600 font-bold text-sm">
+                            <i class="fa-solid fa-arrow-right-arrow-left"></i>
+                            <span>Sarpul Kassa Chiqimi ➔ Kuryer Shahzod</span>
+                        </div>
+                        <p class="text-xs text-slate-600 leading-relaxed">
+                            Bu summa <b>20.10.2026</b> sanasida Sarpul filial kassasidan Shahzodga 2 kunlik lokatsiya xatoliklari va yoqilg'i qoplamasi sifatida naqd to'lab berilgan.
+                        </p>
+                        <div class="p-3 bg-white border border-slate-200 rounded-xl space-y-1">
+                            <div class="flex justify-between">
+                                <span class="text-slate-500">Kassa holati:</span>
+                                <span class="font-bold text-rose-600">-55 000 so'm (Chiqim)</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-slate-500">Shahzod qarzi:</span>
+                                <span class="font-bold text-emerald-600">Yopildi (To'landi)</span>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
         }
 
-        // CHIQIMLAR MODALINI TO'LDIRISH (Kuryer qoplanmasi, Atkaz, Ovqat)
+        function modalGoBack() {
+            if (modalHistoryStack.length > 0) {
+                const prev = modalHistoryStack.pop();
+                document.getElementById('modalMainTitle').textContent = prev.title;
+                document.getElementById('modalMainContent').innerHTML = prev.content;
+                if (modalHistoryStack.length === 0) {
+                    document.getElementById('modalBackBtn').classList.add('hidden');
+                }
+            }
+        }
+
+        // CHIQIMLAR VA ZIYONLAR TAHLILI (Tahrirlash va O'chirish bilan)
         function openExpensesModal(type) {
-            const modal = document.getElementById('expenseDetailModal');
-            const title = document.getElementById('modalExpenseTitle');
-            const content = document.getElementById('modalExpenseContent');
-            content.innerHTML = '';
+            const modal = document.getElementById('fullDetailModal');
+            const title = document.getElementById('modalMainTitle');
+            const content = document.getElementById('modalMainContent');
+            document.getElementById('modalBackBtn').classList.add('hidden');
+            modalHistoryStack = [];
 
             if (type === 'qoplama') {
                 title.textContent = "Kuryer Qoplanmalari (-816 000 so'm)";
                 content.innerHTML = `
-                    <div class="p-2.5 bg-slate-50 border border-slate-200 rounded-xl space-y-1">
-                        <div class="flex justify-between font-bold text-slate-800">
-                            <span>Shahzod</span>
-                            <span class="text-rose-600">-55 000 so'm</span>
+                    <div class="space-y-2">
+                        <div class="p-3 bg-slate-50 border border-slate-200 rounded-xl flex items-center justify-between">
+                            <div>
+                                <span class="font-bold text-slate-900 block">Shahzod (-55 000 so'm)</span>
+                                <span class="text-[11px] text-slate-500">Sarpul kassadan berilgan qoplama</span>
+                            </div>
+                            <div class="flex gap-1.5">
+                                <button onclick="editGenericRecord('Shahzod qoplama')" class="w-7 h-7 rounded bg-blue-100 text-blue-700 flex items-center justify-center text-xs"><i class="fa-solid fa-pen"></i></button>
+                                <button onclick="deleteGenericRecord('Shahzod qoplama')" class="w-7 h-7 rounded bg-rose-100 text-rose-700 flex items-center justify-center text-xs"><i class="fa-solid fa-trash"></i></button>
+                            </div>
                         </div>
-                        <p class="text-[11px] text-slate-500">20.10.2026 (Naqd - Saripul kassa): 2 kunlik qoplama berildi</p>
-                    </div>
-                    <div class="p-2.5 bg-slate-50 border border-slate-200 rounded-xl space-y-1">
-                        <div class="flex justify-between font-bold text-slate-800">
-                            <span>Fazliddin</span>
-                            <span class="text-rose-600">-180 000 so'm</span>
+                        <div class="p-3 bg-slate-50 border border-slate-200 rounded-xl flex items-center justify-between">
+                            <div>
+                                <span class="font-bold text-slate-900 block">Fazliddin (-180 000 so'm)</span>
+                                <span class="text-[11px] text-slate-500">Yoqilg'i va 3 kunlik lokatsiya qoplamasi</span>
+                            </div>
+                            <div class="flex gap-1.5">
+                                <button onclick="editGenericRecord('Fazliddin qoplama')" class="w-7 h-7 rounded bg-blue-100 text-blue-700 flex items-center justify-center text-xs"><i class="fa-solid fa-pen"></i></button>
+                                <button onclick="deleteGenericRecord('Fazliddin qoplama')" class="w-7 h-7 rounded bg-rose-100 text-rose-700 flex items-center justify-center text-xs"><i class="fa-solid fa-trash"></i></button>
+                            </div>
                         </div>
-                        <p class="text-[11px] text-slate-500">Yoqilg'i va 3 kunlik lokatsiya xatoliklari qoplanmasi</p>
-                    </div>
-                    <div class="p-2.5 bg-slate-50 border border-slate-200 rounded-xl space-y-1">
-                        <div class="flex justify-between font-bold text-slate-800">
-                            <span>Zoir</span>
-                            <span class="text-rose-600">-210 000 so'm</span>
-                        </div>
-                        <p class="text-[11px] text-slate-500">ChopaChop uzoq masofalar kompensatsiyasi</p>
                     </div>
                 `;
             } else if (type === 'atkaz') {
                 title.textContent = "Atkaz Tovar Zararlari (-345 000 so'm)";
                 content.innerHTML = `
-                    <div class="p-2.5 bg-rose-50 border border-rose-100 rounded-xl space-y-1">
-                        <div class="flex justify-between font-bold text-slate-900">
-                            <span>Zakaz #4102 (Lavash x2, Kola)</span>
-                            <span class="text-rose-600">-75 000 so'm</span>
+                    <div class="space-y-2">
+                        <div class="p-3 bg-rose-50 border border-rose-100 rounded-xl flex items-center justify-between">
+                            <div>
+                                <span class="font-bold text-rose-950 block">Zakaz #4102: 2x Lavash, Kola</span>
+                                <span class="text-[11px] text-slate-500">Sababi: Mijoz olmadi | Kuryer: Abbos</span>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <span class="font-black text-rose-600">-75 000 so'm</span>
+                                <button onclick="editGenericRecord('Atkaz #4102')" class="w-7 h-7 rounded bg-blue-100 text-blue-700 flex items-center justify-center text-xs"><i class="fa-solid fa-pen"></i></button>
+                            </div>
                         </div>
-                        <p class="text-[11px] text-slate-500">Sababi: Mijoz telefonni ko'tarmadi (Kuryer: Abbos)</p>
-                    </div>
-                    <div class="p-2.5 bg-rose-50 border border-rose-100 rounded-xl space-y-1">
-                        <div class="flex justify-between font-bold text-slate-900">
-                            <span>Zakaz #4145 (Burger kombo)</span>
-                            <span class="text-rose-600">-48 000 so'm</span>
-                        </div>
-                        <p class="text-[11px] text-slate-500">Sababi: Oshxona kechiktirdi, mijoz bekor qildi</p>
                     </div>
                 `;
             } else if (type === 'ovqat') {
                 title.textContent = "Xodimlar Ovqati (-522 000 so'm)";
                 content.innerHTML = `
-                    <div class="p-2.5 bg-slate-50 border border-slate-200 rounded-xl flex justify-between">
-                        <div>
-                            <span class="font-bold text-slate-800 block">Razdacha (Murod & Xushnud)</span>
-                            <span class="text-[11px] text-slate-400">Filial: Vaynkamat</span>
+                    <div class="space-y-2">
+                        <div class="p-3 bg-slate-50 border border-slate-200 rounded-xl flex items-center justify-between">
+                            <div>
+                                <span class="font-bold text-slate-900 block">Razdacha (Xushnud & Murod)</span>
+                                <span class="text-[11px] text-slate-500">Filial: Vaynkamat</span>
+                            </div>
+                            <span class="font-bold text-rose-600">-120 000 so'm</span>
                         </div>
-                        <span class="font-bold text-rose-600">-120 000 so'm</span>
+                        <div class="p-3 bg-slate-50 border border-slate-200 rounded-xl flex items-center justify-between">
+                            <div>
+                                <span class="font-bold text-slate-900 block">Operatorlar (Pari, Sevar, Fayoza)</span>
+                                <span class="text-[11px] text-slate-500">Tushlik va kechki ovqat</span>
+                            </div>
+                            <span class="font-bold text-rose-600">-155 000 so'm</span>
+                        </div>
                     </div>
-                    <div class="p-2.5 bg-slate-50 border border-slate-200 rounded-xl flex justify-between">
-                        <div>
-                            <span class="font-bold text-slate-800 block">Operatorlar smenasi</span>
-                            <span class="text-[11px] text-slate-400">Pari, Fayoza, Sevar</span>
+                `;
+            } else if (type === 'rahbar') {
+                title.textContent = "👑 Rahbar (Jafar) - Shaxsiy Tarix";
+                content.innerHTML = `
+                    <div class="space-y-2">
+                        <div class="p-3 bg-indigo-50 border border-indigo-100 rounded-xl flex items-center justify-between">
+                            <div>
+                                <span class="font-bold text-indigo-950 block">Kassadan shaxsiy xarajat</span>
+                                <span class="text-[11px] text-indigo-700">22.10.2026 - Sarpul kassadan olindi</span>
+                            </div>
+                            <span class="font-black text-rose-600">-250 000 so'm</span>
                         </div>
-                        <span class="font-bold text-rose-600">-155 000 so'm</span>
+                        <div class="p-3 bg-indigo-50 border border-indigo-100 rounded-xl flex items-center justify-between">
+                            <div>
+                                <span class="font-bold text-indigo-950 block">Oshxona: Dabl Lavash + Suv</span>
+                                <span class="text-[11px] text-indigo-700">21.10.2026 - Razdacha orqali yozilgan</span>
+                            </div>
+                            <span class="font-black text-amber-700">-65 000 so'm</span>
+                        </div>
+                    </div>
+                `;
+            } else if (type === 'saripul') {
+                title.textContent = "Saripul Filial Tahlili (1 256 zakaz)";
+                content.innerHTML = `
+                    <div class="p-3 bg-slate-50 rounded-xl space-y-1">
+                        <p class="font-bold text-slate-900">Jami tushum: 14 250 000 so'm</p>
+                        <p class="text-slate-500">Dastavka: 820 ta | Saboy: 436 ta</p>
+                    </div>
+                `;
+            } else if (type === 'vaynkamat') {
+                title.textContent = "Vaynkamat Filial Tahlili (2 536 zakaz)";
+                content.innerHTML = `
+                    <div class="p-3 bg-slate-50 rounded-xl space-y-1">
+                        <p class="font-bold text-slate-900">Jami tushum: 16 529 000 so'm</p>
+                        <p class="text-slate-500">Dastavka: 1 650 ta | Saboy: 886 ta</p>
                     </div>
                 `;
             }
-
             modal.classList.remove('hidden');
         }
 
-        // RAHBAR SHAXSIY TARIXI MODALI
-        function openAdminPersonalHistoryModal() {
-            const modal = document.getElementById('expenseDetailModal');
-            const title = document.getElementById('modalExpenseTitle');
-            const content = document.getElementById('modalExpenseContent');
-            
-            title.textContent = "👑 Rahbar (Jafar) - Shaxsiy Tarix";
-            content.innerHTML = `
-                <div class="p-2.5 bg-indigo-50 border border-indigo-100 rounded-xl space-y-1">
-                    <div class="flex justify-between font-bold text-indigo-950">
-                        <span>Kassadan naqd xarajat</span>
-                        <span class="text-rose-600">-250 000 so'm</span>
-                    </div>
-                    <p class="text-[11px] text-indigo-600">22.10.2026 - Sarpul kassadan shaxsiy ehtiyojga olindi</p>
-                </div>
-                <div class="p-2.5 bg-indigo-50 border border-indigo-100 rounded-xl space-y-1">
-                    <div class="flex justify-between font-bold text-indigo-950">
-                        <span>Oshxona: 2x Dabl Lavash + Suv</span>
-                        <span class="text-amber-700">-65 000 so'm</span>
-                    </div>
-                    <p class="text-[11px] text-indigo-600">21.10.2026 - Razdacha orqali yozilgan</p>
-                </div>
-            `;
-            modal.classList.remove('hidden');
+        // ================= FUNKSIYALAR: SAQLASH VA AMALLAR =================
+        function saveStaffExpense() {
+            const staff = document.getElementById('staffMealSelect').value;
+            const type = document.getElementById('staffItemType').value;
+            const sum = document.getElementById('staffMealSum').value;
+            const desc = document.getElementById('staffMealDesc').value;
+            if (!sum) { alert("Iltimos, summani kiriting!"); return; }
+            alert(`✅ ${staff} hisobiga ${sum} so'm (${desc || type}) muvaffaqiyatli yozildi va oyligidan chegirildi!`);
+            document.getElementById('staffMealSum').value = '';
+            document.getElementById('staffMealDesc').value = '';
         }
 
-        function openBranchDetails(branch) {
-            alert(branch === 'saripul' ? "Saripul: 1 256 ta zakaz, barcha ma'lumotlar to'g'ri bog'langan." : "Vaynkamat: 2 536 ta zakaz kiritilgan.");
+        function saveAtkazRecord() {
+            const branch = document.getElementById('atkazBranch').value;
+            const sum = document.getElementById('atkazSum').value;
+            const courier = document.getElementById('atkazCourier').value;
+            const reason = document.getElementById('atkazReason').value;
+            if (!sum) { alert("Zarar summasini kiriting!"); return; }
+            alert(`🚫 Atkaz qabul qilindi: ${branch} filiali bo'yicha ${sum} so'm zarar (${courier}, Sabab: ${reason}) qayd etildi!`);
+            document.getElementById('atkazSum').value = '';
+            document.getElementById('atkazItems').value = '';
         }
 
         function saveDailySales() {
-            alert("Kunlik savdo muvaffaqiyatli saqlandi!");
+            alert("Kunlik savdo ko'rsatkichlari muvaffaqiyatli saqlandi!");
         }
 
-        // Dastlabki yuklanishda Fayoza huquqlarini o'rnatish
+        function saveRazdachiShift() {
+            alert("Razdachi smenasi va haqi hisoblandi!");
+        }
+
+        function saveRazdachiMeal() {
+            alert("Razdachi ovqat chiqimi yozildi!");
+        }
+
+        function editSaleRecord(date) {
+            prompt(`${date} sanasidagi savdo summasini o'zgartiring:`, "7045000");
+        }
+
+        function deleteSaleRecord(date) {
+            if (confirm(`${date} sanasidagi savdo yozuvini o'chirishni xohlaysizmi?`)) {
+                alert("Yozuv o'chirildi!");
+            }
+        }
+
+        function editGenericRecord(name) {
+            prompt(`${name} summasini tahrirlang:`);
+        }
+
+        function deleteGenericRecord(name) {
+            if (confirm(`${name} yozuvini o'chirmoqchimisiz?`)) {
+                alert("O'chirildi!");
+            }
+        }
+
+        function exportData() {
+            alert("Ma'lumotlar zaxira nusxasi yuklab olindi (JSON)!");
+        }
+
+        function importData() {
+            alert("Zaxira nusxani yuklash oynasi.");
+        }
+
+        // Boshlang'ichda xavfsizlik sozlamasini o'rnatish
         updateSecurityView();
     </script>
 </body>
