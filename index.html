@@ -2,7 +2,7 @@
 <html lang="uz">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>Jazira & ChopaChop Control PRO</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -30,7 +30,10 @@
                     <div class="flex items-center gap-2 text-xs text-slate-500 mt-0.5">
                         <span id="currentDay">Shanba</span>
                         <span class="text-slate-300">•</span>
-                        <span id="currentDateBadge" class="bg-blue-50 text-blue-700 font-medium px-1.5 py-0.5 rounded border border-blue-200 text-[11px]">24 okt. 2026 y.</span>
+                        <!-- SANA TANLASH (INTERAKTIV INPUT) -->
+                        <div class="relative inline-block">
+                            <input type="date" id="mainDateInput" value="2026-10-24" onchange="onDateChanged(this.value)" class="bg-blue-50 text-blue-700 font-semibold px-2 py-0.5 rounded border border-blue-200 text-[11px] focus:outline-none cursor-pointer">
+                        </div>
                     </div>
                 </div>
             </div>
@@ -50,28 +53,26 @@
             </div>
         </div>
 
-        <!-- FAYOZA VA OPERATORLAR UCHUN RAHBAR TOPSHIRIQLARI (BANNER) -->
-        <div id="staffTaskBanner" class="mt-2.5 p-2.5 bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200/80 rounded-xl flex items-center justify-between">
-            <div class="flex items-center gap-2 overflow-hidden">
-                <span class="w-6 h-6 rounded-lg bg-blue-600 text-white flex items-center justify-center text-[10px] shrink-0 font-bold">
-                    <i class="fa-solid fa-bell"></i>
-                </span>
-                <div class="truncate">
-                    <p class="text-[10px] font-bold text-blue-900">👑 Rahbardan Topshiriq:</p>
-                    <p class="text-[11px] text-slate-700 truncate" id="taskBannerText">Sarpul kassa chiqimlarini Shahzod hisobiga to'g'ri bog'lang!</p>
-                </div>
-            </div>
-            <button onclick="switchTab('rejalar')" class="text-[10px] bg-blue-600 text-white px-2 py-1 rounded-lg font-bold shrink-0 ml-2">Ko'rish</button>
+        <!-- SANA BO'YICHA REJIM TOGGLE (KUNLIK vs BARCHA DAVR) -->
+        <div class="mt-2.5 flex items-center justify-between bg-slate-200/70 p-1 rounded-xl text-xs font-semibold">
+            <button id="btnModeDaily" onclick="setViewMode('daily')" class="flex-1 py-1.5 rounded-lg bg-white text-blue-700 shadow-sm transition-all text-center flex items-center justify-center gap-1.5">
+                <i class="fa-regular fa-calendar-check"></i>
+                <span id="labelSelectedDate">24-Oktabr (Kunlik)</span>
+            </button>
+            <button id="btnModeAll" onclick="setViewMode('all')" class="flex-1 py-1.5 rounded-lg text-slate-600 transition-all text-center flex items-center justify-center gap-1.5">
+                <i class="fa-solid fa-layer-group"></i>
+                <span>🌐 Jami (Barcha davr)</span>
+            </button>
         </div>
     </header>
 
     <!-- ASOSIY KONTEYNER -->
     <main class="max-w-md mx-auto p-4 space-y-4">
 
-        <!-- ================= 1. TAB: SAVDO (Toza Savdo Oynasi) ================= -->
+        <!-- ================= 1. TAB: SAVDO ================= -->
         <section id="tab-savdo" class="space-y-4">
             
-            <!-- Vaynkamat -->
+            <!-- Vaynkamat Savdo Kiritish -->
             <div class="bg-white rounded-2xl p-4 shadow-sm border border-slate-200/80 space-y-3">
                 <div class="flex items-center gap-2 pb-2 border-b border-slate-100">
                     <span class="text-rose-500 text-sm"><i class="fa-solid fa-location-dot"></i></span>
@@ -99,7 +100,7 @@
                 </div>
             </div>
 
-            <!-- Sarpul -->
+            <!-- Sarpul Savdo Kiritish -->
             <div class="bg-white rounded-2xl p-4 shadow-sm border border-slate-200/80 space-y-3">
                 <div class="flex items-center gap-2 pb-2 border-b border-slate-100">
                     <span class="text-indigo-500 text-sm"><i class="fa-solid fa-location-dot"></i></span>
@@ -127,7 +128,7 @@
                 </div>
             </div>
 
-            <!-- CHOPACHOP MUASSASALARI (Foizlar Fayozaga ko'rinmaydi) -->
+            <!-- CHOPACHOP MUASSASALARI (Fayozaga foizlar ko'rinmaydi) -->
             <div class="bg-white rounded-2xl p-4 shadow-sm border border-slate-200/80 space-y-3">
                 <div class="flex items-center justify-between pb-2 border-b border-slate-100">
                     <div class="flex items-center gap-2">
@@ -174,57 +175,25 @@
             <button onclick="saveDailySales()" class="w-full py-3.5 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-2xl shadow-lg shadow-blue-500/20 active:scale-[0.99] transition-all flex items-center justify-center gap-2 text-sm">
                 <i class="fa-solid fa-floppy-disk"></i> Kunlik Savdoni Saqlash
             </button>
-
-            <!-- SAVDOLAR TARIXI (Tahrirlash va O'chirish bilan) -->
-            <div class="bg-white rounded-2xl p-4 shadow-sm border border-slate-200/80 space-y-3">
-                <div class="flex items-center justify-between pb-2 border-b border-slate-100">
-                    <h3 class="font-bold text-slate-900 text-xs uppercase tracking-wider">Savdolar Tarixi</h3>
-                    <span class="text-[11px] text-slate-400">Oxirgi kunlar</span>
-                </div>
-                <div class="space-y-2">
-                    <div class="p-3 bg-slate-50 rounded-xl border border-slate-100 flex items-center justify-between text-xs">
-                        <div onclick="openSaleHistoryDetail('22.10.2026')" class="cursor-pointer flex-1">
-                            <span class="font-bold text-slate-900 block">📅 22.10.2026</span>
-                            <span class="text-slate-500 text-[11px]">Jazira Jami: 7 045 000 so'm</span>
-                        </div>
-                        <div class="flex items-center gap-1.5">
-                            <button onclick="editSaleRecord('22.10.2026')" class="w-7 h-7 rounded-lg bg-blue-100 text-blue-700 flex items-center justify-center text-xs"><i class="fa-solid fa-pen"></i></button>
-                            <button onclick="deleteSaleRecord('22.10.2026')" class="w-7 h-7 rounded-lg bg-rose-100 text-rose-700 flex items-center justify-center text-xs"><i class="fa-solid fa-trash"></i></button>
-                        </div>
-                    </div>
-                    <div class="p-3 bg-slate-50 rounded-xl border border-slate-100 flex items-center justify-between text-xs">
-                        <div onclick="openSaleHistoryDetail('21.10.2026')" class="cursor-pointer flex-1">
-                            <span class="font-bold text-slate-900 block">📅 21.10.2026</span>
-                            <span class="text-slate-500 text-[11px]">Jazira Jami: 6 890 000 so'm</span>
-                        </div>
-                        <div class="flex items-center gap-1.5">
-                            <button onclick="editSaleRecord('21.10.2026')" class="w-7 h-7 rounded-lg bg-blue-100 text-blue-700 flex items-center justify-center text-xs"><i class="fa-solid fa-pen"></i></button>
-                            <button onclick="deleteSaleRecord('21.10.2026')" class="w-7 h-7 rounded-lg bg-rose-100 text-rose-700 flex items-center justify-center text-xs"><i class="fa-solid fa-trash"></i></button>
-                        </div>
-                    </div>
-                </div>
-            </div>
         </section>
 
-        <!-- ================= 2. TAB: ANALITIKA (Fayozaga Ochiq, Faqat Maxfiy Foyda Berkitilgan) ================= -->
+        <!-- ================= 2. TAB: ANALITIKA (Sanaga bog'langan ko'rsatkichlar) ================= -->
         <section id="tab-analitika" class="hidden space-y-4">
             
-            <!-- FAQAT RAHBAR KO'RADIGAN SOF FOYDA VA ARENDA / KREDIT NORMA BLOKI -->
+            <!-- RAHBARGA KO'RINADIGAN SOF FOYDA -->
             <div id="adminSecretFinanceBlock" class="hidden space-y-4">
-                <!-- Sof Foyda -->
                 <div class="bg-gradient-to-br from-emerald-500 to-teal-600 text-white rounded-2xl p-4 shadow-md">
                     <div class="flex items-center justify-between">
                         <div>
                             <p class="text-emerald-100 text-xs font-medium flex items-center gap-1.5">
-                                <i class="fa-solid fa-circle-check"></i> Sof Foyda (Kunlik Hisob)
+                                <i class="fa-solid fa-circle-check"></i> Sof Foyda (<span id="profitPeriodBadge">Kunlik</span>)
                             </p>
-                            <h3 class="text-2xl font-black mt-1 tracking-tight">+2 728 476 <span class="text-sm font-normal opacity-90">so'm</span></h3>
+                            <h3 id="statNetProfit" class="text-2xl font-black mt-1 tracking-tight">+2 728 476 <span class="text-sm font-normal opacity-90">so'm</span></h3>
                         </div>
-                        <span class="bg-white/20 px-2.5 py-1 rounded-xl text-[11px] font-bold">13% Ulush</span>
+                        <span class="bg-white/20 px-2.5 py-1 rounded-xl text-[11px] font-bold">13% Jazira</span>
                     </div>
                 </div>
 
-                <!-- Arenda va Kredit Qoplami -->
                 <div class="bg-amber-50/70 border border-amber-200/80 rounded-2xl p-3.5 space-y-2">
                     <div class="flex items-center justify-between">
                         <span class="text-xs font-bold text-amber-900 flex items-center gap-1.5">
@@ -240,96 +209,94 @@
                     </div>
                     <div class="flex items-center justify-between text-[10px] font-medium text-amber-900">
                         <span>Norma: 450 000 so'm</span>
-                        <span class="text-emerald-700 font-bold"><i class="fa-solid fa-check"></i> 100% Qoplandi (+2.2 mln zaxira)</span>
+                        <span class="text-emerald-700 font-bold"><i class="fa-solid fa-check"></i> Qoplandi (+2.2 mln zaxira)</span>
                     </div>
                 </div>
             </div>
 
-            <!-- FAYOZA HAM KO'RA OLADIGAN FILIALLAR VA CHIQIMLAR -->
+            <!-- FILIALLAR VA CHIQIMLAR TAHLILI (Dinamik yangilanadi) -->
             <div class="bg-white rounded-3xl p-4 shadow-sm border border-slate-200/80 space-y-4">
                 <div class="flex items-center justify-between pb-2 border-b border-slate-100">
-                    <span class="text-xs font-bold uppercase tracking-wider text-slate-500">Filiallar va Chiqimlar Tahlili</span>
-                    <span class="text-[10px] bg-slate-100 text-slate-600 px-2 py-0.5 rounded-full font-medium">Barchaga ko'rinadi</span>
+                    <span class="text-xs font-bold uppercase tracking-wider text-slate-500">Filiallar va Chiqimlar</span>
+                    <span id="activeFilterBadge" class="text-[10px] bg-blue-50 text-blue-700 px-2 py-0.5 rounded-full font-bold border border-blue-200">24-Oktabr</span>
                 </div>
 
-                <!-- Filiallar soni -->
+                <!-- 2 ta Filial Tugmasi (Bosganda 3 bosqichli tahlil ochiladi) -->
                 <div class="grid grid-cols-2 gap-3">
-                    <div onclick="openExpensesModal('saripul')" class="p-3 bg-slate-50 border border-slate-200/70 rounded-2xl cursor-pointer hover:bg-slate-100 transition-all">
-                        <span class="text-slate-500 text-[11px] block">Saripul filial</span>
-                        <p class="font-black text-slate-900 text-sm mt-0.5">1 256 zakaz</p>
-                        <p class="text-[10px] text-emerald-600 font-bold mt-0.5">14 250 000 so'm</p>
+                    <div onclick="openBranchModal('saripul')" class="p-3.5 bg-slate-50 border-2 border-indigo-200 rounded-2xl cursor-pointer hover:bg-indigo-50/50 active:scale-95 transition-all shadow-sm">
+                        <div class="flex items-center justify-between text-indigo-700 text-[11px] mb-1">
+                            <span class="font-bold">Saripul filial</span>
+                            <i class="fa-solid fa-chevron-right text-[10px]"></i>
+                        </div>
+                        <p id="statSaripulOrders" class="font-black text-slate-900 text-sm">1 256 zakaz</p>
+                        <p id="statSaripulSum" class="text-[10px] text-emerald-600 font-bold mt-0.5">14 250 000 so'm</p>
+                        <p id="statSaripulExpense" class="text-[10px] text-rose-500 font-semibold mt-1">Chiqim: -1 480 000</p>
                     </div>
 
-                    <div onclick="openExpensesModal('vaynkamat')" class="p-3 bg-slate-50 border border-slate-200/70 rounded-2xl cursor-pointer hover:bg-slate-100 transition-all">
-                        <span class="text-slate-500 text-[11px] block">Vaynkamat filial</span>
-                        <p class="font-black text-slate-900 text-sm mt-0.5">2 536 zakaz</p>
-                        <p class="text-[10px] text-emerald-600 font-bold mt-0.5">16 529 000 so'm</p>
+                    <div onclick="openBranchModal('vaynkamat')" class="p-3.5 bg-slate-50 border-2 border-rose-200 rounded-2xl cursor-pointer hover:bg-rose-50/50 active:scale-95 transition-all shadow-sm">
+                        <div class="flex items-center justify-between text-rose-700 text-[11px] mb-1">
+                            <span class="font-bold">Vaynkamat filial</span>
+                            <i class="fa-solid fa-chevron-right text-[10px]"></i>
+                        </div>
+                        <p id="statVaynOrders" class="font-black text-slate-900 text-sm">2 536 zakaz</p>
+                        <p id="statVaynSum" class="text-[10px] text-emerald-600 font-bold mt-0.5">16 529 000 so'm</p>
+                        <p id="statVaynExpense" class="text-[10px] text-rose-500 font-semibold mt-1">Chiqim: -1 230 000</p>
                     </div>
                 </div>
 
-                <!-- 3 ta asosiy chiqim (Har biri bosiladi, tahrirlanadi, o'chiriladi) -->
+                <!-- 3 TA ASOSIY CHIQIM BLOKI (Sanaga mos filterlanadi) -->
                 <div class="space-y-2 pt-2 border-t border-slate-100">
                     <div class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Chiqimlar va Ziyonlar</div>
                     
                     <!-- Kuryer qoplanmalari -->
-                    <div class="flex items-center justify-between p-3 bg-rose-50/60 border border-rose-100 rounded-xl">
-                        <div onclick="openExpensesModal('qoplama')" class="flex items-center gap-2.5 cursor-pointer flex-1">
+                    <div onclick="openDirectExpenseCategory('kuryer')" class="flex items-center justify-between p-3 bg-rose-50/60 border border-rose-100 rounded-xl cursor-pointer hover:bg-rose-100/60 active:scale-98 transition-all">
+                        <div class="flex items-center gap-2.5">
                             <span class="w-7 h-7 rounded-lg bg-rose-100 text-rose-600 flex items-center justify-center text-xs"><i class="fa-solid fa-motorcycle"></i></span>
                             <div>
                                 <h4 class="text-xs font-bold text-slate-900">Kuryer qoplanmalari</h4>
                                 <p class="text-[10px] text-slate-500">6 ta kuryer (Sarpul kassa bilan bog'langan)</p>
                             </div>
                         </div>
-                        <div class="flex items-center gap-2">
-                            <span class="text-xs font-black text-rose-600">-816 000 so'm</span>
-                            <button onclick="openExpensesModal('qoplama')" class="w-6 h-6 rounded bg-rose-200/60 text-rose-800 flex items-center justify-center text-[10px]"><i class="fa-solid fa-pen"></i></button>
-                        </div>
+                        <span id="statCourierExpenses" class="text-xs font-black text-rose-600">-816 000 so'm</span>
                     </div>
 
                     <!-- Atkaz tovarlar -->
-                    <div class="flex items-center justify-between p-3 bg-rose-50/60 border border-rose-100 rounded-xl">
-                        <div onclick="openExpensesModal('atkaz')" class="flex items-center gap-2.5 cursor-pointer flex-1">
+                    <div onclick="openDirectExpenseCategory('atkaz')" class="flex items-center justify-between p-3 bg-rose-50/60 border border-rose-100 rounded-xl cursor-pointer hover:bg-rose-100/60 active:scale-98 transition-all">
+                        <div class="flex items-center gap-2.5">
                             <span class="w-7 h-7 rounded-lg bg-rose-100 text-rose-600 flex items-center justify-center text-xs"><i class="fa-solid fa-circle-xmark"></i></span>
                             <div>
                                 <h4 class="text-xs font-bold text-slate-900">Atkaz tovarlar zarari</h4>
                                 <p class="text-[10px] text-slate-500">Bekor qilingan zakazlar tahlili</p>
                             </div>
                         </div>
-                        <div class="flex items-center gap-2">
-                            <span class="text-xs font-black text-rose-600">-345 000 so'm</span>
-                            <button onclick="openExpensesModal('atkaz')" class="w-6 h-6 rounded bg-rose-200/60 text-rose-800 flex items-center justify-center text-[10px]"><i class="fa-solid fa-pen"></i></button>
-                        </div>
+                        <span id="statAtkazExpenses" class="text-xs font-black text-rose-600">-345 000 so'm</span>
                     </div>
 
                     <!-- Xodimlar ovqati -->
-                    <div class="flex items-center justify-between p-3 bg-rose-50/60 border border-rose-100 rounded-xl">
-                        <div onclick="openExpensesModal('ovqat')" class="flex items-center gap-2.5 cursor-pointer flex-1">
+                    <div onclick="openDirectExpenseCategory('ovqat')" class="flex items-center justify-between p-3 bg-rose-50/60 border border-rose-100 rounded-xl cursor-pointer hover:bg-rose-100/60 active:scale-98 transition-all">
+                        <div class="flex items-center gap-2.5">
                             <span class="w-7 h-7 rounded-lg bg-rose-100 text-rose-600 flex items-center justify-center text-xs"><i class="fa-solid fa-burger"></i></span>
                             <div>
                                 <h4 class="text-xs font-bold text-slate-900">Xodimlar ovqati</h4>
                                 <p class="text-[10px] text-slate-500">Razdacha, operator va oshxona</p>
                             </div>
                         </div>
-                        <div class="flex items-center gap-2">
-                            <span class="text-xs font-black text-rose-600">-522 000 so'm</span>
-                            <button onclick="openExpensesModal('ovqat')" class="w-6 h-6 rounded bg-rose-200/60 text-rose-800 flex items-center justify-center text-[10px]"><i class="fa-solid fa-pen"></i></button>
-                        </div>
+                        <span id="statFoodExpenses" class="text-xs font-black text-rose-600">-522 000 so'm</span>
                     </div>
                 </div>
             </div>
         </section>
 
-        <!-- ================= 3. TAB: KURYER (6 ta Kuryer va Shahzodning Sarpul Kassa Zanjiri) ================= -->
+        <!-- ================= 3. TAB: KURYER ================= -->
         <section id="tab-kuryer" class="hidden space-y-4">
             <div class="bg-white rounded-2xl p-4 shadow-sm border border-slate-200/80 space-y-3">
                 <div class="flex items-center justify-between pb-2 border-b border-slate-100">
-                    <h3 class="font-bold text-slate-900 text-xs uppercase tracking-wider">Kuryerlar Ro'yxati va Balansi</h3>
-                    <span class="text-[11px] text-slate-400">6 ta kuryer faol</span>
+                    <h3 class="font-bold text-slate-900 text-xs uppercase tracking-wider">Kuryerlar Balansi</h3>
+                    <span class="text-[11px] text-slate-400">6 ta kuryer</span>
                 </div>
 
                 <div class="space-y-2 text-xs">
-                    <!-- Shahzod -->
-                    <div onclick="openCourierFullDetails('Shahzod')" class="p-3 bg-slate-50 border border-slate-200/80 rounded-xl cursor-pointer hover:bg-slate-100 transition-all flex items-center justify-between">
+                    <div onclick="openCourierDrilldown('Shahzod')" class="p-3 bg-slate-50 border border-slate-200/80 rounded-xl cursor-pointer hover:bg-slate-100 transition-all flex items-center justify-between">
                         <div>
                             <div class="font-bold text-slate-900 flex items-center gap-1.5">
                                 <span>Shahzod</span>
@@ -340,57 +307,27 @@
                         <span class="font-bold text-emerald-600">645 000 so'm</span>
                     </div>
 
-                    <!-- Fazliddin -->
-                    <div onclick="openCourierFullDetails('Fazliddin')" class="p-3 bg-slate-50 border border-slate-200/80 rounded-xl cursor-pointer hover:bg-slate-100 transition-all flex items-center justify-between">
+                    <div onclick="openCourierDrilldown('Fazliddin')" class="p-3 bg-slate-50 border border-slate-200/80 rounded-xl cursor-pointer hover:bg-slate-100 transition-all flex items-center justify-between">
                         <div>
                             <div class="font-bold text-slate-900">Fazliddin</div>
-                            <span class="text-[11px] text-slate-500">Hisoblandi: 700 000 | Ushlandi: 0</span>
+                            <span class="text-[11px] text-slate-500">Hisoblandi: 700 000 | Qoplama: -180 000</span>
                         </div>
-                        <span class="font-bold text-emerald-600">700 000 so'm</span>
+                        <span class="font-bold text-emerald-600">520 000 so'm</span>
                     </div>
 
-                    <!-- Zoir -->
-                    <div onclick="openCourierFullDetails('Zoir')" class="p-3 bg-slate-50 border border-slate-200/80 rounded-xl cursor-pointer hover:bg-slate-100 transition-all flex items-center justify-between">
+                    <div onclick="openCourierDrilldown('Zoir')" class="p-3 bg-slate-50 border border-slate-200/80 rounded-xl cursor-pointer hover:bg-slate-100 transition-all flex items-center justify-between">
                         <div>
                             <div class="font-bold text-slate-900">Zoir</div>
-                            <span class="text-[11px] text-slate-500">Hisoblandi: 700 000 | Ushlandi: 0</span>
+                            <span class="text-[11px] text-slate-500">Hisoblandi: 700 000 | Qoplama: -210 000</span>
                         </div>
-                        <span class="font-bold text-emerald-600">700 000 so'm</span>
-                    </div>
-
-                    <!-- Shoxi -->
-                    <div onclick="openCourierFullDetails('Shoxi')" class="p-3 bg-slate-50 border border-slate-200/80 rounded-xl cursor-pointer hover:bg-slate-100 transition-all flex items-center justify-between">
-                        <div>
-                            <div class="font-bold text-slate-900">Shoxi</div>
-                            <span class="text-[11px] text-slate-500">Hisoblandi: 700 000 | Ushlandi: 0</span>
-                        </div>
-                        <span class="font-bold text-emerald-600">700 000 so'm</span>
-                    </div>
-
-                    <!-- Abbos -->
-                    <div onclick="openCourierFullDetails('Abbos')" class="p-3 bg-slate-50 border border-slate-200/80 rounded-xl cursor-pointer hover:bg-slate-100 transition-all flex items-center justify-between">
-                        <div>
-                            <div class="font-bold text-slate-900">Abbos</div>
-                            <span class="text-[11px] text-slate-500">Hisoblandi: 700 000 | Ushlandi: 0</span>
-                        </div>
-                        <span class="font-bold text-emerald-600">700 000 so'm</span>
-                    </div>
-
-                    <!-- Umid -->
-                    <div onclick="openCourierFullDetails('Umid')" class="p-3 bg-slate-50 border border-slate-200/80 rounded-xl cursor-pointer hover:bg-slate-100 transition-all flex items-center justify-between">
-                        <div>
-                            <div class="font-bold text-slate-900">Umid</div>
-                            <span class="text-[11px] text-slate-500">Hisoblandi: 700 000 | Ushlandi: 0</span>
-                        </div>
-                        <span class="font-bold text-emerald-600">700 000 so'm</span>
+                        <span class="font-bold text-emerald-600">490 000 so'm</span>
                     </div>
                 </div>
             </div>
         </section>
 
-        <!-- ================= 4. TAB: RAZDACHA (Faqat Xushnud va Murod) ================= -->
+        <!-- ================= 4. TAB: RAZDACHA ================= -->
         <section id="tab-razdacha" class="hidden space-y-4">
-            
             <div class="flex bg-slate-200/80 p-1 rounded-2xl text-xs font-semibold">
                 <button id="razdachaSubTab1" onclick="switchRazdachaSubTab('hours')" class="flex-1 py-2 rounded-xl bg-white text-slate-900 shadow-sm transition-all">
                     🕒 Ish Soatlari va Oylik
@@ -400,63 +337,32 @@
                 </button>
             </div>
 
-            <!-- 4.A: ISH SOATLARI (Faqat Xushnud & Murod) -->
             <div id="razdachaHoursSection" class="space-y-4">
                 <div class="bg-white rounded-2xl p-4 shadow-sm border border-slate-200/80 space-y-3">
                     <h3 class="text-xs font-bold text-slate-900">Razdachi Smenasini Yopish</h3>
                     <div class="grid grid-cols-2 gap-2">
-                        <select id="razdachiNameInput" class="px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:outline-none font-medium">
+                        <select id="razdachiNameInput" class="px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-medium">
                             <option value="Xushnud">Xushnud</option>
                             <option value="Murod">Murod</option>
                         </select>
-                        <input type="date" value="2026-10-24" class="px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:outline-none">
+                        <input type="date" value="2026-10-24" class="px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs">
                     </div>
                     <div class="grid grid-cols-2 gap-2">
                         <div>
                             <label class="text-[10px] text-slate-500">Boshlanish</label>
-                            <input type="time" value="12:00" class="w-full mt-1 px-3 py-1.5 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:outline-none">
+                            <input type="time" value="12:00" class="w-full mt-1 px-3 py-1.5 bg-slate-50 border border-slate-200 rounded-xl text-xs">
                         </div>
                         <div>
                             <label class="text-[10px] text-slate-500">Tugash</label>
-                            <input type="time" value="00:00" class="w-full mt-1 px-3 py-1.5 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:outline-none">
+                            <input type="time" value="00:00" class="w-full mt-1 px-3 py-1.5 bg-slate-50 border border-slate-200 rounded-xl text-xs">
                         </div>
                     </div>
                     <button onclick="saveRazdachiShift()" class="w-full py-2.5 bg-blue-600 text-white font-bold rounded-xl text-xs shadow hover:bg-blue-700">
-                        Smena Haqini Hisoblash
+                        Smena Haqini Saqlash
                     </button>
-                </div>
-
-                <!-- Soatlik tarix (Tahrirlash va O'chirish bilan) -->
-                <div class="bg-white rounded-2xl p-4 shadow-sm border border-slate-200/80 space-y-2">
-                    <h4 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Tasdiqlangan Ish Soatlari</h4>
-                    <div class="space-y-1.5">
-                        <div class="flex items-center justify-between p-2.5 bg-slate-50 rounded-xl border border-slate-100 text-xs">
-                            <div>
-                                <span class="font-bold text-slate-800">Xushnud</span>
-                                <span class="text-slate-400 text-[11px] block">(20.10.2026 | 12:52 - 00:00)</span>
-                            </div>
-                            <div class="flex items-center gap-2">
-                                <span class="font-bold text-emerald-600">+77 315 so'm</span>
-                                <button onclick="editGenericRecord('Xushnud soati')" class="w-6 h-6 rounded bg-blue-50 text-blue-600 flex items-center justify-center text-[10px]"><i class="fa-solid fa-pen"></i></button>
-                                <button onclick="deleteGenericRecord('Xushnud soati')" class="w-6 h-6 rounded bg-rose-50 text-rose-600 flex items-center justify-center text-[10px]"><i class="fa-solid fa-trash"></i></button>
-                            </div>
-                        </div>
-                        <div class="flex items-center justify-between p-2.5 bg-slate-50 rounded-xl border border-slate-100 text-xs">
-                            <div>
-                                <span class="font-bold text-slate-800">Murod</span>
-                                <span class="text-slate-400 text-[11px] block">(20.10.2026 | 13:00 - 00:00)</span>
-                            </div>
-                            <div class="flex items-center gap-2">
-                                <span class="font-bold text-emerald-600">+76 389 so'm</span>
-                                <button onclick="editGenericRecord('Murod soati')" class="w-6 h-6 rounded bg-blue-50 text-blue-600 flex items-center justify-center text-[10px]"><i class="fa-solid fa-pen"></i></button>
-                                <button onclick="deleteGenericRecord('Murod soati')" class="w-6 h-6 rounded bg-rose-50 text-rose-600 flex items-center justify-center text-[10px]"><i class="fa-solid fa-trash"></i></button>
-                            </div>
-                        </div>
-                    </div>
                 </div>
             </div>
 
-            <!-- 4.B: FAQAT RAZDACHILAR OVQATI (Xushnud & Murod) -->
             <div id="razdachaMealsSection" class="hidden space-y-4">
                 <div class="bg-white rounded-2xl p-4 shadow-sm border border-amber-200/70 space-y-3">
                     <h3 class="text-xs font-bold text-amber-900">Xushnud yoki Murodga Ovqat / Avans Yozish</h3>
@@ -485,10 +391,10 @@
             </div>
         </section>
 
-        <!-- ================= 5. TAB: JAMOA (Mahsulot Olish, Atkaz va Xodimlar Balansi) ================= -->
+        <!-- ================= 5. TAB: JAMOA ================= -->
         <section id="tab-jamoa" class="hidden space-y-4">
 
-            <!-- 1. MODUL: XODIM MAHSULOT / YEGAN OVQATINI YOZISH (Pari, Sevar, Fayoza va boshqalar) -->
+            <!-- Xodim Mahsulot / Ovqat kiritish -->
             <div class="bg-white rounded-2xl p-4 shadow-sm border border-indigo-200/80 space-y-3">
                 <div class="flex items-center gap-2 pb-1 border-b border-indigo-50">
                     <span class="text-indigo-600 text-sm"><i class="fa-solid fa-basket-shopping"></i></span>
@@ -522,13 +428,13 @@
                         <option value="Vaynkamat">📍 Vaynkamat kassa</option>
                     </select>
                 </div>
-                <input type="text" id="staffMealDesc" placeholder="Mahsulot nomi yoki sababi (masalan: Go'sht, Pishloq yoki 1x Lavash)" class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:outline-none">
+                <input type="text" id="staffMealDesc" placeholder="Nomi yoki sababi (masalan: 1x Lavash yoki Go'sht)" class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:outline-none">
                 <button onclick="saveStaffExpense()" class="w-full py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl text-xs shadow flex items-center justify-center gap-1.5">
                     <i class="fa-solid fa-check"></i> Xodim Hisobiga Yozish (Chiqim)
                 </button>
             </div>
 
-            <!-- 2. MODUL: ATKAZ TOVARLARNI YOZISH (Jamoaga ko'chirildi) -->
+            <!-- Atkaz Tovarlarni Yozish -->
             <div class="bg-white rounded-2xl p-4 shadow-sm border border-rose-200/80 space-y-3">
                 <div class="flex items-center gap-2 pb-1 border-b border-rose-50">
                     <span class="text-rose-600 text-sm"><i class="fa-solid fa-triangle-exclamation"></i></span>
@@ -557,20 +463,20 @@
                         <option value="Operator xatosi">Operator xatosi</option>
                     </select>
                 </div>
-                <input type="text" id="atkazItems" placeholder="Qaysi taomlar atkaz bo'ldi? (masalan: 2 ta Dabl Lavash, 1 ta Fanta)" class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:outline-none">
+                <input type="text" id="atkazItems" placeholder="Qaysi taomlar atkaz bo'ldi? (masalan: 2 ta Dabl Lavash)" class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:outline-none">
                 <button onclick="saveAtkazRecord()" class="w-full py-2.5 bg-rose-600 hover:bg-rose-700 text-white font-bold rounded-xl text-xs shadow flex items-center justify-center gap-1.5">
                     <i class="fa-solid fa-ban"></i> Atkaz Zararini Yozish
                 </button>
             </div>
 
-            <!-- RAHBAR (JAFAR) SHAXSIY HISOBI (Faqat Rahbar rejimi yoqilganda ko'rinadi) -->
+            <!-- Rahbar Shaxsiy Hisobi (Faqat Rahbar rejimi) -->
             <div id="adminSelfCard" class="hidden bg-gradient-to-r from-slate-900 to-indigo-950 text-white rounded-2xl p-4 shadow-lg border border-indigo-800 space-y-2">
                 <div class="flex items-center justify-between">
                     <div class="flex items-center gap-2">
                         <div class="w-8 h-8 rounded-full bg-amber-400 text-slate-950 flex items-center justify-center font-black text-xs">J</div>
                         <div>
                             <h3 class="font-bold text-sm text-white">Rahbar: Shodiev Jafar</h3>
-                            <p class="text-[10px] text-indigo-200">Shaxsiy hisob-kitob, ovqat va kassa xarajatlari</p>
+                            <p class="text-[10px] text-indigo-200">Shaxsiy hisob-kitob va ovqatlar</p>
                         </div>
                     </div>
                     <span class="px-2 py-0.5 rounded bg-amber-400/20 text-amber-300 text-[10px] font-bold border border-amber-400/30">MAXFIY</span>
@@ -585,56 +491,23 @@
                         <span class="font-black text-amber-300">-120 000 so'm</span>
                     </div>
                 </div>
-                <button onclick="openExpensesModal('rahbar')" class="w-full mt-2 py-1.5 bg-white/10 hover:bg-white/20 text-white rounded-xl text-xs font-semibold transition-all">
-                    Shaxsiy Tarixni Ko'rish
-                </button>
             </div>
 
-            <!-- XODIMLAR OYLIK QOLDIG'I RO'YXATI -->
+            <!-- Xodimlar Oylik Qoldig'i -->
             <div class="bg-white rounded-2xl p-4 shadow-sm border border-slate-200/80 space-y-3">
                 <div class="flex items-center justify-between pb-2 border-b border-slate-100">
                     <h3 class="font-bold text-slate-900 text-xs uppercase tracking-wider">Xodimlar Oylik Qoldig'i</h3>
-                    <span class="text-[11px] text-slate-400">Batafsil ko'rish uchun bosing</span>
+                    <span class="text-[11px] text-slate-400">Tafsilot uchun bosing</span>
                 </div>
 
                 <div class="space-y-1.5 text-xs">
-                    <!-- Pari -->
                     <div onclick="openStaffDetails('Pari', 1397000, 103000)" class="flex items-center justify-between p-2.5 rounded-xl hover:bg-slate-50 cursor-pointer border border-slate-100 transition-all">
                         <div>
                             <div class="font-bold text-slate-800">Pari <span class="text-[10px] text-slate-400 font-normal">(Operator)</span></div>
-                            <div class="text-[10px] text-slate-400">Hisoblandi: 1 500 000 | Mahsulot/Ovqat: -103 000</div>
+                            <div class="text-[10px] text-slate-400">Hisoblandi: 1 500 000 | Ushlandi: -103 000</div>
                         </div>
                         <span class="font-bold text-emerald-600">1 397 000 so'm</span>
                     </div>
-
-                    <!-- Sevar -->
-                    <div onclick="openStaffDetails('Sevar', 1458000, 42000)" class="flex items-center justify-between p-2.5 rounded-xl hover:bg-slate-50 cursor-pointer border border-slate-100 transition-all">
-                        <div>
-                            <div class="font-bold text-slate-800">Sevar <span class="text-[10px] text-slate-400 font-normal">(Operator)</span></div>
-                            <div class="text-[10px] text-slate-400">Hisoblandi: 1 500 000 | Ushlandi: -42 000</div>
-                        </div>
-                        <span class="font-bold text-emerald-600">1 458 000 so'm</span>
-                    </div>
-
-                    <!-- Guli -->
-                    <div onclick="openStaffDetails('Guli', 1943000, 57000)" class="flex items-center justify-between p-2.5 rounded-xl hover:bg-slate-50 cursor-pointer border border-slate-100 transition-all">
-                        <div>
-                            <div class="font-bold text-slate-800">Guli <span class="text-[10px] text-slate-400 font-normal">(Operator)</span></div>
-                            <div class="text-[10px] text-slate-400">Hisoblandi: 2 000 000 | Ushlandi: -57 000</div>
-                        </div>
-                        <span class="font-bold text-emerald-600">1 943 000 so'm</span>
-                    </div>
-
-                    <!-- Madina -->
-                    <div onclick="openStaffDetails('Madina', 1903000, 97000)" class="flex items-center justify-between p-2.5 rounded-xl hover:bg-slate-50 cursor-pointer border border-slate-100 transition-all">
-                        <div>
-                            <div class="font-bold text-slate-800">Madina <span class="text-[10px] text-slate-400 font-normal">(Operator)</span></div>
-                            <div class="text-[10px] text-slate-400">Hisoblandi: 2 000 000 | Ushlandi: -97 000</div>
-                        </div>
-                        <span class="font-bold text-emerald-600">1 903 000 so'm</span>
-                    </div>
-
-                    <!-- Fayoza -->
                     <div onclick="openStaffDetails('Fayoza', 0, 56000)" class="flex items-center justify-between p-2.5 rounded-xl hover:bg-slate-50 cursor-pointer border border-slate-100 transition-all">
                         <div>
                             <div class="font-bold text-slate-800">Fayoza <span class="text-[10px] text-slate-400 font-normal">(Operator)</span></div>
@@ -646,28 +519,16 @@
             </div>
         </section>
 
-        <!-- ================= 6. TAB: REJALAR (Rahbar Topshiriqlari) ================= -->
+        <!-- ================= 6. TAB: REJALAR ================= -->
         <section id="tab-rejalar" class="hidden space-y-4">
             <div class="bg-white rounded-2xl p-4 shadow-sm border border-slate-200/80 space-y-3">
-                <div class="flex items-center justify-between pb-2 border-b border-slate-100">
-                    <h3 class="font-bold text-slate-900 text-xs uppercase tracking-wider">Topshiriqlar va Rejalar</h3>
-                    <span class="text-[11px] text-blue-600 font-bold">Faol: 3 ta</span>
-                </div>
-                <div class="space-y-2 text-xs">
-                    <div class="p-3 bg-blue-50 border border-blue-200 rounded-xl space-y-1">
-                        <div class="flex justify-between font-bold text-blue-950">
-                            <span>Kuryer Shahzod qoplanmasi tekshiruvi</span>
-                            <span class="text-[10px] bg-blue-200 text-blue-800 px-1.5 py-0.5 rounded">Fayoza</span>
-                        </div>
-                        <p class="text-[11px] text-slate-600">Sarpul kassa chiqimlarini Shahzod hisobiga to'g'ri bog'lang!</p>
+                <h3 class="font-bold text-slate-900 text-xs uppercase tracking-wider">Topshiriqlar va Rejalar</h3>
+                <div class="p-3 bg-blue-50 border border-blue-200 rounded-xl space-y-1 text-xs">
+                    <div class="flex justify-between font-bold text-blue-950">
+                        <span>Shahzod qoplanmasini Sarpul kassaga bog'lash</span>
+                        <span class="text-[10px] bg-blue-200 text-blue-800 px-1.5 py-0.5 rounded">Fayoza</span>
                     </div>
-                    <div class="p-3 bg-slate-50 border border-slate-200 rounded-xl space-y-1">
-                        <div class="flex justify-between font-bold text-slate-900">
-                            <span>Vaynkamat kechki smena atkazlarini tekshirish</span>
-                            <span class="text-[10px] bg-slate-200 text-slate-700 px-1.5 py-0.5 rounded">Barchaga</span>
-                        </div>
-                        <p class="text-[11px] text-slate-600">Oshxonadan chiqayotgan mahsulotlarning sifatini nazorat qiling.</p>
-                    </div>
+                    <p class="text-[11px] text-slate-600">20-oktabrdagi 55 000 so'm kassa chiqimi to'liq tekshirildi.</p>
                 </div>
             </div>
         </section>
@@ -676,14 +537,14 @@
         <section id="tab-moliya" class="hidden space-y-4">
             <div class="bg-white rounded-2xl p-4 shadow-sm border border-slate-200/80 text-center py-8 space-y-2">
                 <div class="w-12 h-12 bg-blue-50 text-blue-600 rounded-full flex items-center justify-center mx-auto text-lg"><i class="fa-solid fa-wallet"></i></div>
-                <h3 class="font-bold text-slate-900 text-sm">Moliyaviy Hisobotlar</h3>
-                <p class="text-xs text-slate-500 max-w-xs mx-auto">Filial kassalari, xarajatlar va oylik sof balans hisoboti.</p>
+                <h3 class="font-bold text-slate-900 text-sm">Moliyaviy Balans</h3>
+                <p class="text-xs text-slate-500 max-w-xs mx-auto">Filial kassalari, chiqimlar va sof foyda hisobotlari.</p>
             </div>
         </section>
 
     </main>
 
-    <!-- BOTTOM NAVBAR (7 ta asosiy bo'lim to'liq) -->
+    <!-- BOTTOM NAVBAR -->
     <nav class="fixed bottom-0 left-0 right-0 bg-white border-t border-slate-200 z-40 max-w-md mx-auto px-1 py-2 flex justify-around text-[9px] font-semibold text-slate-500 shadow-lg">
         <button onclick="switchTab('savdo')" id="nav-savdo" class="flex flex-col items-center gap-1 text-blue-600">
             <i class="fa-solid fa-store text-base"></i>
@@ -715,26 +576,27 @@
         </button>
     </nav>
 
-    <!-- KATTA ICHMA-ICH MODAL OYNA (92vh - TO'LIQ TARIX VA TAHRIRLASH) -->
-    <div id="fullDetailModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex items-end sm:items-center justify-center p-0 sm:p-4">
-        <div class="bg-white w-full max-w-md rounded-t-3xl sm:rounded-3xl h-[92vh] flex flex-col overflow-hidden shadow-2xl">
-            <!-- Modal Header -->
-            <div class="p-4 border-b border-slate-100 flex items-center justify-between bg-slate-50">
-                <div class="flex items-center gap-2">
-                    <button id="modalBackBtn" onclick="modalGoBack()" class="hidden w-7 h-7 rounded-full bg-white border border-slate-200 text-slate-700 flex items-center justify-center text-xs shadow-sm">
-                        <i class="fa-solid fa-arrow-left"></i>
-                    </button>
-                    <h3 id="modalMainTitle" class="font-bold text-slate-900 text-sm">Tafsilot</h3>
-                </div>
-                <button onclick="closeModal('fullDetailModal')" class="w-7 h-7 rounded-full bg-white border border-slate-200 text-slate-500 flex items-center justify-center text-xs shadow-sm">
-                    <i class="fa-solid fa-xmark"></i>
+    <!-- ================= 100% TO'LIQ EKRANLI MODAL (FULL SCREEN: 100dvh) ================= -->
+    <div id="fullDetailModal" class="fixed inset-0 z-50 bg-slate-100 hidden flex flex-col w-full h-[100dvh]">
+        <!-- Full Screen Header -->
+        <div class="px-4 py-3.5 border-b border-slate-200 flex items-center justify-between bg-white sticky top-0 z-10 shadow-sm shrink-0">
+            <div class="flex items-center gap-2.5">
+                <button id="modalBackBtn" onclick="modalGoBack()" class="hidden w-8 h-8 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 flex items-center justify-center text-xs transition-all active:scale-95 shadow-sm">
+                    <i class="fa-solid fa-arrow-left"></i>
                 </button>
+                <div>
+                    <h3 id="modalMainTitle" class="font-bold text-slate-900 text-sm leading-tight">Tafsilot</h3>
+                    <p id="modalSubtitle" class="text-[10px] text-slate-400">To'liq kassa tahlili</p>
+                </div>
             </div>
-            
-            <!-- Modal Body (Scrollable) -->
-            <div id="modalMainContent" class="flex-1 overflow-y-auto p-4 space-y-2 text-xs">
-                <!-- Dinamik kontent -->
-            </div>
+            <button onclick="closeModal('fullDetailModal')" class="w-8 h-8 rounded-xl bg-slate-100 hover:bg-rose-50 hover:text-rose-600 text-slate-500 flex items-center justify-center text-xs transition-all active:scale-95 shadow-sm">
+                <i class="fa-solid fa-xmark text-sm"></i>
+            </button>
+        </div>
+        
+        <!-- Full Screen Scrollable Body -->
+        <div id="modalMainContent" class="flex-1 overflow-y-auto p-4 space-y-3 pb-28 text-xs bg-slate-50">
+            <!-- Dinamik kontent shu yerga render qilinadi -->
         </div>
     </div>
 
@@ -756,11 +618,492 @@
         </div>
     </div>
 
-    <!-- JAVASCRIPT VA TO'LIQ MANTIQ -->
+    <!-- ================= JAVASCRIPT VA MANTIQ ================= -->
     <script>
         let isAdmin = false;
+        let selectedDate = "2026-10-24";
+        let viewMode = "daily"; // "daily" yoki "all"
         let modalHistoryStack = [];
 
+        // MA'LUMOTLAR BAZASI (Sanalar kesimida)
+        const database = {
+            branches: {
+                saripul: {
+                    name: "Saripul",
+                    days: {
+                        "2026-10-24": { orders: 410, income: 4850000, dast_sum: 3200000, dast_cnt: 270, sab_sum: 1650000, sab_cnt: 140 },
+                        "2026-10-23": { orders: 390, income: 4510000, dast_sum: 2950000, dast_cnt: 250, sab_sum: 1560000, sab_cnt: 140 },
+                        "2026-10-22": { orders: 246, income: 2945000, dast_sum: 1950000, dast_cnt: 160, sab_sum: 995000, sab_cnt: 86 },
+                        "2026-10-21": { orders: 210, income: 1945000, dast_sum: 1740000, dast_cnt: 140, sab_sum: 205000, sab_cnt: 70 }
+                    }
+                },
+                vaynkamat: {
+                    name: "Vaynkamat",
+                    days: {
+                        "2026-10-24": { orders: 820, income: 5500000, dast_sum: 3700000, dast_cnt: 520, sab_sum: 1800000, sab_cnt: 300 },
+                        "2026-10-23": { orders: 790, income: 5210000, dast_sum: 3500000, dast_cnt: 500, sab_sum: 1710000, sab_cnt: 290 },
+                        "2026-10-22": { orders: 516, income: 3419000, dast_sum: 2300000, dast_cnt: 330, sab_sum: 1119000, sab_cnt: 186 },
+                        "2026-10-21": { orders: 410, income: 2400000, dast_sum: 1650000, dast_cnt: 300, sab_sum: 750000, sab_cnt: 110 }
+                    }
+                }
+            },
+            expenses: [
+                // Saripul chiqimlari
+                { id: 1, date: "2026-10-24", branch: "saripul", category: "kuryer", target: "Shahzod", amount: 45000, desc: "Lokatsiya xatoligi qoplamasi" },
+                { id: 2, date: "2026-10-24", branch: "saripul", category: "atkaz", target: "Zakaz #4201", amount: 65000, desc: "Mijoz rad etdi (Lavash)" },
+                { id: 3, date: "2026-10-24", branch: "saripul", category: "ovqat", target: "Pari", amount: 35000, desc: "1x Lavash, Kola" },
+                { id: 4, date: "2026-10-24", branch: "saripul", category: "bozorlik", target: "Ta'minotchi Rustam", amount: 280000, desc: "Go'sht va sabzavotlar" },
+
+                { id: 5, date: "2026-10-20", branch: "saripul", category: "kuryer", target: "Shahzod", amount: 55000, desc: "2 kunlik qoplama to'lovi (Naqd kassa)" },
+                { id: 6, date: "2026-10-21", branch: "saripul", category: "kuryer", target: "Fazliddin", amount: 60000, desc: "Yoqilg'i qoplamasi" },
+                { id: 7, date: "2026-10-21", branch: "saripul", category: "atkaz", target: "Zakaz #4102", amount: 75000, desc: "Mijoz telefon olmadi" },
+                { id: 8, date: "2026-10-21", branch: "saripul", category: "ovqat", target: "Fayoza", amount: 45000, desc: "Dabl Lavash" },
+                { id: 9, date: "2026-10-21", branch: "saripul", category: "bozorlik", target: "Bozor xaridi", amount: 320000, desc: "Oshxona go'shti" },
+
+                // Vaynkamat chiqimlari (1 230 000 so'm yoyilmasi)
+                { id: 10, date: "2026-10-24", branch: "vaynkamat", category: "kuryer", target: "Shahzod", amount: 120000, desc: "Masofa bonusi" },
+                { id: 11, date: "2026-10-24", branch: "vaynkamat", category: "kuryer", target: "Fazliddin", amount: 180000, desc: "Yoqilg'i va kompensatsiya" },
+                { id: 12, date: "2026-10-24", branch: "vaynkamat", category: "kuryer", target: "Zoir", amount: 140000, desc: "Uzoq masofa buyurtmalari" },
+                { id: 13, date: "2026-10-24", branch: "vaynkamat", category: "atkaz", target: "Zakaz #4145", amount: 130000, desc: "Kuryer kechikdi, oshpaz xatosi" },
+                { id: 14, date: "2026-10-24", branch: "vaynkamat", category: "atkaz", target: "Zakaz #4188", amount: 120000, desc: "Mijoz bekor qildi" },
+                { id: 15, date: "2026-10-24", branch: "vaynkamat", category: "ovqat", target: "Murod", amount: 80000, desc: "Razdacha tushlik va xoddok" },
+                { id: 16, date: "2026-10-24", branch: "vaynkamat", category: "ovqat", target: "Xushnud", amount: 100000, desc: "Kechki ovqat va kola" },
+                { id: 17, date: "2026-10-24", branch: "vaynkamat", category: "bozorlik", target: "Idish-tovoq & paketlar", amount: 360000, desc: "Xo'jalik mollari va qadoqlar" },
+
+                // Vaynkamat boshqa sanalar (masalan 21-okt)
+                { id: 18, date: "2026-10-21", branch: "vaynkamat", category: "kuryer", target: "Zoir", amount: 90000, desc: "Lokatsiya to'lovi" },
+                { id: 19, date: "2026-10-21", branch: "vaynkamat", category: "atkaz", target: "Zakaz #3991", amount: 48000, desc: "Mijoz rad qildi" },
+                { id: 20, date: "2026-10-21", branch: "vaynkamat", category: "ovqat", target: "Murod", amount: 35000, desc: "Tushlik" },
+                { id: 21, date: "2026-10-21", branch: "vaynkamat", category: "bozorlik", target: "Ta'minot", amount: 150000, desc: "Pishloq va souslar" }
+            ]
+        };
+
+        // SANANI O'ZGARTIRISH
+        function onDateChanged(newDate) {
+            selectedDate = newDate;
+            viewMode = "daily";
+            updateUI();
+        }
+
+        function setViewMode(mode) {
+            viewMode = mode;
+            updateUI();
+        }
+
+        // BARCHA KO'RSATKICHLARNI SANAGA MOSLAB HISOB-KITOB QILISH
+        function updateUI() {
+            const btnDaily = document.getElementById('btnModeDaily');
+            const btnAll = document.getElementById('btnModeAll');
+            const labelSelectedDate = document.getElementById('labelSelectedDate');
+            const activeFilterBadge = document.getElementById('activeFilterBadge');
+            const profitPeriodBadge = document.getElementById('profitPeriodBadge');
+
+            if (viewMode === 'daily') {
+                btnDaily.className = "flex-1 py-1.5 rounded-lg bg-white text-blue-700 shadow-sm transition-all text-center flex items-center justify-center gap-1.5 font-bold";
+                btnAll.className = "flex-1 py-1.5 rounded-lg text-slate-600 transition-all text-center flex items-center justify-center gap-1.5";
+                const d = new Date(selectedDate);
+                const dayText = `${d.getDate()}-Oktabr (Kunlik)`;
+                labelSelectedDate.textContent = dayText;
+                activeFilterBadge.textContent = `${d.getDate()}-Oktabr`;
+                profitPeriodBadge.textContent = "Kunlik";
+            } else {
+                btnAll.className = "flex-1 py-1.5 rounded-lg bg-white text-blue-700 shadow-sm transition-all text-center flex items-center justify-center gap-1.5 font-bold";
+                btnDaily.className = "flex-1 py-1.5 rounded-lg text-slate-600 transition-all text-center flex items-center justify-center gap-1.5";
+                activeFilterBadge.textContent = "🌐 Barcha davr";
+                profitPeriodBadge.textContent = "Barcha davr";
+            }
+
+            // Filiallar bo'yicha hisoblash
+            const sarpStats = calculateBranchStats('saripul');
+            const vaynStats = calculateBranchStats('vaynkamat');
+
+            document.getElementById('statSaripulOrders').textContent = `${sarpStats.orders.toLocaleString()} zakaz`;
+            document.getElementById('statSaripulSum').textContent = `${sarpStats.income.toLocaleString()} so'm`;
+            document.getElementById('statSaripulExpense').textContent = `Chiqim: -${sarpStats.expense.toLocaleString()}`;
+
+            document.getElementById('statVaynOrders').textContent = `${vaynStats.orders.toLocaleString()} zakaz`;
+            document.getElementById('statVaynSum').textContent = `${vaynStats.income.toLocaleString()} so'm`;
+            document.getElementById('statVaynExpense').textContent = `Chiqim: -${vaynStats.expense.toLocaleString()}`;
+
+            // Umumiy chiqimlar bloklari
+            const courierExp = calculateTotalExpenseByCategory('kuryer');
+            const atkazExp = calculateTotalExpenseByCategory('atkaz');
+            const foodExp = calculateTotalExpenseByCategory('ovqat');
+
+            document.getElementById('statCourierExpenses').textContent = `-${courierExp.toLocaleString()} so'm`;
+            document.getElementById('statAtkazExpenses').textContent = `-${atkazExp.toLocaleString()} so'm`;
+            document.getElementById('statFoodExpenses').textContent = `-${foodExp.toLocaleString()} so'm`;
+
+            // Sof foyda hisobi (13% ChopaChop ulushi)
+            const totalIncome = sarpStats.income + vaynStats.income;
+            const netProfit = Math.round(totalIncome * 0.13) - (courierExp + atkazExp + foodExp);
+            document.getElementById('statNetProfit').innerHTML = `+${Math.max(netProfit, 0).toLocaleString()} <span class="text-sm font-normal opacity-90">so'm</span>`;
+        }
+
+        function calculateBranchStats(branchKey) {
+            const b = database.branches[branchKey];
+            let orders = 0, income = 0;
+
+            if (viewMode === 'daily') {
+                if (b.days[selectedDate]) {
+                    orders = b.days[selectedDate].orders;
+                    income = b.days[selectedDate].income;
+                }
+            } else {
+                for (let d in b.days) {
+                    orders += b.days[d].orders;
+                    income += b.days[d].income;
+                }
+            }
+
+            // Filialning chiqimlarini hisoblash
+            const expList = database.expenses.filter(x => x.branch === branchKey && (viewMode === 'all' || x.date === selectedDate));
+            const expense = expList.reduce((acc, curr) => acc + curr.amount, 0);
+
+            return { orders, income, expense, cash: income - expense };
+        }
+
+        function calculateTotalExpenseByCategory(catKey) {
+            const list = database.expenses.filter(x => x.category === catKey && (viewMode === 'all' || x.date === selectedDate));
+            return list.reduce((acc, curr) => acc + curr.amount, 0);
+        }
+
+        // ================= 3 BOSQICHLI IYERARXIYA MODALI =================
+
+        // 1-BOSQICH: Filial Kassa Kitobi
+        function openBranchModal(branchKey) {
+            const modal = document.getElementById('fullDetailModal');
+            const title = document.getElementById('modalMainTitle');
+            const sub = document.getElementById('modalSubtitle');
+            const content = document.getElementById('modalMainContent');
+            const backBtn = document.getElementById('modalBackBtn');
+            backBtn.classList.add('hidden');
+            modalHistoryStack = [];
+
+            const bName = branchKey === 'saripul' ? 'Saripul' : 'Vaynkamat';
+            const stats = calculateBranchStats(branchKey);
+
+            title.textContent = `🍗 ${bName} Filial Kassa Kitobi`;
+            sub.textContent = viewMode === 'daily' ? `${selectedDate} holati` : 'Barcha davr jami';
+
+            // Chiqimlar yoyilmasi (2-bosqich summalari)
+            const kurExp = getBranchCategorySum(branchKey, 'kuryer');
+            const atkExp = getBranchCategorySum(branchKey, 'atkaz');
+            const ovqExp = getBranchCategorySum(branchKey, 'ovqat');
+            const bozExp = getBranchCategorySum(branchKey, 'bozorlik');
+
+            content.innerHTML = `
+                <!-- Kassa Kartasi -->
+                <div class="bg-gradient-to-br from-slate-900 to-indigo-950 text-white rounded-2xl p-4 shadow-md space-y-3">
+                    <div class="flex justify-between items-center border-b border-indigo-800/80 pb-2">
+                        <span class="text-xs text-indigo-200 font-semibold uppercase">Kassa Sof Qoldig'i</span>
+                        <span class="bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 text-[10px] font-bold px-2 py-0.5 rounded-full">Naqd</span>
+                    </div>
+                    <div>
+                        <p class="text-2xl font-black text-white">+${stats.cash.toLocaleString()} <span class="text-xs font-normal text-indigo-300">so'm</span></p>
+                        <p class="text-[10px] text-indigo-300 mt-0.5">${stats.orders.toLocaleString()} ta buyurtma asosida</p>
+                    </div>
+                    <div class="grid grid-cols-2 gap-2 pt-2 border-t border-indigo-800/60 text-xs">
+                        <div>
+                            <span class="text-[10px] text-slate-300 block">Jami Tushum (Kirim):</span>
+                            <span class="font-bold text-emerald-400">+${stats.income.toLocaleString()} so'm</span>
+                        </div>
+                        <div>
+                            <span class="text-[10px] text-slate-300 block">Jami Chiqimlar:</span>
+                            <span class="font-bold text-rose-400">-${stats.expense.toLocaleString()} so'm</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 2-BOSQICHGA O'TISH: 4 TA KATEGORIYA (Har biri bosiladi) -->
+                <div class="bg-white rounded-2xl p-4 border border-slate-200 shadow-sm space-y-3">
+                    <div class="flex justify-between items-center pb-2 border-b border-slate-100">
+                        <h4 class="font-bold text-slate-900 text-xs uppercase tracking-wider">Chiqimlar Yoyilmasi (${stats.expense.toLocaleString()} so'm)</h4>
+                        <span class="text-[10px] text-slate-400 font-medium">Bosing ➔</span>
+                    </div>
+
+                    <div class="space-y-2">
+                        <!-- 1. Kuryerlar -->
+                        <div onclick="openDrilldownLevel3('${branchKey}', 'kuryer')" class="p-3 bg-slate-50 border border-slate-200 hover:border-blue-400 hover:bg-blue-50/50 rounded-xl flex items-center justify-between cursor-pointer transition-all shadow-sm">
+                            <div class="flex items-center gap-2.5">
+                                <span class="w-8 h-8 rounded-lg bg-blue-100 text-blue-700 flex items-center justify-center text-xs"><i class="fa-solid fa-motorcycle"></i></span>
+                                <div>
+                                    <span class="font-bold text-slate-900 block">Kuryerlarga to'langan pullar</span>
+                                    <span class="text-[10px] text-slate-500">Qoplanma, yoqilg'i va kompensatsiya</span>
+                                </div>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <span class="font-black text-rose-600 text-xs">-${kurExp.toLocaleString()} so'm</span>
+                                <i class="fa-solid fa-chevron-right text-slate-400 text-[10px]"></i>
+                            </div>
+                        </div>
+
+                        <!-- 2. Atkaz tovarlar -->
+                        <div onclick="openDrilldownLevel3('${branchKey}', 'atkaz')" class="p-3 bg-slate-50 border border-slate-200 hover:border-rose-400 hover:bg-rose-50/50 rounded-xl flex items-center justify-between cursor-pointer transition-all shadow-sm">
+                            <div class="flex items-center gap-2.5">
+                                <span class="w-8 h-8 rounded-lg bg-rose-100 text-rose-700 flex items-center justify-center text-xs"><i class="fa-solid fa-ban"></i></span>
+                                <div>
+                                    <span class="font-bold text-slate-900 block">Atkaz tovarlar zarari</span>
+                                    <span class="text-[10px] text-slate-500">Mijoz olmagan yoki bekor qilingan</span>
+                                </div>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <span class="font-black text-rose-600 text-xs">-${atkExp.toLocaleString()} so'm</span>
+                                <i class="fa-solid fa-chevron-right text-slate-400 text-[10px]"></i>
+                            </div>
+                        </div>
+
+                        <!-- 3. Xodimlar ovqati -->
+                        <div onclick="openDrilldownLevel3('${branchKey}', 'ovqat')" class="p-3 bg-slate-50 border border-slate-200 hover:border-amber-400 hover:bg-amber-50/50 rounded-xl flex items-center justify-between cursor-pointer transition-all shadow-sm">
+                            <div class="flex items-center gap-2.5">
+                                <span class="w-8 h-8 rounded-lg bg-amber-100 text-amber-700 flex items-center justify-center text-xs"><i class="fa-solid fa-burger"></i></span>
+                                <div>
+                                    <span class="font-bold text-slate-900 block">Xodimlar yegan ovqat / mahsulot</span>
+                                    <span class="text-[10px] text-slate-500">Razdacha, operatorlar va kassa avansi</span>
+                                </div>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <span class="font-black text-rose-600 text-xs">-${ovqExp.toLocaleString()} so'm</span>
+                                <i class="fa-solid fa-chevron-right text-slate-400 text-[10px]"></i>
+                            </div>
+                        </div>
+
+                        <!-- 4. Oshxona bozorligi -->
+                        <div onclick="openDrilldownLevel3('${branchKey}', 'bozorlik')" class="p-3 bg-slate-50 border border-slate-200 hover:border-emerald-400 hover:bg-emerald-50/50 rounded-xl flex items-center justify-between cursor-pointer transition-all shadow-sm">
+                            <div class="flex items-center gap-2.5">
+                                <span class="w-8 h-8 rounded-lg bg-emerald-100 text-emerald-700 flex items-center justify-center text-xs"><i class="fa-solid fa-cart-shopping"></i></span>
+                                <div>
+                                    <span class="font-bold text-slate-900 block">Oshxona bozorligi & Xo'jalik</span>
+                                    <span class="text-[10px] text-slate-500">Go'sht, sabzavot va mayda xaridlar</span>
+                                </div>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <span class="font-black text-rose-600 text-xs">-${bozExp.toLocaleString()} so'm</span>
+                                <i class="fa-solid fa-chevron-right text-slate-400 text-[10px]"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            modal.classList.remove('hidden');
+        }
+
+        function getBranchCategorySum(branchKey, catKey) {
+            const list = database.expenses.filter(x => x.branch === branchKey && x.category === catKey && (viewMode === 'all' || x.date === selectedDate));
+            return list.reduce((acc, curr) => acc + curr.amount, 0);
+        }
+
+        // 3-BOSQICH: Eng Chuqur Detal (Har bir chek, shaxs, sana, tahrirlash va o'chirish)
+        function openDrilldownLevel3(branchKey, catKey) {
+            const title = document.getElementById('modalMainTitle');
+            const sub = document.getElementById('modalSubtitle');
+            const content = document.getElementById('modalMainContent');
+            const backBtn = document.getElementById('modalBackBtn');
+
+            // Stack ga saqlab olamiz
+            modalHistoryStack.push({
+                title: title.textContent,
+                sub: sub.textContent,
+                content: content.innerHTML
+            });
+            backBtn.classList.remove('hidden');
+
+            const catTitles = {
+                kuryer: "🏍️ Kuryerlarga To'langan Pullar",
+                atkaz: "🚫 Atkaz Tovarlar Tafsiloti",
+                ovqat: "🍔 Xodimlar Ovqati va Avanslar",
+                bozorlik: "🥩 Bozorlik va Xo'jalik Haridlari"
+            };
+
+            const bName = branchKey === 'saripul' ? 'Saripul' : 'Vaynkamat';
+            title.textContent = catTitles[catKey];
+            sub.textContent = `${bName} filiali bo'yicha cheklar ro'yxati`;
+
+            const items = database.expenses.filter(x => x.branch === branchKey && x.category === catKey && (viewMode === 'all' || x.date === selectedDate));
+
+            if (items.length === 0) {
+                content.innerHTML = `
+                    <div class="p-8 text-center text-slate-400 space-y-2 bg-white rounded-2xl border border-slate-200">
+                        <i class="fa-regular fa-folder-open text-3xl"></i>
+                        <p class="font-bold text-slate-600 text-sm">Ushbu kunda chiqim bo'lmagan</p>
+                        <p class="text-[11px]">Boshqa sanani tanlang yoki "Jami" rejimiga o'ting.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            let html = '<div class="space-y-2">';
+            items.forEach(item => {
+                html += `
+                    <div class="p-3 bg-white border border-slate-200 rounded-xl flex items-center justify-between shadow-sm">
+                        <div class="space-y-0.5">
+                            <div class="flex items-center gap-1.5 font-bold text-slate-900">
+                                <span>${item.target}</span>
+                                <span class="text-[10px] bg-slate-100 text-slate-600 px-1.5 py-0.2 rounded font-normal">${item.date}</span>
+                            </div>
+                            <p class="text-[11px] text-slate-500">${item.desc}</p>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <span class="font-black text-rose-600 text-xs">-${item.amount.toLocaleString()} so'm</span>
+                            <div class="flex gap-1">
+                                <button onclick="editExpenseRecord(${item.id})" class="w-6 h-6 rounded bg-blue-50 text-blue-600 flex items-center justify-center text-[10px]"><i class="fa-solid fa-pen"></i></button>
+                                <button onclick="deleteExpenseRecord(${item.id}, '${branchKey}', '${catKey}')" class="w-6 h-6 rounded bg-rose-50 text-rose-600 flex items-center justify-center text-[10px]"><i class="fa-solid fa-trash"></i></button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+            html += '</div>';
+
+            content.innerHTML = html;
+        }
+
+        // 3-BOSQICHDAN 2-BOSQICHGA QAYTISH
+        function modalGoBack() {
+            if (modalHistoryStack.length > 0) {
+                const prev = modalHistoryStack.pop();
+                document.getElementById('modalMainTitle').textContent = prev.title;
+                document.getElementById('modalSubtitle').textContent = prev.sub;
+                document.getElementById('modalMainContent').innerHTML = prev.content;
+                if (modalHistoryStack.length === 0) {
+                    document.getElementById('modalBackBtn').classList.add('hidden');
+                }
+            }
+        }
+
+        // ASOSIY SAHIFADAGI CHIQIM BLOKLARINI BOSGANDA HAM DETAL OCHILADI
+        function openDirectExpenseCategory(catKey) {
+            const modal = document.getElementById('fullDetailModal');
+            const title = document.getElementById('modalMainTitle');
+            const sub = document.getElementById('modalSubtitle');
+            const content = document.getElementById('modalMainContent');
+            document.getElementById('modalBackBtn').classList.add('hidden');
+            modalHistoryStack = [];
+
+            const catTitles = {
+                kuryer: "🏍️ Kuryer Qoplanmalari (Umumiy)",
+                atkaz: "🚫 Atkaz Tovar Zararlari (Umumiy)",
+                ovqat: "🍔 Xodimlar Ovqati (Umumiy)"
+            };
+
+            title.textContent = catTitles[catKey];
+            sub.textContent = viewMode === 'daily' ? `${selectedDate} holati` : 'Barcha davr jami';
+
+            const items = database.expenses.filter(x => x.category === catKey && (viewMode === 'all' || x.date === selectedDate));
+
+            if (items.length === 0) {
+                content.innerHTML = `<div class="p-8 text-center text-slate-400 bg-white rounded-2xl">Chiqim topilmadi.</div>`;
+            } else {
+                let html = '<div class="space-y-2">';
+                items.forEach(item => {
+                    const bBadge = item.branch === 'saripul' ? 'Sarpul' : 'Vaynkamat';
+                    html += `
+                        <div class="p-3 bg-white border border-slate-200 rounded-xl flex items-center justify-between shadow-sm">
+                            <div>
+                                <div class="flex items-center gap-1.5 font-bold text-slate-900">
+                                    <span>${item.target}</span>
+                                    <span class="text-[10px] bg-indigo-50 text-indigo-700 px-1.5 py-0.2 rounded font-semibold">${bBadge}</span>
+                                </div>
+                                <span class="text-[11px] text-slate-500">${item.desc} (${item.date})</span>
+                            </div>
+                            <span class="font-black text-rose-600 text-xs">-${item.amount.toLocaleString()} so'm</span>
+                        </div>
+                    `;
+                });
+                html += '</div>';
+                content.innerHTML = html;
+            }
+
+            modal.classList.remove('hidden');
+        }
+
+        // KURYER DETALI
+        function openCourierDrilldown(courierName) {
+            const modal = document.getElementById('fullDetailModal');
+            const title = document.getElementById('modalMainTitle');
+            const sub = document.getElementById('modalSubtitle');
+            const content = document.getElementById('modalMainContent');
+            document.getElementById('modalBackBtn').classList.add('hidden');
+            modalHistoryStack = [];
+
+            title.textContent = `Kuryer: ${courierName}`;
+            sub.textContent = "Hisob va qoplanmalar";
+
+            const items = database.expenses.filter(x => x.category === 'kuryer' && x.target === courierName);
+
+            let html = `
+                <div class="p-4 bg-white border border-slate-200 rounded-2xl shadow-sm space-y-2 mb-3">
+                    <p class="font-bold text-slate-900 text-sm">Hisoblangan haq: 700 000 so'm</p>
+                    <p class="text-xs text-slate-500">Filial kassalaridan to'langan qoplanmalar:</p>
+                </div>
+                <div class="space-y-2">
+            `;
+
+            items.forEach(it => {
+                html += `
+                    <div class="p-3 bg-white border border-slate-200 rounded-xl flex justify-between items-center shadow-sm">
+                        <div>
+                            <span class="font-bold text-slate-800 block">${it.date} (${it.branch.toUpperCase()} kassa)</span>
+                            <span class="text-[11px] text-slate-500">${it.desc}</span>
+                        </div>
+                        <span class="font-bold text-rose-600">-${it.amount.toLocaleString()} so'm</span>
+                    </div>
+                `;
+            });
+            html += '</div>';
+
+            content.innerHTML = html;
+            modal.classList.remove('hidden');
+        }
+
+        function openStaffDetails(name, bal, ded) {
+            const modal = document.getElementById('fullDetailModal');
+            document.getElementById('modalMainTitle').textContent = `Xodim: ${name}`;
+            document.getElementById('modalSubtitle').textContent = "Oylik balansi";
+            document.getElementById('modalBackBtn').classList.add('hidden');
+            modalHistoryStack = [];
+
+            document.getElementById('modalMainContent').innerHTML = `
+                <div class="p-4 bg-white border border-slate-200 rounded-2xl space-y-3 shadow-sm">
+                    <div class="flex justify-between items-center pb-2 border-b border-slate-100">
+                        <span class="font-bold text-slate-800">Qo'lga tegishi kerak:</span>
+                        <span class="font-black text-emerald-600 text-sm">${bal.toLocaleString()} so'm</span>
+                    </div>
+                    <div class="flex justify-between text-slate-500 pt-1">
+                        <span>Olingan mahsulot/avans:</span>
+                        <span class="font-bold text-rose-600">-${ded.toLocaleString()} so'm</span>
+                    </div>
+                </div>
+            `;
+            modal.classList.remove('hidden');
+        }
+
+        // ================= TAHRIRLASH VA O'CHIRISH =================
+        function editExpenseRecord(id) {
+            const item = database.expenses.find(x => x.id === id);
+            if (!item) return;
+            const newSum = prompt(`${item.target} uchun yangi summani kiriting:`, item.amount);
+            if (newSum && !isNaN(newSum)) {
+                item.amount = parseInt(newSum);
+                alert("Summa yangilandi!");
+                updateUI();
+                modalGoBack();
+            }
+        }
+
+        function deleteExpenseRecord(id, branchKey, catKey) {
+            if (confirm("Ushbu chiqim yozuvini o'chirmoqchimisiz?")) {
+                const idx = database.expenses.findIndex(x => x.id === id);
+                if (idx !== -1) {
+                    database.expenses.splice(idx, 1);
+                    alert("Yozuv o'chirildi!");
+                    updateUI();
+                    openDrilldownLevel3(branchKey, catKey);
+                }
+            }
+        }
+
+        // ================= XAVFSIZLIK VA BOSHQARUV =================
         function switchTab(tabName) {
             document.querySelectorAll('main > section').forEach(sec => sec.classList.add('hidden'));
             const targetSection = document.getElementById('tab-' + tabName);
@@ -774,20 +1117,6 @@
             if (activeNav) {
                 activeNav.classList.add('text-blue-600');
                 activeNav.classList.remove('text-slate-500');
-            }
-        }
-
-        function switchRazdachaSubTab(type) {
-            if (type === 'hours') {
-                document.getElementById('razdachaHoursSection').classList.remove('hidden');
-                document.getElementById('razdachaMealsSection').classList.add('hidden');
-                document.getElementById('razdachaSubTab1').classList.add('bg-white', 'text-slate-900', 'shadow-sm');
-                document.getElementById('razdachaSubTab2').classList.remove('bg-white', 'text-slate-900', 'shadow-sm');
-            } else {
-                document.getElementById('razdachaHoursSection').classList.add('hidden');
-                document.getElementById('razdachaMealsSection').classList.remove('hidden');
-                document.getElementById('razdachaSubTab2').classList.add('bg-white', 'text-slate-900', 'shadow-sm');
-                document.getElementById('razdachaSubTab1').classList.remove('bg-white', 'text-slate-900', 'shadow-sm');
             }
         }
 
@@ -848,285 +1177,76 @@
             document.getElementById(id).classList.add('hidden');
         }
 
-        // ================= KURYER TO'LIQ TARIXI VA -55 MING KASSA BOG'LANISHI =================
-        function openCourierFullDetails(courierName) {
-            const modal = document.getElementById('fullDetailModal');
-            const title = document.getElementById('modalMainTitle');
-            const content = document.getElementById('modalMainContent');
-            const backBtn = document.getElementById('modalBackBtn');
-            backBtn.classList.add('hidden');
-            modalHistoryStack = [];
-
-            title.textContent = `Kuryer tafsiloti - ${courierName}`;
-            
-            if (courierName === 'Shahzod') {
-                content.innerHTML = `
-                    <div class="space-y-2">
-                        <div class="p-2.5 bg-slate-50 border border-slate-200 rounded-xl flex justify-between items-center">
-                            <div>
-                                <span class="font-bold text-slate-800 block">📅 19.10.2026 (Chopachop: Qazi)</span>
-                                <span class="text-slate-500 text-[11px]">Lakatsiya xato kiritilgan</span>
-                            </div>
-                            <span class="font-bold text-blue-600">+20 000 so'm</span>
-                        </div>
-                        <div class="p-2.5 bg-slate-50 border border-slate-200 rounded-xl flex justify-between items-center">
-                            <div>
-                                <span class="font-bold text-slate-800 block">📅 19.10.2026 (Chopachop: jazira)</span>
-                                <span class="text-slate-500 text-[11px]">Lakatsiya notug'ri kiritilgan</span>
-                            </div>
-                            <span class="font-bold text-blue-600">+10 000 so'm</span>
-                        </div>
-                        <!-- Sarpul kassa -55 ming qoplama to'lovi -->
-                        <div onclick="openNestedDetail('sarpul_shahzod_55')" class="p-3 bg-amber-50 border-2 border-amber-300 rounded-xl flex justify-between items-center cursor-pointer shadow-sm hover:bg-amber-100 transition-all">
-                            <div>
-                                <span class="font-black text-amber-950 flex items-center gap-1.5">
-                                    <i class="fa-solid fa-money-bill-wave text-amber-600"></i> 20.10.2026 (Naqd - Sarpul kassa)
-                                </span>
-                                <span class="text-[11px] text-amber-800 block">2 kunlik qoplama puli berildi (Bosing ➔)</span>
-                            </div>
-                            <span class="font-black text-rose-600 text-sm">-55 000 so'm</span>
-                        </div>
-                        <div class="p-2.5 bg-slate-50 border border-slate-200 rounded-xl flex justify-between items-center">
-                            <div>
-                                <span class="font-bold text-slate-800 block">📅 21.10.2026 (Chopachop: Qazi)</span>
-                                <span class="text-slate-500 text-[11px]">Lakatsiya xato</span>
-                            </div>
-                            <span class="font-bold text-blue-600">+20 000 so'm</span>
-                        </div>
-                    </div>
-                `;
+        function switchRazdachaSubTab(type) {
+            if (type === 'hours') {
+                document.getElementById('razdachaHoursSection').classList.remove('hidden');
+                document.getElementById('razdachaMealsSection').classList.add('hidden');
+                document.getElementById('razdachaSubTab1').classList.add('bg-white', 'text-slate-900', 'shadow-sm');
+                document.getElementById('razdachaSubTab2').classList.remove('bg-white', 'text-slate-900', 'shadow-sm');
             } else {
-                content.innerHTML = `
-                    <div class="p-4 text-center text-slate-500 space-y-2">
-                        <i class="fa-solid fa-motorcycle text-3xl text-slate-300"></i>
-                        <p class="font-bold text-slate-700">${courierName} hisobi faol</p>
-                        <p class="text-[11px]">Barcha smenalar va buyurtmalar yetkazilishi me'yorda.</p>
-                    </div>
-                `;
-            }
-            modal.classList.remove('hidden');
-        }
-
-        // ICHMA-ICH OYNA
-        function openNestedDetail(type) {
-            const title = document.getElementById('modalMainTitle');
-            const content = document.getElementById('modalMainContent');
-            const backBtn = document.getElementById('modalBackBtn');
-            modalHistoryStack.push({ title: title.textContent, content: content.innerHTML });
-            backBtn.classList.remove('hidden');
-
-            if (type === 'sarpul_shahzod_55') {
-                title.textContent = "Kassa Bog'liqligi: Shahzod (-55 000)";
-                content.innerHTML = `
-                    <div class="p-4 bg-slate-50 border border-slate-200 rounded-2xl space-y-3">
-                        <div class="flex items-center gap-2 text-rose-600 font-bold text-sm">
-                            <i class="fa-solid fa-arrow-right-arrow-left"></i>
-                            <span>Sarpul Kassa Chiqimi ➔ Kuryer Shahzod</span>
-                        </div>
-                        <p class="text-xs text-slate-600 leading-relaxed">
-                            Bu summa <b>20.10.2026</b> sanasida Sarpul filial kassasidan Shahzodga 2 kunlik lokatsiya xatoliklari va yoqilg'i qoplamasi sifatida naqd to'lab berilgan.
-                        </p>
-                        <div class="p-3 bg-white border border-slate-200 rounded-xl space-y-1">
-                            <div class="flex justify-between">
-                                <span class="text-slate-500">Kassa holati:</span>
-                                <span class="font-bold text-rose-600">-55 000 so'm (Chiqim)</span>
-                            </div>
-                            <div class="flex justify-between">
-                                <span class="text-slate-500">Shahzod qarzi:</span>
-                                <span class="font-bold text-emerald-600">Yopildi (To'landi)</span>
-                            </div>
-                        </div>
-                    </div>
-                `;
+                document.getElementById('razdachaHoursSection').classList.add('hidden');
+                document.getElementById('razdachaMealsSection').classList.remove('hidden');
+                document.getElementById('razdachaSubTab2').classList.add('bg-white', 'text-slate-900', 'shadow-sm');
+                document.getElementById('razdachaSubTab1').classList.remove('bg-white', 'text-slate-900', 'shadow-sm');
             }
         }
 
-        function modalGoBack() {
-            if (modalHistoryStack.length > 0) {
-                const prev = modalHistoryStack.pop();
-                document.getElementById('modalMainTitle').textContent = prev.title;
-                document.getElementById('modalMainContent').innerHTML = prev.content;
-                if (modalHistoryStack.length === 0) {
-                    document.getElementById('modalBackBtn').classList.add('hidden');
-                }
-            }
-        }
-
-        // CHIQIMLAR VA ZIYONLAR TAHLILI (Tahrirlash va O'chirish bilan)
-        function openExpensesModal(type) {
-            const modal = document.getElementById('fullDetailModal');
-            const title = document.getElementById('modalMainTitle');
-            const content = document.getElementById('modalMainContent');
-            document.getElementById('modalBackBtn').classList.add('hidden');
-            modalHistoryStack = [];
-
-            if (type === 'qoplama') {
-                title.textContent = "Kuryer Qoplanmalari (-816 000 so'm)";
-                content.innerHTML = `
-                    <div class="space-y-2">
-                        <div class="p-3 bg-slate-50 border border-slate-200 rounded-xl flex items-center justify-between">
-                            <div>
-                                <span class="font-bold text-slate-900 block">Shahzod (-55 000 so'm)</span>
-                                <span class="text-[11px] text-slate-500">Sarpul kassadan berilgan qoplama</span>
-                            </div>
-                            <div class="flex gap-1.5">
-                                <button onclick="editGenericRecord('Shahzod qoplama')" class="w-7 h-7 rounded bg-blue-100 text-blue-700 flex items-center justify-center text-xs"><i class="fa-solid fa-pen"></i></button>
-                                <button onclick="deleteGenericRecord('Shahzod qoplama')" class="w-7 h-7 rounded bg-rose-100 text-rose-700 flex items-center justify-center text-xs"><i class="fa-solid fa-trash"></i></button>
-                            </div>
-                        </div>
-                        <div class="p-3 bg-slate-50 border border-slate-200 rounded-xl flex items-center justify-between">
-                            <div>
-                                <span class="font-bold text-slate-900 block">Fazliddin (-180 000 so'm)</span>
-                                <span class="text-[11px] text-slate-500">Yoqilg'i va 3 kunlik lokatsiya qoplamasi</span>
-                            </div>
-                            <div class="flex gap-1.5">
-                                <button onclick="editGenericRecord('Fazliddin qoplama')" class="w-7 h-7 rounded bg-blue-100 text-blue-700 flex items-center justify-center text-xs"><i class="fa-solid fa-pen"></i></button>
-                                <button onclick="deleteGenericRecord('Fazliddin qoplama')" class="w-7 h-7 rounded bg-rose-100 text-rose-700 flex items-center justify-center text-xs"><i class="fa-solid fa-trash"></i></button>
-                            </div>
-                        </div>
-                    </div>
-                `;
-            } else if (type === 'atkaz') {
-                title.textContent = "Atkaz Tovar Zararlari (-345 000 so'm)";
-                content.innerHTML = `
-                    <div class="space-y-2">
-                        <div class="p-3 bg-rose-50 border border-rose-100 rounded-xl flex items-center justify-between">
-                            <div>
-                                <span class="font-bold text-rose-950 block">Zakaz #4102: 2x Lavash, Kola</span>
-                                <span class="text-[11px] text-slate-500">Sababi: Mijoz olmadi | Kuryer: Abbos</span>
-                            </div>
-                            <div class="flex items-center gap-2">
-                                <span class="font-black text-rose-600">-75 000 so'm</span>
-                                <button onclick="editGenericRecord('Atkaz #4102')" class="w-7 h-7 rounded bg-blue-100 text-blue-700 flex items-center justify-center text-xs"><i class="fa-solid fa-pen"></i></button>
-                            </div>
-                        </div>
-                    </div>
-                `;
-            } else if (type === 'ovqat') {
-                title.textContent = "Xodimlar Ovqati (-522 000 so'm)";
-                content.innerHTML = `
-                    <div class="space-y-2">
-                        <div class="p-3 bg-slate-50 border border-slate-200 rounded-xl flex items-center justify-between">
-                            <div>
-                                <span class="font-bold text-slate-900 block">Razdacha (Xushnud & Murod)</span>
-                                <span class="text-[11px] text-slate-500">Filial: Vaynkamat</span>
-                            </div>
-                            <span class="font-bold text-rose-600">-120 000 so'm</span>
-                        </div>
-                        <div class="p-3 bg-slate-50 border border-slate-200 rounded-xl flex items-center justify-between">
-                            <div>
-                                <span class="font-bold text-slate-900 block">Operatorlar (Pari, Sevar, Fayoza)</span>
-                                <span class="text-[11px] text-slate-500">Tushlik va kechki ovqat</span>
-                            </div>
-                            <span class="font-bold text-rose-600">-155 000 so'm</span>
-                        </div>
-                    </div>
-                `;
-            } else if (type === 'rahbar') {
-                title.textContent = "👑 Rahbar (Jafar) - Shaxsiy Tarix";
-                content.innerHTML = `
-                    <div class="space-y-2">
-                        <div class="p-3 bg-indigo-50 border border-indigo-100 rounded-xl flex items-center justify-between">
-                            <div>
-                                <span class="font-bold text-indigo-950 block">Kassadan shaxsiy xarajat</span>
-                                <span class="text-[11px] text-indigo-700">22.10.2026 - Sarpul kassadan olindi</span>
-                            </div>
-                            <span class="font-black text-rose-600">-250 000 so'm</span>
-                        </div>
-                        <div class="p-3 bg-indigo-50 border border-indigo-100 rounded-xl flex items-center justify-between">
-                            <div>
-                                <span class="font-bold text-indigo-950 block">Oshxona: Dabl Lavash + Suv</span>
-                                <span class="text-[11px] text-indigo-700">21.10.2026 - Razdacha orqali yozilgan</span>
-                            </div>
-                            <span class="font-black text-amber-700">-65 000 so'm</span>
-                        </div>
-                    </div>
-                `;
-            } else if (type === 'saripul') {
-                title.textContent = "Saripul Filial Tahlili (1 256 zakaz)";
-                content.innerHTML = `
-                    <div class="p-3 bg-slate-50 rounded-xl space-y-1">
-                        <p class="font-bold text-slate-900">Jami tushum: 14 250 000 so'm</p>
-                        <p class="text-slate-500">Dastavka: 820 ta | Saboy: 436 ta</p>
-                    </div>
-                `;
-            } else if (type === 'vaynkamat') {
-                title.textContent = "Vaynkamat Filial Tahlili (2 536 zakaz)";
-                content.innerHTML = `
-                    <div class="p-3 bg-slate-50 rounded-xl space-y-1">
-                        <p class="font-bold text-slate-900">Jami tushum: 16 529 000 so'm</p>
-                        <p class="text-slate-500">Dastavka: 1 650 ta | Saboy: 886 ta</p>
-                    </div>
-                `;
-            }
-            modal.classList.remove('hidden');
-        }
-
-        // ================= FUNKSIYALAR: SAQLASH VA AMALLAR =================
         function saveStaffExpense() {
             const staff = document.getElementById('staffMealSelect').value;
-            const type = document.getElementById('staffItemType').value;
             const sum = document.getElementById('staffMealSum').value;
+            const branch = document.getElementById('staffMealBranch').value.toLowerCase();
             const desc = document.getElementById('staffMealDesc').value;
-            if (!sum) { alert("Iltimos, summani kiriting!"); return; }
-            alert(`✅ ${staff} hisobiga ${sum} so'm (${desc || type}) muvaffaqiyatli yozildi va oyligidan chegirildi!`);
+            if (!sum) { alert("Summani kiriting!"); return; }
+
+            database.expenses.push({
+                id: Date.now(),
+                date: selectedDate,
+                branch: branch,
+                category: 'ovqat',
+                target: staff,
+                amount: parseInt(sum),
+                desc: desc || "Oshxona mahsuloti"
+            });
+
+            alert(`✅ ${staff} hisobiga ${sum} so'm muvaffaqiyatli yozildi!`);
             document.getElementById('staffMealSum').value = '';
             document.getElementById('staffMealDesc').value = '';
+            updateUI();
         }
 
         function saveAtkazRecord() {
-            const branch = document.getElementById('atkazBranch').value;
+            const branch = document.getElementById('atkazBranch').value.toLowerCase();
             const sum = document.getElementById('atkazSum').value;
             const courier = document.getElementById('atkazCourier').value;
             const reason = document.getElementById('atkazReason').value;
+            const items = document.getElementById('atkazItems').value;
             if (!sum) { alert("Zarar summasini kiriting!"); return; }
-            alert(`🚫 Atkaz qabul qilindi: ${branch} filiali bo'yicha ${sum} so'm zarar (${courier}, Sabab: ${reason}) qayd etildi!`);
+
+            database.expenses.push({
+                id: Date.now(),
+                date: selectedDate,
+                branch: branch,
+                category: 'atkaz',
+                target: `Atkaz (${courier})`,
+                amount: parseInt(sum),
+                desc: `${items || 'Taom'} | Sabab: ${reason}`
+            });
+
+            alert(`🚫 Atkaz zarari (${sum} so'm) saqlandi!`);
             document.getElementById('atkazSum').value = '';
             document.getElementById('atkazItems').value = '';
+            updateUI();
         }
 
-        function saveDailySales() {
-            alert("Kunlik savdo ko'rsatkichlari muvaffaqiyatli saqlandi!");
-        }
+        function saveDailySales() { alert("Kunlik savdo ko'rsatkichlari saqlandi!"); }
+        function saveRazdachiShift() { alert("Razdachi smenasi saqlandi!"); }
+        function saveRazdachiMeal() { alert("Razdachi ovqat chiqimi yozildi!"); }
+        function exportData() { alert("Ma'lumotlar nusxasi yuklab olindi (JSON)!"); }
+        function importData() { alert("Zaxira nusxani yuklash oynasi."); }
 
-        function saveRazdachiShift() {
-            alert("Razdachi smenasi va haqi hisoblandi!");
-        }
-
-        function saveRazdachiMeal() {
-            alert("Razdachi ovqat chiqimi yozildi!");
-        }
-
-        function editSaleRecord(date) {
-            prompt(`${date} sanasidagi savdo summasini o'zgartiring:`, "7045000");
-        }
-
-        function deleteSaleRecord(date) {
-            if (confirm(`${date} sanasidagi savdo yozuvini o'chirishni xohlaysizmi?`)) {
-                alert("Yozuv o'chirildi!");
-            }
-        }
-
-        function editGenericRecord(name) {
-            prompt(`${name} summasini tahrirlang:`);
-        }
-
-        function deleteGenericRecord(name) {
-            if (confirm(`${name} yozuvini o'chirmoqchimisiz?`)) {
-                alert("O'chirildi!");
-            }
-        }
-
-        function exportData() {
-            alert("Ma'lumotlar zaxira nusxasi yuklab olindi (JSON)!");
-        }
-
-        function importData() {
-            alert("Zaxira nusxani yuklash oynasi.");
-        }
-
-        // Boshlang'ichda xavfsizlik sozlamasini o'rnatish
+        // Boshlang'ich holatni sozlash
         updateSecurityView();
+        updateUI();
     </script>
 </body>
 </html>
